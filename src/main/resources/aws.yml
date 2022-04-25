@@ -2,7 +2,11 @@ cloud:
   aws:
     credentials:
       accessKey: 
+<<<<<<< HEAD
       secretKey:
+=======
+      secretKey: 
+>>>>>>> c4d69bf6439050dd3e039474a76bc7c353aabff1
       instanceProfile : true
     s3:
       bucket: mulmul
