@@ -1,8 +1,8 @@
 cloud:
   aws:
     credentials:
-      accessKey: AKIASP764BG4LP2VJ2XH
-      secretKey: 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
+      accessKey: 
+      secretKey: 
       instanceProfile : true
     s3:
       bucket: mulmul
