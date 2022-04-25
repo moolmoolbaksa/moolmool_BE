@@ -1,5 +1,7 @@
 package com.sparta.mulmul.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.mapping.Bag;
@@ -9,6 +11,8 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Item {
 
     @Id
@@ -39,7 +43,7 @@ public class Item {
     @Column(nullable = false)
     private String status;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String itemImg;
 
     @Column(nullable = false)
