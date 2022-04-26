@@ -1,8 +1,6 @@
 package com.sparta.mulmul.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.mulmul.model.User;
-import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.jwt.JwtTokenUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;

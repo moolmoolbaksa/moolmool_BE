@@ -27,20 +27,20 @@ public class RestLoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-        UsernamePasswordAuthenticationToken authRequest;
+        UsernamePasswordAuthenticationToken token;
 
         try{
             UserRequestDto requestDto = objectMapper.readValue(request.getReader().lines().collect(Collectors.joining()), UserRequestDto.class);
             String username = requestDto.getUsername();
             String password = requestDto.getPassword();
-            authRequest = new UsernamePasswordAuthenticationToken(username, password);
+            token = new UsernamePasswordAuthenticationToken(username, password);
         } catch (IOException e){
             e.printStackTrace();
             throw new AuthenticationServiceException("username, password Null or Fail to Json parsing");
         }
 
-        setDetails(request, authRequest);
-        return this.getAuthenticationManager().authenticate(authRequest);
+        setDetails(request, token);
+        return this.getAuthenticationManager().authenticate(token);
     }
 
 }
