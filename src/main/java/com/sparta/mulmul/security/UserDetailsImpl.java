@@ -1,6 +1,6 @@
-package com.sparta.mulmul.service;
+package com.sparta.mulmul.security;
 
-import com.sparta.mulmul.model.User;
+import com.sparta.mulmul.dto.UserRequestDto;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,27 +10,26 @@ import java.util.Collections;
 // 작동구조상, 안의 내용들만 잘 구현해 주면 DB 접촉 없이도 토큰만으로 유효한 자료를 설정해 줄 수 있을 것 같습니다.
 public class UserDetailsImpl implements UserDetails {
 
-    //////////////////////////////////// 받아온 객체를 바탕으로 뭔가 설정해서 비교하겠다는 뜻임. UserDetailsService에서 User를 가져와서 UserDetails를 만들어 주게 됩니다.
-    private final User user;
+    private Long userId;
+    private String nickname;
 
-    public UserDetailsImpl(User user) {
-        this.user = user;
+    public UserDetailsImpl(UserRequestDto requestDto){
+        this.userId = requestDto.getUserId();
+        this.nickname = requestDto.getNickname();
     }
 
-    public User getUser() {
-        return user;
+    public static UserDetailsImpl fromUserRequestDto(UserRequestDto requestDto){
+        return new UserDetailsImpl(requestDto);
     }
-    ////////////////////////////////////
 
-    @Override
-    public String getPassword() {
-        return user.getPassword();
-    }
+    public Long getUserId() { return userId; }
+    public String getNickname() { return nickname; }
 
     @Override
-    public String getUsername() {
-        return user.getUsername();
-    }
+    public String getUsername() { return null; }
+
+    @Override
+    public String getPassword() { return null; }
 
     @Override
     public boolean isAccountNonExpired() {

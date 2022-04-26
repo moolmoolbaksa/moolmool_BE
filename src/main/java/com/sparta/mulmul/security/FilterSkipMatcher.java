@@ -1,4 +1,4 @@
-package com.sparta.springcore.security;
+package com.sparta.mulmul.security;
 
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;

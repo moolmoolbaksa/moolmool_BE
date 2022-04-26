@@ -1,10 +1,9 @@
 package com.sparta.mulmul.security.provider;
 
 import com.sparta.mulmul.dto.UserRequestDto;
-import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,11 +12,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@RequiredArgsConstructor
-public class FormLoginAuthProvider implements AuthenticationProvider {
+public class RestLoginAuthProvider implements AuthenticationProvider {
+
+    @Autowired
+    private UserRepository userRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    public RestLoginAuthProvider(BCryptPasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {

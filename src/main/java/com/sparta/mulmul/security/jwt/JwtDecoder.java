@@ -1,4 +1,4 @@
-package com.sparta.mulmul.security;
+package com.sparta.mulmul.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.Optional;
 
-import static com.sparta.springcore.security.jwt.JwtTokenUtils.*;
+import static com.sparta.mulmul.security.jwt.JwtTokenUtils.*;
 
 @Component
 public class JwtDecoder {
@@ -19,7 +19,8 @@ public class JwtDecoder {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public String decodeUsername(String token) {
+    public String decodeTokenByNickname(String token) {
+
         DecodedJWT decodedJWT = isValidToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유효한 토큰이 아닙니다."));
 
@@ -32,12 +33,30 @@ public class JwtDecoder {
             throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
         }
 
-        String username = decodedJWT
-                .getClaim(CLAIM_USER_NAME)
+        return decodedJWT
+                .getClaim(CLAIM_NICK_NAME)
                 .asString();
-
-        return username;
     }
+
+    public Long decodeTokenByUserId(String token) {
+
+        DecodedJWT decodedJWT = isValidToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유효한 토큰이 아닙니다."));
+
+        Date expiredDate = decodedJWT
+                .getClaim(CLAIM_EXPIRED_DATE)
+                .asDate();
+
+        Date now = new Date();
+        if (expiredDate.before(now)) {
+            throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
+        }
+
+        return decodedJWT
+                .getClaim(CLAIM_USER_ID)
+                .asLong();
+    }
+
 
     private Optional<DecodedJWT> isValidToken(String token) {
         DecodedJWT jwt = null;

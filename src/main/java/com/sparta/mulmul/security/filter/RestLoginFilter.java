@@ -1,7 +1,6 @@
 package com.sparta.mulmul.security.filter;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.UserRequestDto;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,10 +15,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
-public class RestLoginFilterFilter extends UsernamePasswordAuthenticationFilter {
+public class RestLoginFilter extends UsernamePasswordAuthenticationFilter {
     final private ObjectMapper objectMapper;
 
-    public RestLoginFilterFilter(final AuthenticationManager authenticationManager) {
+    public RestLoginFilter(final AuthenticationManager authenticationManager) {
         super.setAuthenticationManager(authenticationManager);
         objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -43,4 +42,5 @@ public class RestLoginFilterFilter extends UsernamePasswordAuthenticationFilter 
         setDetails(request, authRequest);
         return this.getAuthenticationManager().authenticate(authRequest);
     }
+
 }

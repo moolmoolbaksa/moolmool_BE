@@ -1,4 +1,4 @@
-package com.sparta.mulmul.security;
+package com.sparta.mulmul.security.jwt;
 
 import org.springframework.stereotype.Component;
 
