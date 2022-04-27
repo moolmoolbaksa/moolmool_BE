@@ -62,10 +62,4 @@ public class ItemController {
     }
 
 
-
-    // 테스트용 보따리생성
-    @PostMapping("/bag")
-    public void createBag(@ResponseBody BagTestDto bagTestDto){
-        itemService.createBag(bagTestDto);
-    }
 }

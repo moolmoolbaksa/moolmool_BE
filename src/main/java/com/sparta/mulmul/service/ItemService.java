@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -148,26 +149,17 @@ public class ItemService {
     public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
         Long userId = userDetails.getUserId();
-        Scrab scrab = scrabRepository.findByUserIdAndItemId(userId, itemId);
-        if(){
-            Long scrabId = scrabRepository.findByUserIdAndItemId(userId, itemId).getId();
+        Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userId, itemId);
+        if(scrab.isPresent()){
+            Long scrabId = scrabRepository.findByUserIdAndItemId(userId, itemId).get().getId();
             scrabRepository.deleteById(scrabId);
         }else{
-            Scrab scrab = Scrab.builder()
-                    .q
+            Scrab newScrab = Scrab.builder()
+                    .userId(userId)
+                    .itemId(itemId)
+                    .build();
+            scrabRepository.save(newScrab);
         }
-    }
-
-
-
-
-    public void createBag(BagTestDto bagTestDto) {
-        // 테스트용 보따리 생성
-        Bag bag = Bag.builder()
-                .itemCnt(0)
-                .userId(bagTestDto.getUserId())
-                .build();
-        bagRepositroy.save(bag);
     }
 
 
