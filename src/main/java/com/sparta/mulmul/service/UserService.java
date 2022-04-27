@@ -2,11 +2,12 @@ package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.UserCheckResponseDto;
 import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
+import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.mapping.Bag;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class UserService {
         bagRepository.save(new Bag(userRepository.save(
                 User.withPassword(requestDto, EncodedPassword)
         )));
+
         // 이런 식으로 생성하시면 될 것 같아요. 받아온 user 정보에서 id값을 가져와서 bag에 넣으면 되겠네요.
         // 깃허브에 올릴게요
     }
