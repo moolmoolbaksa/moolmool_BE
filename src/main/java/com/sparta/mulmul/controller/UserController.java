@@ -48,7 +48,7 @@ public class UserController {
         return ResponseEntity.ok().body(OkDto.of("true"));
     }
 
-    @GetMapping("/user-check")
+    @GetMapping("/user/check")
     public UserCheckResponseDto userCheck(@AuthenticationPrincipal UserDetailsImpl userDetails){
         return userService.userCheck(userDetails);
     }
