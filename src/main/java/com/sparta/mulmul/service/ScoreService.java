@@ -23,13 +23,16 @@ public class ScoreService {
     // 성훈 - 평가 페이지 보여주기
     public OppentScoreResponseDto showOppentScore(Long barterId,   UserDetailsImpl userDetails) {
 
+        // 거래내역을 조회
         Barter mybarter = barterRepository.getById(barterId);
         Long userId = userDetails.getUserId();
 
+        // 만약 바이어Id와 로그인 유저가 동일하면, 상대방의 아이디를 셀러Id로 식별
         if (mybarter.getBuyerId() == userId){
             Long oppenetId = mybarter.getSellerId();
             User OppentUser = userRepository.getById(oppenetId);
 
+            // 상대방의 정보를 조회
             String profile = OppentUser.getProfile();
             String nickname = OppentUser.getNickname();
             float grade = OppentUser.getGrade();
@@ -38,9 +41,11 @@ public class ScoreService {
             return opentScore;
         }
 
+        // 만약 바이어Id와 로그인 유저Id가 다르다면, 상대방의 아이디를 바이어Id로 식별
         Long oppenetId = mybarter.getBuyerId();
         User OppentUser = userRepository.getById(oppenetId);
 
+        // 상대방의 정보를 조회
         String profile = OppentUser.getProfile();
         String nickname = OppentUser.getNickname();
         float grade = OppentUser.getGrade();
@@ -52,7 +57,7 @@ public class ScoreService {
     // 성훈 - 상대 평점주기
     public GradeScoreResponseDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails){
         GradeScoreResponseDto gradeScoreResponseDto = null;
-        // 상대 user
+        // 상대 userId
         Long oppentUserId = gradeScoreRequestDto.getUserId();
 //        String gradeScore = gradeScoreRequestDto.getScore();
         User oppentUser = userRepository.getById(oppentUserId);
