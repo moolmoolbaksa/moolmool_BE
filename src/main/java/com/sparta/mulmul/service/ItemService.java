@@ -11,6 +11,7 @@ import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.ScrabRepository;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -127,10 +128,11 @@ public class ItemService {
     }
 
     // 이승재 / 아이템 구독하기
-    public void scrabItem(Long itemId) {
+    public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
-
-        if(scrabRepository.findByUserIdAndItemId(userId, itemId).isPresent){
+        Long userId = userDetails.getUserId();
+        Scrab scrab = scrabRepository.findByUserIdAndItemId(userId, itemId);
+        if(){
             Long scrabId = scrabRepository.findByUserIdAndItemId(userId, itemId).getId();
             scrabRepository.deleteById(scrabId);
         }else{

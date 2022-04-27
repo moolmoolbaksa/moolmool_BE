@@ -5,9 +5,11 @@ import com.sparta.mulmul.dto.BagTestDto;
 import com.sparta.mulmul.dto.ItemDetailResponseDto;
 import com.sparta.mulmul.dto.ItemRequestDto;
 import com.sparta.mulmul.dto.ItemResponseDto;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.AwsS3Service;
 import com.sparta.mulmul.service.ItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,8 +55,8 @@ public class ItemController {
 
     // 이승재 / 아이템 구독하기
     @PostMapping("/api/{itemId}/scrabs")
-    private void scrabItem(@PathVariable Long itemId){
-        itemService.scrabItem(itemId);
+    private void scrabItem(@PathVariable Long itemId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        itemService.scrabItem(itemId, userDetails);
     }
 
 
