@@ -40,9 +40,9 @@ public class User {
     // 회원 정보 초기화 (초기설정을 어떻게 해줄 것인지, 점수 알고리즘이 나오면 다시 만들어 보도록 합니다.)
     public void initUserInfo(UserRequestDto requestDto){
         this.address = requestDto.getAddress();
-        this.profile = requestDto.getProfile();
+        if ( requestDto.getProfile() == null ) { this.profile = "setDefaultURL"; }
+        else { this.profile = requestDto.getProfile(); }
         this.storeInfo = requestDto.getStoreInfo();
-        this.raterCount = 0;
     }
 
     // 정적 팩토리 메소드

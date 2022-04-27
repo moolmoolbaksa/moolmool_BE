@@ -6,6 +6,7 @@ import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.mapping.Bag;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final BagRepository bagRepository;
 
     // 회원가입 처리
     public void signup(UserRequestDto requestDto){
@@ -26,12 +28,12 @@ public class UserService {
         checkBy("usernameAndNickname", requestDto);
         // 비밀번호 암호화
         String EncodedPassword = passwordEncoder.encode(requestDto.getPassword());
-
         // 회원가입 및 반환
-        userRepository.save(
+        bagRepository.save(new Bag(userRepository.save(
                 User.withPassword(requestDto, EncodedPassword)
-        );
-
+        )));
+        // 이런 식으로 생성하시면 될 것 같아요. 받아온 user 정보에서 id값을 가져와서 bag에 넣으면 되겠네요.
+        // 깃허브에 올릴게요
     }
 
     // 아이디 중복 체크
@@ -58,7 +60,7 @@ public class UserService {
             { throw new IllegalArgumentException("닉네임이 중복됩니다.");}
         }
         else { // 메소드 인자 입력 오류
-            throw new IllegalArgumentException("\"username\", \"nickname\", \"usernameAndNickname\"을 인자로 삼아 중복체크를 시행해 주세요.");
+            throw new IllegalArgumentException("\"username\", \"nickname\", \"usernameAndNickname\"을 인자로 중복체크를 시행해 주세요.");
         }
     }
 

@@ -2,8 +2,6 @@ package com.sparta.mulmul.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.OkDto;
-import com.sparta.mulmul.repository.UserRepository;
-import com.sparta.mulmul.utils.StatusResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -17,13 +15,13 @@ import java.io.OutputStream;
 
 public class RestFailureHandler implements AuthenticationFailureHandler {
 
-    @Resource(name="statusResponseUtil")
-    private StatusResponseUtil responseUtil;
-
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse httpServletResponse,
                                         AuthenticationException exception) throws IOException, ServletException {
-        httpServletResponse = responseUtil.setBadRequest(httpServletResponse);
+
+        httpServletResponse.setContentType("application/json");
+        httpServletResponse.setCharacterEncoding("utf-8");
+        httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
         OutputStream out = httpServletResponse.getOutputStream();
         ObjectMapper mapper = new ObjectMapper();
