@@ -8,9 +8,11 @@ import com.sparta.mulmul.dto.ItemResponseDto;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Scrab;
+import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.ScrabRepository;
+import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final BagRepository bagRepositroy;
     private final ScrabRepository scrabRepository;
+    private final UserRepository userRepository;
 
     // 이승재 / 보따리 아이템 등록하기
     public void createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
@@ -87,7 +90,7 @@ public class ItemService {
 
 
     // 이승재 / 아이템 상세페이지
-    public ItemDetailResponseDto getItemDetail(Long itemId) {
+    public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
@@ -104,12 +107,19 @@ public class ItemService {
         int viewCnt = item.getViewCnt();
         viewCnt += 1;
         item.update(viewCnt);
-//        boolean isSarb;
-//        if(userRepository.findById(userdetail.getId).isPresent){
-//            isSarb = true;
-//        }else{
-//            isSarb = false;
-//        }
+
+        // 이승재 / 아이템 구독 정보 유저 정보를 통해 확인
+        boolean isSarb;
+        if(scrabRepository.findByUserIdAndItemId(userDetails.getUserId(), itemId).isPresent()){
+            isSarb = true;
+        }else{
+            isSarb = false;
+        }
+
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
+
         List<String> itemImgList = new ArrayList<>();
         for(int i = 0; i<item.getItemImg().split(",").length; i++){
             itemImgList.add(item.getItemImg().split(",")[i]);
@@ -118,10 +128,9 @@ public class ItemService {
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 //userdetails.getuserId
                 (long)1,
-                "유저닉네임",
-                "유저 등급",
-                (float) 4.13,
-                "유저 이미지",
+                user.getNickname(),
+                user.getGrade(),
+                user.getProfile(),
                 item.getStatus(),
                 itemImgList,
                 bagImages,
@@ -130,7 +139,7 @@ public class ItemService {
                 item.getCreatedAt(),
                 item.getViewCnt(),
                 item.getScrabCnt(),
-                false
+                isSarb
         );
         return itemDetailResponseDto;
     }

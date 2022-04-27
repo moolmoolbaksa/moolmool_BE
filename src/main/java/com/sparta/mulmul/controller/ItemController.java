@@ -51,8 +51,8 @@ public class ItemController {
 
     //이승재 / 아이템 상세페이지
     @GetMapping("/api/items/{itemId}")
-    public ItemDetailResponseDto getItemDetail(@PathVariable Long itemId){
-        return itemService.getItemDetail(itemId);
+    public ItemDetailResponseDto getItemDetail(@PathVariable Long itemId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return itemService.getItemDetail(itemId, userDetails);
     }
 
     // 이승재 / 아이템 구독하기
