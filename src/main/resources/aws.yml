@@ -1,11 +1,11 @@
 cloud:
   aws:
     credentials:
-      accessKey: AKIAZJHGNPP24RCH5IOV
-      secretKey: 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
+      accessKey:
+      secretKey:
       instanceProfile : true
     s3:
-      bucket: gotgam
+      bucket: mulmul
     region:
       static: ap-northeast-2
     stack:
