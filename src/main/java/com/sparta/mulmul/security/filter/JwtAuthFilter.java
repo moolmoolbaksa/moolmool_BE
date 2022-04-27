@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtPreProcessingToken;
-import com.sparta.mulmul.utils.StatusResponseUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -14,23 +12,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import javax.annotation.Resource;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.NoSuchElementException;
 
 /**
  * Token 을 내려주는 Filter 가 아닌  client 에서 받아지는 Token 을 서버 사이드에서 검증하는 클레스 SecurityContextHolder 보관소에 해당
  * Token 값의 인증 상태를 보관 하고 필요할때 마다 인증 확인 후 권한 상태 확인 하는 기능
  */
 public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
-
-    @Resource(name="statusResponseUtil")
-    private StatusResponseUtil responseUtil;
 
     private final HeaderTokenExtractor extractor;
 
@@ -53,7 +46,9 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
         // 회원가입시에 작동됩니다.
         String tokenPayload = request.getHeader("Authorization");
         if (tokenPayload == null) {
-            response = responseUtil.setBadRequest(response);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             OutputStream out = response.getOutputStream();
             ObjectMapper mapper = new ObjectMapper();
             mapper.writerWithDefaultPrettyPrinter().writeValue(out, ResponseEntity.badRequest().body(OkDto.valueOf("false")).getBody());
