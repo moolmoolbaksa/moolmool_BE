@@ -4,6 +4,7 @@ import com.sparta.mulmul.dto.BarterItemResponseDto;
 import com.sparta.mulmul.dto.BarterResponseDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class BarterService {
+    private final BagRepository bagRepository;
     private final BarterRepository barterRepository;
     private final ItemRepository itemRepository;
 
@@ -25,7 +27,7 @@ public class BarterService {
 
         // USERID? 셀러이거나 바이어 일때는 어떻게 구분하지? -> BuyerIdOrSellerId
         // 유저의 거래내역 리스트를 전부 조회한다
-        List<Barter> mybarterList = barterRepository.findAllByBuyerIdOrSellerId(userId);
+        List<Barter> mybarterList = barterRepository.findAllByBuyerIdOrSellerId(userId, userId);
         // (거래 물품리스트들과 거래내역의 Id값)이 포함된 거래내역 리스트를 담을 Dto
         List<BarterResponseDto> barterResponseDtoList = new ArrayList<>();
         // 거래 물품리스트를 담을 Dto
@@ -38,35 +40,35 @@ public class BarterService {
             Long buyerId = barters.getBuyerId();
             Long sellerId = barters.getSellerId();
 
-            //barter 거래내역 id split하기
+            //barter 거래내역 id split하기 -> 파싱하여 거래항 물품의 Id값을 찾기
             String barter = barters.getBarter();
             String[] barterIds = barter.split(";");
             String[] buyerItemIdList = barterIds[0].split(",");
             String[] sellerItemIdList = barterIds[1].split(",");
 
-            //buyer와 seller의 각각의 거래물품을 조회한다.
-            List<Item> buyerItemList = itemRepository.findAllByUserIdAndItemId(buyerId, buyerItemIdList);
-            List<Item> sellertemList = itemRepository.findAllByUserIdAndItemId(sellerId, sellerItemIdList);
+            // 바이어(유저)의 물품을 찾아서 정보를 넣기
+            for(String buyerItemId : buyerItemIdList){
+               Long itemId = Long.parseLong(buyerItemId);
 
-            // 거래 물품리스트를 담을 Dto에 buyer의 거래물품 정보를 넣어준다
-            for (Item buyerItems : buyerItemList) {
-                Long itemId = buyerItems.getId();
-                String title = buyerItems.getTitle();
-                String itemImg = buyerItems.getItemImg();
+                Item buyerItem = itemRepository.getById(itemId);
+                String title = buyerItem.getTitle();
+                String itemImg = buyerItem.getItemImg();
                 String tradeAt = "거래일시";
-                String status = buyerItems.getStatus();
+                String status = buyerItem.getStatus();
 
                 BarterItemResponseDto BuyerItemList = new BarterItemResponseDto(itemId, title, itemImg, tradeAt, status);
                 barterResponseDtosList.add(BuyerItemList);
             }
 
-            // 거래 물품리스트를 담을 Dto에 seller의 거래물품 정보를 넣어준다.
-            for (Item sellerItems : sellertemList) {
-                Long itemId = sellerItems.getId();
-                String title = sellerItems.getTitle();
-                String itemImg = sellerItems.getItemImg();
+            //셀러(유저)의 물품을 찾아서 정보를 넣기
+            for(String sellerItemId : sellerItemIdList){
+                Long itemId = Long.parseLong(sellerItemId);
+
+                Item sellerItem = itemRepository.getById(itemId);
+                String title = sellerItem.getTitle();
+                String itemImg = sellerItem.getItemImg();
                 String tradeAt = "거래일시";
-                String status = sellerItems.getStatus();
+                String status = sellerItem.getStatus();
 
                 BarterItemResponseDto sellerItemList = new BarterItemResponseDto(itemId, title, itemImg, tradeAt, status);
                 barterResponseDtosList.add(sellerItemList);

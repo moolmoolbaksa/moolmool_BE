@@ -2,9 +2,11 @@ package com.sparta.mulmul.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.User;
-import com.sparta.mulmul.repository.ImageRepository;
+import com.sparta.mulmul.repository.BagRepository;
+//import com.sparta.mulmul.repository.ImageRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -27,8 +29,9 @@ public class UserService {
 
     private final AmazonS3 amazonS3;
 
-    private final ImageRepository imageRepository;
-    private final ItemRepository itemRepository;
+//    private final ImageRepository imageRepository;
+//    private final ItemRepository itemRepository;
+    private final BagRepository bagRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
@@ -98,8 +101,12 @@ public class UserService {
         Long userId = userDetails.getUserId();
         User user = userRepository.getById(userId);
 
-        // 한 유저의 모든 아이템을 보여줌
-        List<Item> myItemList = itemRepository.findAllByUserId(userId);
+        // 내 보따리Id를 조회
+        Bag myBag = bagRepository.findByUserId(userId);
+        Long myBagId = myBag.getId();
+
+        // 한 유저의 모든 아이템을 보여줌 (보따리Id로 찾기기)
+//       List<Item> myItemList = itemRepository.findAllByBagId(myBagId);
         List<ItemResponseDto> itemResponseDtosList = new ArrayList<>();
 
         String nickname = user.getNickname();
@@ -110,40 +117,40 @@ public class UserService {
         String address = user.getAddress();
         String storeInfo = user.getStoreInfo();
 
-        // 내 보유 아이템을 리스트 형식으로 담기
-        for (Item items : myItemList) {
-            Long itemId = items.getId();
-            String itemImg = items.getItemImg();
-            ItemResponseDto itemResponseDto = new ItemResponseDto(itemId, itemImg);
-            itemResponseDtosList.add(itemResponseDto);
-        }
+//        // 내 보유 아이템을 리스트 형식으로 담기
+//        for (Item items : myItemList) {
+//            Long itemId = items.getId();
+//            String itemImg = items.getItemImg();
+//            ItemResponseDto itemResponseDto = new ItemResponseDto(itemId, itemImg);
+//            itemResponseDtosList.add(itemResponseDto);
+//        }
 
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
         MyPageResponseDto myPageResponseDto = new MyPageResponseDto(nickname, profile, degree, grade, address, storeInfo, itemResponseDtosList);
         return myPageResponseDto;
     }
 
-    // 성훈_마이페이지_내 정보수정
-    // update로하면 수정이되나? 기억이 가물가물하다.
-    public UserEditResponseDto editMyPage(String nickname, String address, String storeInfo, List<String> imgUrl, UserDetailsImpl userDetails) {
-        UserEditResponseDto userEditResponseDto = null;
-        String profile = null;
-
-        // 회원의 정보
-        for (String imgUrls : imgUrl) {
-            profile = imgUrls;
-
-
-            // 유저 정보를 수정
-            Long userId = userDetails.getUserId();
-            User user = userRepository.getById(userId);
-            user.update(nickname, profile, address,storeInfo);
-
-            // 수정된 정보를 Response하기위해 정보를 넣어 줌
-            UserEditDtailResponseDto userEditDtailResponseDto = new UserEditDtailResponseDto(nickname, profile, address, storeInfo);
-            // 요청값 반환
-            userEditResponseDto = new UserEditResponseDto(true, userEditDtailResponseDto);
-        }
-        return userEditResponseDto;
-    }
+//    // 성훈_마이페이지_내 정보수정
+//    // update로하면 수정이되나? 기억이 가물가물하다.
+//    public UserEditResponseDto editMyPage(String nickname, String address, String storeInfo, List<String> imgUrl, UserDetailsImpl userDetails) {
+//        UserEditResponseDto userEditResponseDto = null;
+//        String profile = null;
+//
+//        // 회원의 정보
+//        for (String imgUrls : imgUrl) {
+//            profile = imgUrls;
+//
+//
+//            // 유저 정보를 수정
+//            Long userId = userDetails.getUserId();
+//            User user = userRepository.getById(userId);
+//            user.update(nickname, profile, address,storeInfo);
+//
+//            // 수정된 정보를 Response하기위해 정보를 넣어 줌
+//            UserEditDtailResponseDto userEditDtailResponseDto = new UserEditDtailResponseDto(nickname, profile, address, storeInfo);
+//            // 요청값 반환
+//            userEditResponseDto = new UserEditResponseDto(true, userEditDtailResponseDto);
+//        }
+//        return userEditResponseDto;
+//    }
 }

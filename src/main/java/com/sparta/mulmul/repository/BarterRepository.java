@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface BarterRepository extends JpaRepository<Barter, Long> {
 
-    List<Barter> findAllByBuyerIdOrSellerId(Long userId);
+    List<Barter> findAllByBuyerIdOrSellerId(Long userId, Long id);
 }
