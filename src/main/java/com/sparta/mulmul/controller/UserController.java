@@ -23,21 +23,21 @@ public class UserController {
     @PostMapping("/user/signup")
     public ResponseEntity<OkDto> signup(@RequestBody UserRequestDto requestDto){
         userService.signup(requestDto);
-        return ResponseEntity.ok().body(OkDto.of("true"));
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
     // 아이디 중복 체크
     @PostMapping("/user/id-check")
     public ResponseEntity<OkDto> idCheck(@RequestBody UserRequestDto requestDto){
         userService.checkBy("username", requestDto);
-        return ResponseEntity.ok().body(OkDto.of("true"));
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
     // 닉네임 중복 체크
     @PostMapping("/user/nickname-check")
     public ResponseEntity<OkDto> nickCheck(@RequestBody UserRequestDto requestDto){
         userService.checkBy("nickname", requestDto);
-        return ResponseEntity.ok().body(OkDto.of("true"));
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
     // 주소, 프로필 이미지 설정
@@ -45,7 +45,7 @@ public class UserController {
     public ResponseEntity<OkDto> setUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                               @RequestBody UserRequestDto requestDto) {
         userService.setUserInfo(userDetails, requestDto);
-        return ResponseEntity.ok().body(OkDto.of("true"));
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
     @GetMapping("/user/check")

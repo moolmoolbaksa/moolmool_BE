@@ -1,6 +1,9 @@
-package com.sparta.mulmul.security;
+package com.sparta.mulmul.config;
 
 import com.sparta.mulmul.repository.UserRepository;
+import com.sparta.mulmul.security.FilterSkipMatcher;
+import com.sparta.mulmul.security.RestFailureHandler;
+import com.sparta.mulmul.security.RestLoginSuccessHandler;
 import com.sparta.mulmul.security.filter.JwtAuthFilter;
 import com.sparta.mulmul.security.filter.RestLoginFilter;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
@@ -89,15 +92,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public RestLoginFilter restLoginFilter() throws Exception {
         RestLoginFilter restLoginFilter = new RestLoginFilter(authenticationManager());
         restLoginFilter.setFilterProcessesUrl("/user/login");
-        restLoginFilter.setAuthenticationSuccessHandler(formLoginSuccessHandler());
+        restLoginFilter.setAuthenticationFailureHandler(restFailureHandler());
+        restLoginFilter.setAuthenticationSuccessHandler(restLoginSuccessHandler());
         restLoginFilter.afterPropertiesSet();
         return restLoginFilter;
     }
 
     @Bean
-    public RestLoginSuccessHandler formLoginSuccessHandler() {
+    public RestLoginSuccessHandler restLoginSuccessHandler() {
         return new RestLoginSuccessHandler();
     }
+
+    @Bean
+    public RestFailureHandler restFailureHandler() { return new RestFailureHandler(); }
 
     @Bean
     public RestLoginAuthProvider restLoginAuthProvider() {

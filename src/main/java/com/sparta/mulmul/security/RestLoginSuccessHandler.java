@@ -2,9 +2,11 @@ package com.sparta.mulmul.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.security.jwt.JwtTokenUtils;
+import com.sparta.mulmul.utils.StatusResponseUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,10 +32,10 @@ public class RestLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         response.setCharacterEncoding("utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
 
-        // body에 응답값 담아주기::isFirst를 어떻게 세팅할지 생각해 봐야합니다.
         Map<String,Object> res = new HashMap<>();
         res.put("ok", true);
-        res.put("isFirst", false);
+        if ( userDetails.getProfile() == null ) { res.put("isFirst", true); }
+        else { res.put("isFirst", false); }
 
         OutputStream out = response.getOutputStream();
         ObjectMapper mapper = new ObjectMapper();

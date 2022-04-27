@@ -16,9 +16,10 @@ public class UserRequestDto {
     private String profile;
     private String storeInfo;
 
-    public UserRequestDto(Long userId, String nickname){
+    public UserRequestDto(Long userId, String nickname, String profile){
         this.userId = userId;
         this.nickname = nickname;
+        this.profile = profile;
     }
 
     public UserRequestDto(User user){
@@ -33,6 +34,9 @@ public class UserRequestDto {
 
     public static UserRequestDto fromUser(User user){
         return new UserRequestDto(user);
+    }
+    public static UserRequestDto createTokenValueOf(Long userId, String nickname, String profile){
+        return new UserRequestDto(userId, nickname, profile);
     }
 
 }

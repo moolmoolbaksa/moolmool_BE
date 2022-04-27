@@ -3,7 +3,6 @@ package com.sparta.mulmul.security.provider;
 import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,12 +11,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.annotation.Resource;
+
 public class RestLoginAuthProvider implements AuthenticationProvider {
 
-    // 리팩토링 필요합니다. @Autowired 대신 @Resouce 사용해 봅니다.
-    @Autowired
+    @Resource(name="userRepository")
     private UserRepository userRepository;
-
     private final BCryptPasswordEncoder passwordEncoder;
     public RestLoginAuthProvider(BCryptPasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
@@ -27,7 +26,7 @@ public class RestLoginAuthProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
-        // FormLoginFilter 에서 생성된 토큰으로부터 아이디와 비밀번호를 조회함
+        // RestLoginFilter 에서 생성된 토큰으로부터 아이디와 비밀번호를 조회함
         String username = token.getName();
         String password = (String) token.getCredentials();
 
