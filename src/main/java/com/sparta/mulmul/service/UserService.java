@@ -22,9 +22,8 @@ public class UserService {
     // 회원가입 처리
     public void signup(UserRequestDto requestDto){
 
-
         // 회원가입 유효성 검사 실시 (혹시 valid check를 시행할 하나의 공통 메소드를 만들 방법을 연구해 보도록 합니다.)
-
+        checkBy("usernameAndNickname", requestDto);
         // 비밀번호 암호화
         String EncodedPassword = passwordEncoder.encode(requestDto.getPassword());
 
@@ -38,25 +37,29 @@ public class UserService {
     // 아이디 중복 체크
     public void checkBy(String userInfo, UserRequestDto requestDto){
 
-        // username에 대한 중복 체크 시행
-        if (userInfo.equals("username"))
-        {
+        if (userInfo.equals("username")) { // username에 대한 중복 체크 시행
             if ( userRepository
                     .findByUsername(requestDto.getUsername())
                     .isPresent() )
             { throw new IllegalArgumentException("이메일이 중복됩니다.");}
-        }
-        // nickname에 대한 중복 체크 시행
-        else if (userInfo.equals("nickname"))
-        {
+        } else if (userInfo.equals("nickname")) { // nickname에 대한 중복 체크 시행
+            if ( userRepository
+                    .findByNickname(requestDto.getNickname())
+                    .isPresent() )
+            { throw new IllegalArgumentException("닉네임이 중복됩니다.");}
+        } else if (userInfo.equals("usernameAndNickname")) {
+            if ( userRepository
+                    .findByUsername(requestDto.getUsername())
+                    .isPresent() )
+            { throw new IllegalArgumentException("이메일이 중복됩니다.");}
             if ( userRepository
                     .findByNickname(requestDto.getNickname())
                     .isPresent() )
             { throw new IllegalArgumentException("닉네임이 중복됩니다.");}
         }
-        // 메소드 인자 입력 오류
-        else
-        { throw new IllegalArgumentException("\"username\", \"nickname\"을 인자로 삼아 중복체크를 시행해 주세요."); }
+        else { // 메소드 인자 입력 오류
+            throw new IllegalArgumentException("\"username\", \"nickname\", \"usernameAndNickname\"을 인자로 삼아 중복체크를 시행해 주세요.");
+        }
     }
 
     // 회원 정보 초기화 시켜주기
@@ -67,7 +70,7 @@ public class UserService {
                 .getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User's not found error"));
 
-        user.initProfile(requestDto);
+        user.initUserInfo(requestDto);
     }
 
     // 로그인 체크하기

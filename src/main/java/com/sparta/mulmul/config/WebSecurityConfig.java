@@ -1,6 +1,9 @@
-package com.sparta.mulmul.security;
+package com.sparta.mulmul.config;
 
 import com.sparta.mulmul.repository.UserRepository;
+import com.sparta.mulmul.security.FilterSkipMatcher;
+import com.sparta.mulmul.security.RestFailureHandler;
+import com.sparta.mulmul.security.RestLoginSuccessHandler;
 import com.sparta.mulmul.security.filter.JwtAuthFilter;
 import com.sparta.mulmul.security.filter.RestLoginFilter;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
@@ -17,6 +20,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +67,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable();
 
+        // cors 필터 등록
+        http
+                .cors()
+                .configurationSource(corsConfigurationSource());
+
+        // 세션 종료
         http
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -80,15 +92,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public RestLoginFilter restLoginFilter() throws Exception {
         RestLoginFilter restLoginFilter = new RestLoginFilter(authenticationManager());
         restLoginFilter.setFilterProcessesUrl("/user/login");
-        restLoginFilter.setAuthenticationSuccessHandler(formLoginSuccessHandler());
+        restLoginFilter.setAuthenticationFailureHandler(restFailureHandler());
+        restLoginFilter.setAuthenticationSuccessHandler(restLoginSuccessHandler());
         restLoginFilter.afterPropertiesSet();
         return restLoginFilter;
     }
 
     @Bean
-    public RestLoginSuccessHandler formLoginSuccessHandler() {
+    public RestLoginSuccessHandler restLoginSuccessHandler() {
         return new RestLoginSuccessHandler();
     }
+
+    @Bean
+    public RestFailureHandler restFailureHandler() { return new RestFailureHandler(); }
 
     @Bean
     public RestLoginAuthProvider restLoginAuthProvider() {
@@ -127,6 +143,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }
