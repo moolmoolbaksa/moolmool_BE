@@ -51,7 +51,6 @@ public class Item extends Timestamped{
     @Column(nullable = false)
     private String favored;
 
-
     @ManyToOne
     private Bag bag;
 

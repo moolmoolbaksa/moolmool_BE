@@ -98,7 +98,7 @@ public class ItemService {
 
 
         // 아이템에 해당하는 보따리에 담겨있는 모든 아이템 이미지 가져오기
-        List<Item> userItemList = itemRepository.findAllByBag(item.getBag().getId());
+        List<Item> userItemList = itemRepository.findAllByBagId(item.getBag().getId());
         List<String> bagImages = new ArrayList<>();
         for(Item item1 : userItemList){
             String repImg =item1.getItemImg().split(",")[0];
