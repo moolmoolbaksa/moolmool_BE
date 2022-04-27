@@ -15,13 +15,13 @@ public class ScoreController {
     final private ScoreService scoreService;
 
     // 성훈 - 상대 정보 보여주기
-    @GetMapping("/api/score/{barterid}")
+    @GetMapping("/api/score/{barterId}")
     public OppentScoreResponseDto showOppentScore(@PathVariable Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return scoreService.showOppentScore(barterId, userDetails);
     }
 
     // 성훈 - 평가주기
-    @PostMapping("/api/score")
+    @PutMapping("/api/score")
     public GradeScoreResponseDto showMyPageage (@RequestBody GradeScoreRequestDto gradeScoreRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return scoreService.gradeScore(gradeScoreRequestDto, userDetails);
     }

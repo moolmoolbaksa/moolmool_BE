@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sparta.mulmul.model.Image;
 import com.sparta.mulmul.repository.ImageRepository;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -71,38 +72,38 @@ public class AwsS3Service {
     }
 
 
-    // 성훈 - user 프로필 수정하기기
-//   public List<String> uploadFile(List<MultipartFile> multipartFile, UserDetailsImpl userDetails) {
-//        List<String> imageUrlList = new ArrayList<>();
-////        User user = userDetails.getUser;
-//
-//        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
-//        multipartFile.forEach(file -> {
-//            String fileName = createFileName(file.getOriginalFilename());
-//            ObjectMetadata objectMetadata = new ObjectMetadata();
-//            objectMetadata.setContentLength(file.getSize());
-//            objectMetadata.setContentType(file.getContentType());
-//
-//            // 기존 의미지 삭제
-////            String nowImageUrl = userRepository.findbyId(user.getId)
-////            if (nowFileName == fileName){
-////                amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
-////            }
-//
-//            try(InputStream inputStream = file.getInputStream()) {
-//                amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-//                        .withCannedAcl(CannedAccessControlList.PublicRead));
-//            } catch(IOException e) {
-//                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+//     성훈 - user 프로필 수정하기기
+   public List<String> uploadFile(List<MultipartFile> multipartFile, UserDetailsImpl userDetails) {
+        List<String> imageUrlList = new ArrayList<>();
+//        User user = userDetails.getUser;
+
+        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
+        multipartFile.forEach(file -> {
+            String fileName = createFileName(file.getOriginalFilename());
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentType(file.getContentType());
+
+            // 기존 의미지 삭제
+//            String nowImageUrl = userRepository.findbyId(user.getId)
+//            if (nowFileName == fileName){
+//                amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
 //            }
-//            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
-//            Image image = new Image(fileName, imgUrl);
-//            imageRepository.save(image);
-//            imageUrlList.add(imgUrl);
-//        });
-//
-//
-//        return imageUrlList;
-//    }
+
+            try(InputStream inputStream = file.getInputStream()) {
+                amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+            } catch(IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+            }
+            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
+            Image image = new Image(fileName, imgUrl);
+            imageRepository.save(image);
+            imageUrlList.add(imgUrl);
+        });
+
+
+        return imageUrlList;
+    }
 }
 
