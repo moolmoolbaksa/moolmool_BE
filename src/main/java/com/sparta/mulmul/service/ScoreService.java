@@ -51,7 +51,7 @@ public class ScoreService {
         String nickname = OppentUser.getNickname();
         float grade = OppentUser.getGrade();
 
-        return new OppentScoreResponseDto(userId, profile, nickname, grade);
+        return new OppentScoreResponseDto(oppenetId, profile, nickname, grade);
     }
 
     // 성훈 - 상대 평점주기
@@ -60,41 +60,68 @@ public class ScoreService {
         GradeScoreResponseDto gradeScoreResponseDto = null;
         // 상대 userId
         Long oppentUserId = gradeScoreRequestDto.getUserId();
-//        String gradeScore = gradeScoreRequestDto.getScore();
+        // A/B/C/D/F 평가주기
+        String gradeScore = gradeScoreRequestDto.getScore();
+        // 상대찾기
         User oppentUser = userRepository.getById(oppentUserId);
+        // 상대의 총점수
         float oppentUserTotalGrade = oppentUser.getTotalGrade();
-        float oppentIserGrad = oppentUser.getGrade();
+        // 상대 평가점수
+        float oppentGrade = oppentUser.getGrade();
+        // 상대 평가자 수
         int oppentRaterCnt = oppentUser.getRaterCount();
+        // 상대 등급
         String oppentDegree = oppentUser.getDegree();
-//        float score = 0;
 
-        // 협의 중
-//        if (gradeScore=="A"){
-//            score = 4;
-//            oppentUserTotalGrade = oppentUserTotalGrade + score;
-//        } else if (gradeScore=="B") {
-//            score = 3;
-//            oppentUserTotalGrade = oppentUserTotalGrade + score;
-//        } else if (gradeScore=="C") {
-//            score = 2;
-//            oppentUserTotalGrade = oppentUserTotalGrade + score;
-//        } else if (gradeScore=="D") {
-//            score = 1;
-//            oppentUserTotalGrade = oppentUserTotalGrade + score;
-//        } else if (gradeScore=="F") {
-//            score = 0;
-//            oppentUserTotalGrade = oppentUserTotalGrade + score;
-//        }
+        float gradeFloat = 0.0f;
 
-        // 유저평가 계산법 논의필요
-//        oppentIserGrad = oppentUserTotalGrade /5;
+        System.out.println("체점" + gradeScore);
+         //협의 중
+        if (gradeScore.equals("A")){
+            gradeFloat = 5.0f;
+            oppentUserTotalGrade = oppentUserTotalGrade + gradeFloat;
+
+        } else if (gradeScore.equals("B")) {
+            gradeFloat = 4.0f;
+            oppentUserTotalGrade = oppentUserTotalGrade + gradeFloat;
+
+        } else if (gradeScore.equals("C")) {
+            gradeFloat = 3.0f;
+            oppentUserTotalGrade = oppentUserTotalGrade + gradeFloat;
+
+        } else if (gradeScore.equals("D")) {
+            gradeFloat = 2.0f;
+            oppentUserTotalGrade = oppentUserTotalGrade + gradeFloat;
+
+        } else if (gradeScore.equals("F")) {
+            gradeFloat = 1.0f;
+            oppentUserTotalGrade = oppentUserTotalGrade + gradeFloat;
+
+        }
+        System.out.println("플럿값" + gradeFloat);
+
         // 평가자수 +1
         oppentRaterCnt = oppentRaterCnt + 1;
 
-        //임의로 넣어줌 -> 상의해야됨
-        oppentDegree = "물물박사";
+        //         유저평가 계산법 논의필요
+        oppentGrade = oppentUserTotalGrade / oppentRaterCnt;
 
-        oppentUser.updateScore(oppentUserTotalGrade, oppentIserGrad, oppentRaterCnt, oppentDegree);
+        //임의로 넣어줌 -> 상의해야됨
+        if (oppentUserTotalGrade >= 20.0f){
+            oppentDegree = "물물박사";
+        } else if(oppentUserTotalGrade >= 15.0f){
+            oppentDegree = "물물석사";
+        } else if(oppentUserTotalGrade >= 10.0f){
+            oppentDegree = "물물학사";
+        } else if (oppentUserTotalGrade >= 5.0f){
+            oppentDegree = "물물학생";
+        } else {
+            oppentDegree = "물물어린이";
+        }
+        System.out.println("총점수" + oppentGrade);
+        System.out.println("등급" + oppentDegree);
+
+        oppentUser.updateScore(oppentUserTotalGrade, oppentGrade, oppentRaterCnt, oppentDegree);
 
         gradeScoreResponseDto = new GradeScoreResponseDto(true);
         return gradeScoreResponseDto;
