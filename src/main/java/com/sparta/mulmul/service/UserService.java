@@ -3,6 +3,7 @@ package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.UserCheckResponseDto;
 import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.model.User;
+import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +30,7 @@ public class UserService {
         // 비밀번호 암호화
         String EncodedPassword = passwordEncoder.encode(requestDto.getPassword());
         // 회원가입 및 반환
-        bagRepository.save(new Bag(userRepository.save(
-                User.withPassword(requestDto, EncodedPassword)
-        )));
+        bagRepository.save(new Bag(userRepository.save(User.withPassword(requestDto, EncodedPassword))));
         // 이런 식으로 생성하시면 될 것 같아요. 받아온 user 정보에서 id값을 가져와서 bag에 넣으면 되겠네요.
         // 깃허브에 올릴게요
     }
