@@ -17,7 +17,7 @@ public class Item {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "bag_id", nullable = false)
+    @JoinColumn(name = "bag_id", nullable = false)
     private Bag bag;
 
     @Column(nullable = false)

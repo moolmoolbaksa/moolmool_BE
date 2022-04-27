@@ -1,8 +1,6 @@
 package com.sparta.mulmul.controller;
 
-import com.sparta.mulmul.dto.OkDto;
-import com.sparta.mulmul.dto.UserCheckResponseDto;
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.AwsS3Service;
 import com.sparta.mulmul.service.UserService;
@@ -10,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,21 +24,21 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/user/signup")
-    public ResponseEntity<OkDto> signup(@RequestBody UserRequestDto requestDto){
+    public ResponseEntity<OkDto> signup(@RequestBody UserRequestDto requestDto) {
         userService.signup(requestDto);
         return ResponseEntity.ok().body(OkDto.of("true"));
     }
 
     // 아이디 중복 체크
     @PostMapping("/user/id-check")
-    public ResponseEntity<OkDto> idCheck(@RequestBody UserRequestDto requestDto){
+    public ResponseEntity<OkDto> idCheck(@RequestBody UserRequestDto requestDto) {
         userService.checkBy("username", requestDto);
         return ResponseEntity.ok().body(OkDto.of("true"));
     }
 
     // 닉네임 중복 체크
     @PostMapping("/user/nickname-check")
-    public ResponseEntity<OkDto> nickCheck(@RequestBody UserRequestDto requestDto){
+    public ResponseEntity<OkDto> nickCheck(@RequestBody UserRequestDto requestDto) {
         userService.checkBy("nickname", requestDto);
         return ResponseEntity.ok().body(OkDto.of("true"));
     }
@@ -47,30 +46,31 @@ public class UserController {
     // 주소, 프로필 이미지 설정
     @PostMapping("/user/info")
     public ResponseEntity<OkDto> setUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                              @RequestBody UserRequestDto requestDto) {
+                                             @RequestBody UserRequestDto requestDto) {
         userService.setUserInfo(userDetails, requestDto);
         return ResponseEntity.ok().body(OkDto.of("true"));
     }
 
     @GetMapping("/user/check")
-    public UserCheckResponseDto userCheck(@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public UserCheckResponseDto userCheck(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userService.userCheck(userDetails);
     }
 
     /*성훈 - 마이페이지 내 정보 보기*/
     @GetMapping("/api/mypage")
-    public MyPageResponseDto showMyPageage (@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userService.showMyPage(userDetails);
     }
 
     /*성훈 - 마이페이지 내 정보 수정*/
     @PutMapping("/api/mypage")
-    public UserEditResponseDto showMyPageage (@RequestParam("nickname") String nickname,
-                                              @RequestParam("profile") List<MultipartFile> multipartFile,
-                                              @RequestParam("address") String address,
-                                              @RequestParam("storeInfo") String storeInfo,
-                                              @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
+                                             @RequestParam("profile") List<MultipartFile> multipartFile,
+                                             @RequestParam("address") String address,
+                                             @RequestParam("storeInfo") String storeInfo,
+                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
         return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
 
+    }
 }

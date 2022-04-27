@@ -3,8 +3,10 @@ package com.sparta.mulmul.controller;
 import com.sparta.mulmul.dto.GradeScoreRequestDto;
 import com.sparta.mulmul.dto.GradeScoreResponseDto;
 import com.sparta.mulmul.dto.OppentScoreResponseDto;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.ScoreService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor

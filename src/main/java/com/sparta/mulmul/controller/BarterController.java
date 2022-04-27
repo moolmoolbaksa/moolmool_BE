@@ -1,8 +1,10 @@
 package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.BarterResponseDto;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.BarterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

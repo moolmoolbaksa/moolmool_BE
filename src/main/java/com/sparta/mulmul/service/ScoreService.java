@@ -7,6 +7,7 @@ import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.UserRepository;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,10 @@ public class ScoreService {
 
 
     // 성훈 - 평가 페이지 보여주기
-    public OppentScoreResponseDto showOppentScore(Long barterId,  UserDetailsImpl userDetails) {
+    public OppentScoreResponseDto showOppentScore(Long barterId,   UserDetailsImpl userDetails) {
 
         Barter mybarter = barterRepository.getById(barterId);
-        User user = userDetails.getUser;
-        Long userId = user.getId();
+        Long userId = userDetails.getUserId();
 
         if (mybarter.getBuyerId() == userId){
             Long oppenetId = mybarter.getSellerId();
@@ -34,7 +34,7 @@ public class ScoreService {
             String nickname = OppentUser.getNickname();
             float grade = OppentUser.getGrade();
 
-            OppentScoreResponseDto opentScore = new OppentScoreResponseDto(userId, profile, nickname, grade);
+            OppentScoreResponseDto opentScore = new OppentScoreResponseDto(oppenetId, profile, nickname, grade);
             return opentScore;
         }
 
@@ -54,13 +54,13 @@ public class ScoreService {
         GradeScoreResponseDto gradeScoreResponseDto = null;
         // 상대 user
         Long oppentUserId = gradeScoreRequestDto.getUserId();
-        String gradeScore = gradeScoreRequestDto.getScore();
+//        String gradeScore = gradeScoreRequestDto.getScore();
         User oppentUser = userRepository.getById(oppentUserId);
         float oppentUserTotalGrade = oppentUser.getTotalGrade();
         float oppentIserGrad = oppentUser.getGrade();
-        int oppentRaterCnt = oppentUser.getRaterCnt();
+        int oppentRaterCnt = oppentUser.getRaterCount();
         String oppentDegree = oppentUser.getDegree();
-        float score = 0;
+//        float score = 0;
 
         // 협의 중
 //        if (gradeScore=="A"){

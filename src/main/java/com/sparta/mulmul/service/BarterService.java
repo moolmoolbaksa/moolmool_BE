@@ -4,10 +4,9 @@ import com.sparta.mulmul.dto.BarterItemResponseDto;
 import com.sparta.mulmul.dto.BarterResponseDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
-import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
-import com.sparta.mulmul.repository.UserRepository;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +17,11 @@ import java.util.List;
 @Service
 public class BarterService {
     private final BarterRepository barterRepository;
-    private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
     // 성훈 - 거래내역서 보기
     public List<BarterResponseDto> showMyBarter(UserDetailsImpl userDetails) {
-        User user = userDetails.getUser;
-        Long userId = user.getId();
+        Long userId = userDetails.getUserId();
 
         // USERID? 셀러이거나 바이어 일때는 어떻게 구분하지? -> BuyerIdOrSellerId
         // 유저의 거래내역 리스트를 전부 조회한다

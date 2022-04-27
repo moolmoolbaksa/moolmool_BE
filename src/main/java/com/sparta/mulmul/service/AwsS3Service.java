@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sparta.mulmul.model.Image;
 import com.sparta.mulmul.repository.ImageRepository;
 import com.sparta.mulmul.repository.UserRepository;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
