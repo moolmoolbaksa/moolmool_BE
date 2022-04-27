@@ -18,6 +18,8 @@ public class ItemRequestDto {
     private List<String> imgUrl;
     private String type;
 
+
+    //이승재 / 보따리 아이템 등록하기용 Dto
     public ItemRequestDto(String category, List<String> favored, String title, String contents, List<String> imgUrl, String type) {
         this.category = category;
         this.favored = favored;

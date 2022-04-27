@@ -1,7 +1,7 @@
 cloud:
   aws:
     credentials:
-      accessKey:
+      accessKey: 
       secretKey:
       instanceProfile : true
     s3:

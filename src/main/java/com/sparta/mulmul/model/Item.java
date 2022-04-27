@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.mapping.Bag;
 
 import javax.persistence.*;
 
@@ -13,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Item {
+public class Item extends Timestamped{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +42,7 @@ public class Item {
     @Column(nullable = false)
     private String status;
 
-    @Column(nullable = false, length = 1000)
+    @Column(length = 1000)
     private String itemImg;
 
     @Column(nullable = false)
@@ -52,7 +51,13 @@ public class Item {
     @Column(nullable = false)
     private String favored;
 
-//    @ManyToOne
-//    private Bag bag;
 
+    @ManyToOne
+    private Bag bag;
+
+
+    // 이승재 / 아이템 상세 페이지 접속할 때마다 조회수 올리기
+    public void update(int viewCnt){
+        this.viewCnt = viewCnt;
+    }
 }
