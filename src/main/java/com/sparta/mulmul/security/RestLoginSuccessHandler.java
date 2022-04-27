@@ -30,10 +30,10 @@ public class RestLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         response.setCharacterEncoding("utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
 
-        // body에 응답값 담아주기::isFirst를 어떻게 세팅할지 생각해 봐야합니다.
         Map<String,Object> res = new HashMap<>();
         res.put("ok", true);
-        res.put("isFirst", false);
+        if ( userDetails.getProfile() == null ) { res.put("isFirst", true); }
+        else { res.put("isFirst", false); }
 
         OutputStream out = response.getOutputStream();
         ObjectMapper mapper = new ObjectMapper();

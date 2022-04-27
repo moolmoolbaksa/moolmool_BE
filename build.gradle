@@ -16,6 +16,8 @@ configurations {
 
 repositories {
     mavenCentral()
+    // 이미지 업로드
+//    maven { url 'https://repo.spring.io/libs-milestone' }
 }
 
 dependencies {
@@ -27,6 +29,7 @@ dependencies {
     runtimeOnly 'mysql:mysql-connector-java'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // 이미지 업로드
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     // JWT
@@ -35,6 +38,7 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
     compileOnly 'com.auth0:java-jwt:3.13.0'
+
 }
 
 tasks.named('test') {

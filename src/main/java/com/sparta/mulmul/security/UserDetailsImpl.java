@@ -12,10 +12,12 @@ public class UserDetailsImpl implements UserDetails {
 
     private final Long userId;
     private final String nickname;
+    private final String profile;
 
     public UserDetailsImpl(UserRequestDto requestDto){
         this.userId = requestDto.getUserId();
         this.nickname = requestDto.getNickname();
+        this.profile = requestDto.getProfile();
     }
 
     public static UserDetailsImpl fromUserRequestDto(UserRequestDto requestDto){
@@ -24,6 +26,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public Long getUserId() { return userId; }
     public String getNickname() { return nickname; }
+    public String getProfile() { return profile; }
 
     @Override
     public String getUsername() { return null; }

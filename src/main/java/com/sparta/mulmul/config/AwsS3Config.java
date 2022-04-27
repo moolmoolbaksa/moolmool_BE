@@ -27,5 +27,6 @@ public class AwsS3Config {
                 .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                 .build();
+
     }
 }

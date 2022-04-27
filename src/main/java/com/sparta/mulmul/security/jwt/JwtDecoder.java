@@ -19,7 +19,7 @@ public class JwtDecoder {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public String decodeTokenByNickname(String token) {
+    public String decodeTokenBy(String from, String token) {
 
         DecodedJWT decodedJWT = isValidToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유효한 토큰이 아닙니다."));
@@ -33,8 +33,12 @@ public class JwtDecoder {
             throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
         }
 
+        String claim;
+        if ( from.equals("nickname")) { claim = CLAIM_NICK_NAME; }
+        else if ( from.equals("profile") ) { claim = CLAIM_PROFILE; }
+        else{ throw new IllegalArgumentException("올바른 인자를 입력해 주세요. \"nickname\" or \"profile\""); }
         return decodedJWT
-                .getClaim(CLAIM_NICK_NAME)
+                .getClaim(claim)
                 .asString();
     }
 
