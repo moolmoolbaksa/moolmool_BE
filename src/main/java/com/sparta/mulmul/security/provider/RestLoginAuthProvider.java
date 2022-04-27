@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class RestLoginAuthProvider implements AuthenticationProvider {
 
+    // 리팩토링 필요합니다. @Autowired 대신 @Resouce 사용해 봅니다.
     @Autowired
     private UserRepository userRepository;
 
@@ -30,7 +31,7 @@ public class RestLoginAuthProvider implements AuthenticationProvider {
         String username = token.getName();
         String password = (String) token.getCredentials();
 
-        // UserDetailsService 를 통해 DB에서 username 으로 사용자 조회
+        // UserRepository 를 통해 DB에서 username 으로 사용자 조회
         UserRequestDto requestDto = UserRequestDto
                 .fromUser(userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("회원이 존재하지 않습니다.")));
