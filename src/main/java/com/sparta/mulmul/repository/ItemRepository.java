@@ -7,5 +7,8 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllByCategory(String category);
-    List<Item> findAllByBag(Long bagId);
+    List<Item> findAllByBagId(Long bagId);
+
+//    // 성훈
+//    List<Item> findAllByUserId(Long userId);
 }

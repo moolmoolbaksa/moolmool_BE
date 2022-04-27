@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ItemResponseDto {
     private Long itemId;
-    private String  title;
+    private String title;
     private String contents;
     private String image;
     private String address;
@@ -22,15 +22,15 @@ public class ItemResponseDto {
 
 
     // 이승재 / 전체 아이템 조회(카테고리별)
-    public ItemResponseDto (Long itemId,
-                            String title,
-                            String contents,
-                            String image,
-                            String address,
-                            int scrabCnt,
-                            int viewCnt,
-                            String status,
-                            boolean isScrab){
+    public ItemResponseDto(Long itemId,
+                           String title,
+                           String contents,
+                           String image,
+                           String address,
+                           int scrabCnt,
+                           int viewCnt,
+                           String status,
+                           boolean isScrab) {
         this.itemId = itemId;
         this.title = title;
         this.contents = contents;
