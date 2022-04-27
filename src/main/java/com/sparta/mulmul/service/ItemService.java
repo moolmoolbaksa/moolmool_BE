@@ -27,7 +27,7 @@ public class ItemService {
     private final ScrabRepository scrabRepository;
 
     // 이승재 / 보따리 아이템 등록하기
-    public void createItem(ItemRequestDto itemRequestDto){
+    public void createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
         List<String> imgUrlList = itemRequestDto.getImgUrl();
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
@@ -35,8 +35,8 @@ public class ItemService {
 
 
         // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
-//        Bag bag = bagRepositroy.findByUserId(user.getuserId);
-        // bag.update(bag.getItemCnt+1);
+        Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
+         bag.update(bag.getItemCnt()+1);
 
 
         Item item = Item.builder()
@@ -51,17 +51,24 @@ public class ItemService {
                 .itemImg(imgUrl)
                 .type(itemRequestDto.getType())
                 .favored(favored)
-//                .bag(bag)
+                .bag(bag)
                 .build();
 
         itemRepository.save(item);
 
     }
     //이승재 / 전체 아이템 조회(카테고리별)
-    public List<ItemResponseDto> getItems(String category) {
+    public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
        List<Item> itemList = itemRepository.findAllByCategory(category);
        List<ItemResponseDto> items = new ArrayList<>();
+       Long userId = userDetails.getUserId();
        for(Item item : itemList) {
+           boolean isScrab;
+           if(scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()){
+               isScrab  = true;
+           }else{
+               isScrab = false;
+           }
            ItemResponseDto itemResponseDto = new ItemResponseDto(
                    item.getId(),
                    item.getTitle(),
@@ -70,7 +77,8 @@ public class ItemService {
                    item.getAddress(),
                    item.getScrabCnt(),
                    item.getViewCnt(),
-                   item.getStatus());
+                   item.getStatus(),
+                   isScrab);
            items.add(itemResponseDto);
 
        }

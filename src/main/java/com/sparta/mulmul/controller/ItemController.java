@@ -31,21 +31,23 @@ public class ItemController {
             @RequestParam("title") String title,
             @RequestParam("contents") String contents,
             @RequestParam("images") List<MultipartFile> multipartFiles,
-            @RequestParam("type") String type
+            @RequestParam("type") String type,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
 
     ){
          List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
         ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
-        itemService.createItem(itemRequestDto);
+        itemService.createItem(itemRequestDto, userDetails);
         return "ok";
     }
 
+
     //이승재 / 아이템 전체조회(카테고리별)
     @GetMapping("/items")
-    public List<ItemResponseDto> getItems(@RequestParam String category){
-        System.out.println(category);
-        return itemService.getItems(category);
+    public List<ItemResponseDto> getItems(@RequestParam String category, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return itemService.getItems(category, userDetails);
     }
+
 
     //이승재 / 아이템 상세페이지
     @GetMapping("/api/items/{itemId}")

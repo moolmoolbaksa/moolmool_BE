@@ -18,6 +18,7 @@ public class ItemResponseDto {
     private int scrabCnt;
     private int viewCnt;
     private String status;
+    private boolean isScrab;
 
 
     // 이승재 / 전체 아이템 조회(카테고리별)
@@ -28,7 +29,8 @@ public class ItemResponseDto {
                             String address,
                             int scrabCnt,
                             int viewCnt,
-                            String status){
+                            String status,
+                            boolean isScrab){
         this.itemId = itemId;
         this.title = title;
         this.contents = contents;
@@ -37,6 +39,7 @@ public class ItemResponseDto {
         this.scrabCnt = scrabCnt;
         this.viewCnt = viewCnt;
         this.status = status;
+        this.isScrab = isScrab;
     }
 
 }
