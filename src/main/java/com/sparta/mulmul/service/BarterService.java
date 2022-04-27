@@ -17,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class BarterService {
-    private final BagRepository bagRepository;
     private final BarterRepository barterRepository;
     private final ItemRepository itemRepository;
 
@@ -52,7 +51,7 @@ public class BarterService {
 
                 Item buyerItem = itemRepository.getById(itemId);
                 String title = buyerItem.getTitle();
-                String itemImg = buyerItem.getItemImg();
+                String itemImg = "이미지"; //buyerItem.getItemImg();
                 String tradeAt = "거래일시";
                 String status = buyerItem.getStatus();
 
@@ -66,7 +65,7 @@ public class BarterService {
 
                 Item sellerItem = itemRepository.getById(itemId);
                 String title = sellerItem.getTitle();
-                String itemImg = sellerItem.getItemImg();
+                String itemImg = "이미지"; //sellerItem.getItemImg();
                 String tradeAt = "거래일시";
                 String status = sellerItem.getStatus();
 

@@ -11,6 +11,7 @@ public class BarterResponseDto {
     private Long barterId;
     private List<BarterItemResponseDto> myItem;
 
+    // 성훈 - 거래내역
     public  BarterResponseDto(Long barterId, List<BarterItemResponseDto> myItem) {
         this.barterId = barterId;
         this.myItem = myItem;

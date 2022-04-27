@@ -16,6 +16,7 @@ public class MyPageResponseDto {
     private String storeInfo;
     private List<ItemResponseDto> itemList;
 
+    // 성훈 - 마이페이지 전체 조회
     public MyPageResponseDto(String nickname, String profile, String degree, float grade, String address, String storeInfo, List<ItemResponseDto> itemList) {
         this.nickname = nickname;
         this.profile = profile;

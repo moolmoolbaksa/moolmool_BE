@@ -56,11 +56,11 @@ public class UserController {
         return userService.userCheck(userDetails);
     }
 
-    /*성훈 - 마이페이지 내 정보 보기*/
-    @GetMapping("/api/mypage")
-    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return userService.showMyPage(userDetails);
-    }
+//    /*성훈 - 마이페이지 내 정보 보기*/
+//    @GetMapping("/api/mypage")
+//    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return userService.showMyPage(userDetails);
+//    }
 
 //    /*성훈 - 마이페이지 내 정보 수정*/
 //    @PutMapping("/api/mypage")

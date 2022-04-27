@@ -11,6 +11,7 @@ public class OppentScoreResponseDto {
     private String nickname;
     private float grade;
 
+    // 성훈 - 상대 평가 정보
     public OppentScoreResponseDto(Long userId, String profile, String nickname, float grade) {
         this.userId = userId;
         this.nickname = nickname;

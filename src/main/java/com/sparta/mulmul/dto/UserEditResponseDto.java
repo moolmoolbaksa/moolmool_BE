@@ -10,6 +10,7 @@ public class UserEditResponseDto {
 
     private UserEditDtailResponseDto result;
 
+    // 성훈 - 유저수정 반환값
     public UserEditResponseDto(Boolean ok, UserEditDtailResponseDto result) {
         this.ok = ok;
         this.result = result;

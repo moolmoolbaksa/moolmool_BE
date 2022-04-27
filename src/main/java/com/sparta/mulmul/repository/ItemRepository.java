@@ -9,6 +9,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllByCategory(String category);
     List<Item> findAllByBag(Long bagId);
 
-    // 성훈
-    List<Item> findAllByBagId(Long myBagId);
+//    // 성훈
+//    List<Item> findAllByUserId(Long userId);
 }

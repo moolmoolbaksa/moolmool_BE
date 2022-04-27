@@ -12,6 +12,7 @@ public class UserEditDtailResponseDto {
     private String address;
     private String storeInfo;
 
+    // 성훈 - 유저 정보 수정
     public UserEditDtailResponseDto (String nickname, String profile, String address, String storeInfo) {
         this.nickname = nickname;
         this.profile = profile;

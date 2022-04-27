@@ -1,10 +1,7 @@
 package com.sparta.mulmul.model;
 
 import lombok.AllArgsConstructor;
-<<<<<<< HEAD
-=======
 import lombok.Builder;
->>>>>>> f8b8d245ed152fb43edc844bc70a21a51c6d1516
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
