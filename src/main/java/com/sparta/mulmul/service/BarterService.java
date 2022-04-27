@@ -30,7 +30,8 @@ public class BarterService {
         // (거래 물품리스트들과 거래내역의 Id값)이 포함된 거래내역 리스트를 담을 Dto
         List<BarterResponseDto> barterResponseDtoList = new ArrayList<>();
         // 거래 물품리스트를 담을 Dto
-        List<BarterItemResponseDto> barterResponseDtosList = new ArrayList<>();
+        List<BarterItemResponseDto> barterResponseDtosList = null;
+        barterResponseDtosList = new ArrayList<>();
 
         // 내가 거래한 거래리스트를 대입한다.
         // barterId, buyerId, SellerId를 분리한다.
@@ -45,9 +46,10 @@ public class BarterService {
             String[] buyerItemIdList = barterIds[0].split(",");
             String[] sellerItemIdList = barterIds[1].split(",");
 
+
             // 바이어(유저)의 물품을 찾아서 정보를 넣기
-            for(String buyerItemId : buyerItemIdList){
-               Long itemId = Long.parseLong(buyerItemId);
+            for (String buyerItemId : buyerItemIdList) {
+                Long itemId = Long.parseLong(buyerItemId);
 
                 Item buyerItem = itemRepository.getById(itemId);
                 String title = buyerItem.getTitle();
@@ -60,7 +62,7 @@ public class BarterService {
             }
 
             //셀러(유저)의 물품을 찾아서 정보를 넣기
-            for(String sellerItemId : sellerItemIdList){
+            for (String sellerItemId : sellerItemIdList) {
                 Long itemId = Long.parseLong(sellerItemId);
 
                 Item sellerItem = itemRepository.getById(itemId);

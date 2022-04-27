@@ -75,7 +75,6 @@ public class ScoreService {
 
         float gradeFloat = 0.0f;
 
-        System.out.println("체점" + gradeScore);
          //협의 중
         if (gradeScore.equals("A")){
             gradeFloat = 5.0f;
@@ -98,7 +97,6 @@ public class ScoreService {
             oppentUserTotalGrade = oppentUserTotalGrade + gradeFloat;
 
         }
-        System.out.println("플럿값" + gradeFloat);
 
         // 평가자수 +1
         oppentRaterCnt = oppentRaterCnt + 1;
@@ -118,8 +116,6 @@ public class ScoreService {
         } else {
             oppentDegree = "물물어린이";
         }
-        System.out.println("총점수" + oppentGrade);
-        System.out.println("등급" + oppentDegree);
 
         oppentUser.updateScore(oppentUserTotalGrade, oppentGrade, oppentRaterCnt, oppentDegree);
 

@@ -101,7 +101,7 @@ public class UserService {
 
         // 한 유저의 모든 아이템을 보여줌
         List<Item> myItemList = itemRepository.findAllByBagId(myBagId);
-        List<ItemResponseDto> itemResponseDtosList = new ArrayList<>();
+        List<ItemUserResponseDto> myItemResponseDtosList = new ArrayList<>();
 
         String nickname = user.getNickname();
         String profile = "프로필.jpg";
@@ -115,11 +115,11 @@ public class UserService {
             Long itemId = items.getId();
             String itemImg = items.getItemImg();
             ItemUserResponseDto itemResponseDto = new ItemUserResponseDto(itemId, itemImg);
-            itemResponseDtosList.add(itemResponseDto);
+            myItemResponseDtosList.add(itemResponseDto);
         }
 
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
-        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(nickname, profile, degree, grade, address, storeInfo, itemResponseDtosList);
+        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(nickname, profile, degree, grade, address, storeInfo, myItemResponseDtosList);
         return myPageResponseDto;
     }
 
