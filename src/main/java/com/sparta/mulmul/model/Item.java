@@ -1,5 +1,6 @@
 package com.sparta.mulmul.model;
 
+import com.sparta.mulmul.dto.ItemRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,5 +59,15 @@ public class Item extends Timestamped{
     // 이승재 / 아이템 상세 페이지 접속할 때마다 조회수 올리기
     public void update(int viewCnt){
         this.viewCnt = viewCnt;
+    }
+
+    // 이승재 / 아이템 수정
+    public void itemUpdate(ItemRequestDto itemRequestDto, String imgUrl, String favored) {
+        this.title = itemRequestDto.getTitle();
+        this.contents = itemRequestDto.getContents();
+        this.category = itemRequestDto.getCategory();
+        this.favored = imgUrl;
+        this.itemImg = favored;
+        this.type = itemRequestDto.getType();
     }
 }

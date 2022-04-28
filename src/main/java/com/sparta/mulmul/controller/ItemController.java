@@ -40,7 +40,30 @@ public class ItemController {
     }
 
 
+    //이승재 / 아이템 수정 (미리 구현)
+    @PutMapping("/api/items/{itemId}")
+    public ResponseEntity<OkDto> updateItem(
+            @RequestParam("category") String category,
+            @RequestParam("favored") List<String> favored,
+            @RequestParam("title") String title,
+            @RequestParam("contents") String contents,
+            @RequestParam("images") List<MultipartFile> multipartFiles,
+            @RequestParam("type") String type,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long itemId
+    ){
+        List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
+        ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
+        itemService.updateItem(itemRequestDto, userDetails, itemId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
 
+    //이승재 / 아이템 삭제(미리 구현)
+    @DeleteMapping("/api/items/{itemId}")
+    public ResponseEntity<OkDto> deleteItem(@PathVariable Long itemId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        itemService.deleteItem(itemId, userDetails);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
 
 
     //이승재 / 아이템 전체조회(카테고리별)
