@@ -1,9 +1,10 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.BarterItemResponseDto;
+import com.sparta.mulmul.dto.MyBarterDto;
 import com.sparta.mulmul.dto.BarterResponseDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -31,9 +32,10 @@ public class BarterService {
         // (거래 물품리스트들과 거래내역의 Id값)이 포함된 거래내역 리스트를 담을 Dto
         List<BarterResponseDto> barterResponseDtoList = new ArrayList<>();
         // 거래 물품리스트를 담을 Dto
-        List<BarterItemResponseDto> barterResponseDtosList = null;
-        barterResponseDtosList = new ArrayList<>();
-
+        List<MyBarterDto> myBarterList = null;
+        myBarterList = new ArrayList<>();
+        List<MyBarterDto> barterList = null;
+        barterList = new ArrayList<>();
 
 
         // 내가 거래한 거래리스트를 대입한다.
@@ -59,13 +61,19 @@ public class BarterService {
                 Long itemId = Long.parseLong(buyerItemId);
                 System.out.println("바이어 아이템 아이디 " + itemId);
                 Item buyerItem = itemRepository.getById(itemId);
-                BarterItemResponseDto BuyerItemList = new BarterItemResponseDto(
+                MyBarterDto buyerItemList = new MyBarterDto(
                         itemId,
                         buyerItem.getTitle(),
                         buyerItem.getItemImg(),
                         buyerItem.getCreatedAt(),
                         buyerItem.getStatus());
-                barterResponseDtosList.add(BuyerItemList);
+                if (buyerItem.getBag().getUserId().equals(userId)){
+                    myBarterList.add(buyerItemList);
+                } else {
+                    barterList.add(buyerItemList);
+                }
+
+
             }
 
             //셀러(유저)의 물품을 찾아서 정보를 넣기
@@ -73,26 +81,30 @@ public class BarterService {
                 Long itemId = Long.parseLong(sellerItemId);
                 System.out.println("셀러 아이템 아이디 " + itemId);
                 Item sellerItem = itemRepository.getById(itemId);
-                BarterItemResponseDto sellerItemList = new BarterItemResponseDto(
+                MyBarterDto sellerItemList = new MyBarterDto(
                         itemId,
                         sellerItem.getTitle(),
                         sellerItem.getItemImg(),
                         sellerItem.getCreatedAt(),
                         sellerItem.getStatus());
-                barterResponseDtosList.add(sellerItemList);
+                if (sellerItem.getBag().getUserId().equals(userId)){
+                    myBarterList.add(sellerItemList);
+                } else {
+                    barterList.add(sellerItemList);
+                }
             }
 
-            for(BarterItemResponseDto barterItemResponseDto : barterResponseDtosList){
-                System.out.println("아이템 아이디 " + barterItemResponseDto.getItemId());
-            }
+//            for(MyBarterDto barterItemResponseDto : barterResponseDtosList){
+//                System.out.println("아이템 아이디 " + barterItemResponseDto.getItemId());
+//            }
 
             // 거래Id와 모든 거래 물품을 넣어준다
-            BarterResponseDto barderResponse = new BarterResponseDto(barterId, barterResponseDtosList);
-            barterResponseDtoList.add(barderResponse);
+            BarterResponseDto barterResponse = new BarterResponseDto(barterId, myBarterList, barterList);
+            barterResponseDtoList.add(barterResponse);
         }
-        for(BarterResponseDto barterResponseDto : barterResponseDtoList){
-            System.out.println("완성본 " + barterResponseDto.getMyItem().toString());
-        }
+//        for(BarterResponseDto barterResponseDto : barterResponseDtoList){
+//            System.out.println("완성본 " + barterResponseDto.getMyItem().toString());
+//        }
         return barterResponseDtoList;
     }
 }

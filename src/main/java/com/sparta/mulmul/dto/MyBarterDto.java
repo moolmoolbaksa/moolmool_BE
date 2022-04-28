@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class BarterItemResponseDto {
+public class MyBarterDto {
     private Long itemId;
     private String title;
     private String itemImg;
@@ -17,7 +17,7 @@ public class BarterItemResponseDto {
     private String status;
 
     //성훈 - 거래내역
-    public BarterItemResponseDto(Long itemId, String title, String itemImg, LocalDateTime date, String status) {
+    public MyBarterDto(Long itemId, String title, String itemImg, LocalDateTime date, String status) {
         this.itemId = itemId;
         this.title = title;
         this.itemImg = itemImg;

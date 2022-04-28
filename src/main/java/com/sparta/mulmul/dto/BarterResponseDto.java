@@ -9,17 +9,13 @@ import java.util.List;
 @Builder
 public class BarterResponseDto {
     private Long barterId;
-    private List<BarterItemResponseDto> myItem;
-//    private List<BarterItemResponseDto> baterItem;
+    private List<MyBarterDto> myItem;
+    private List<MyBarterDto> barterList;
 
-    // 성훈 - 거래내역
-    public  BarterResponseDto(Long barterId, List<BarterItemResponseDto> myItem) {
+
+    public  BarterResponseDto(Long barterId, List<MyBarterDto> myItem, List<MyBarterDto> barterList) {
         this.barterId = barterId;
         this.myItem = myItem;
+        this.barterList = barterList;
     }
-
-//    public  BarterResponseDto(Long barterId, List<BarterItemResponseDto> myItem) {
-//        this.barterId = barterId;
-//        this.myItem = myItem;
-//    }
 }
