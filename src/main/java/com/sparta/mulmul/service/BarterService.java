@@ -1,10 +1,9 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.MyBarterDto;
 import com.sparta.mulmul.dto.BarterResponseDto;
+import com.sparta.mulmul.dto.MyBarterDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
-import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -23,9 +22,6 @@ public class BarterService {
     // 성훈 - 거래내역서 보기
     public List<BarterResponseDto> showMyBarter(UserDetailsImpl userDetails) {
         Long userId = userDetails.getUserId();
-
-//        barterRepository.findAllBySellerId(userId);
-//        barterRepository.findAllByBuyerId(userId);
         // (거래 물품리스트들과 거래내역의 Id값)이 포함된 거래내역 리스트를 담을 Dto
         List<BarterResponseDto> barterResponseDtoList = new ArrayList<>();
 
@@ -37,8 +33,6 @@ public class BarterService {
         for (Barter barters : mybarterList) {
             Long barterId = barters.getId();
             System.out.println("바터아이디 " + barterId);
-            // 거래내역 1 -> 1,2;3, 4;5,6
-            // 거래내역2 -> 1,2;3, 4;5,6
 
             // 거래 물품리스트를 담을 Dto
             List<MyBarterDto> myBarterList = new ArrayList<>();
@@ -51,13 +45,9 @@ public class BarterService {
             String[] buyerItemIdList = barterIds[0].split(",");
             String[] sellerItemIdList = barterIds[1].split(",");
 
-            System.out.println("바이어 리스트 " + buyerItemIdList);
-            System.out.println("셀러 리스트 " + sellerItemIdList);
-
             // 바이어(유저)의 물품을 찾아서 정보를 넣기
             for (String buyerItemId : buyerItemIdList) {
                 Long itemId = Long.parseLong(buyerItemId);
-                System.out.println("바이어 아이템 아이디 " + itemId);
                 Item buyerItem = itemRepository.getById(itemId);
                 MyBarterDto buyerItemList = new MyBarterDto(
                         itemId,
@@ -75,16 +65,13 @@ public class BarterService {
             //셀러(유저)의 물품을 찾아서 정보를 넣기
             for (String sellerItemId : sellerItemIdList) {
                 Long itemId = Long.parseLong(sellerItemId);
-                System.out.println("셀러 아이템 아이디 " + itemId);
                 Item sellerItem = itemRepository.getById(itemId);
-
                 MyBarterDto sellerItemList = new MyBarterDto(
                         itemId,
                         sellerItem.getTitle(),
                         sellerItem.getItemImg(),
                         sellerItem.getCreatedAt(),
                         sellerItem.getStatus());
-
                 if (sellerItem.getBag().getUserId().equals(userId)) {
                     myBarterList.add(sellerItemList);
                 } else {
@@ -92,16 +79,14 @@ public class BarterService {
                 }
             }
 
-//            for(MyBarterDto barterItemResponseDto : barterResponseDtosList){
-//                System.out.println("아이템 아이디 " + barterItemResponseDto.getItemId());
-//            }
             // 거래Id와 모든 거래 물품을 넣어준다
-            BarterResponseDto barterResponse = new BarterResponseDto(barterId, myBarterList, barterList);
+            BarterResponseDto barterResponse = new BarterResponseDto(
+                    barterId,
+                    myBarterList,
+                    barterList);
             barterResponseDtoList.add(barterResponse);
         }
-//        for(BarterResponseDto barterResponseDto : barterResponseDtoList){
-//            System.out.println("완성본 " + barterResponseDto.getMyItem().toString());
-//        }
+
         return barterResponseDtoList;
     }
 }

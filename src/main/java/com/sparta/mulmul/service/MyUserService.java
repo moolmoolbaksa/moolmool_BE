@@ -58,17 +58,13 @@ public class MyUserService {
         }
 
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
-        MyPageResponseDto myPageResponseDto = new MyPageResponseDto(nickname, profile, degree, grade, address, storeInfo, myItemResponseDtosList);
-        return myPageResponseDto;
+        return new MyPageResponseDto(nickname, profile, degree, grade, address, storeInfo, myItemResponseDtosList);
     }
 
 
-    // s3에서 삭제가 안됨
     // 성훈_마이페이지_내 정보수정
-    // update로하면 수정이되나? 기억이 가물가물하다.
     @Transactional
     public UserEditResponseDto editMyPage(String nickname, String address, String storeInfo, List<String> imgUrl, UserDetailsImpl userDetails) {
-        UserEditResponseDto userEditResponseDto = null;
         String profile = null;
 
         // 회원의 정보
@@ -84,7 +80,6 @@ public class MyUserService {
         // 수정된 정보를 Response하기위해 정보를 넣어 줌
         UserEditDtailResponseDto userEditDtailResponseDto = new UserEditDtailResponseDto(nickname, profile, address, storeInfo);
         // 요청값 반환
-        userEditResponseDto = new UserEditResponseDto(true,userEditDtailResponseDto);
-        return userEditResponseDto;
+        return new UserEditResponseDto(true,userEditDtailResponseDto);
     }
 }
