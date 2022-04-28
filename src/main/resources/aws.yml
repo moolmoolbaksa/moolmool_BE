@@ -1,8 +1,8 @@
 cloud:
   aws:
     credentials:
-      accessKey: AKIAZJHGNPP23XQTOH4X
-      secretKey: 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
+      accessKey:
+      secretKey:
       instanceProfile : true
     s3:
       bucket: gotgam
