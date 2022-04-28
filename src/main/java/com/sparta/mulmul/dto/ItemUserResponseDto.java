@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ItemUserResponseDto extends ItemResponseDto {
+public class ItemUserResponseDto{
     private Long itemId;
     private String itemImg;
 

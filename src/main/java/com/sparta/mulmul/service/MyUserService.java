@@ -63,6 +63,7 @@ public class MyUserService {
     }
 
 
+    // s3에서 삭제가 안됨
     // 성훈_마이페이지_내 정보수정
     // update로하면 수정이되나? 기억이 가물가물하다.
     @Transactional

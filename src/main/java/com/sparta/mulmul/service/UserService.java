@@ -1,20 +1,19 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.dto.UserCheckResponseDto;
+import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.model.Bag;
-import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
+import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import com.sparta.mulmul.repository.ItemRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
 
 // 유저 서비스
 @Service

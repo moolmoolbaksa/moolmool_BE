@@ -90,16 +90,16 @@ public class AwsS3Service {
             // 이미지에 대한 url
             String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
 
-            // 기존 의미지 삭제
+            // 기존 ImageRepository에서 삭제
             Long userId = userDetails.getUserId();
-            System.out.println(userId);
             User user = userRepository.getById(userId);
+
             String userImgUrl = user.getProfile();
-            System.out.println(userImgUrl);
             if (userImgUrl != null){
                 Image nowImage = imageRepository.findByImgUrl(userImgUrl);
+                String nowFileName = nowImage.getFileName();
                 Long nowImgeId = nowImage.getId();
-                amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+                amazonS3.deleteObject(new DeleteObjectRequest(bucket, nowFileName));
                 imageRepository.deleteById(nowImgeId);
             }
 
