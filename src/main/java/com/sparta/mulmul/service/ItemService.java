@@ -63,7 +63,24 @@ public class ItemService {
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
-       List<Item> itemList = itemRepository.findAllByCategory(category);
+        if(category.isEmpty()){
+            List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
+            List<ItemResponseDto> items = new ArrayList<>();
+            for(Item item : itemList){
+                ItemResponseDto itemResponseDto = new ItemResponseDto(
+                        item.getId(),
+                        item.getTitle(),
+                        item.getContents(),
+                        item.getItemImg().split(",")[0],
+                        item.getAddress(),
+                        item.getScrabCnt(),
+                        item.getViewCnt(),
+                        item.getStatus());
+                items.add(itemResponseDto);
+                }
+            return items;
+            }
+       List<Item> itemList = itemRepository.findAllByCategoryAndOrderByCreatedAtDesc(category);
        List<ItemResponseDto> items = new ArrayList<>();
        Long userId = userDetails.getUserId();
        for(Item item : itemList) {

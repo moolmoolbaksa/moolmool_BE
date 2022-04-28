@@ -42,4 +42,23 @@ public class ItemResponseDto {
         this.isScrab = isScrab;
     }
 
+    public ItemResponseDto(Long itemId,
+                           String title,
+                           String contents,
+                           String image,
+                           String address,
+                           int scrabCnt,
+                           int viewCnt,
+                           String status) {
+        this.itemId = itemId;
+        this.title = title;
+        this.contents = contents;
+        this.image = image;
+        this.address = address;
+        this.scrabCnt = scrabCnt;
+        this.viewCnt = viewCnt;
+        this.status = status;
+
+    }
+
 }
