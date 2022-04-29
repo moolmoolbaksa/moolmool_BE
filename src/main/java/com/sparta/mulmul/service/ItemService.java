@@ -80,7 +80,7 @@ public class ItemService {
                 }
             return items;
             }
-       List<Item> itemList = itemRepository.findAllByCategoryAndOrderByCreatedAtDesc(category);
+       List<Item> itemList = itemRepository.findAllByCategory(category);
        List<ItemResponseDto> items = new ArrayList<>();
        Long userId = userDetails.getUserId();
        for(Item item : itemList) {

@@ -26,10 +26,12 @@ public class UserService {
 //
 //    private final AmazonS3 amazonS3;
 
+
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BagRepository bagRepository;
+
 
     // 회원가입 처리
     public void signup(UserRequestDto requestDto){
