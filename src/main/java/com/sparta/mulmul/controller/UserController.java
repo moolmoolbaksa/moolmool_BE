@@ -18,7 +18,11 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+<<<<<<< HEAD
     private final AwsS3Service awsS3Service;
+=======
+//    private final AwsS3Service awsS3Service;
+>>>>>>> 81bdec794485c192c88db30e73f8e1c5319bbe54
 
     // 아래에서 부터 주어지는 return 값은 논의 후 한 가지 방법으로 바뀔 수 있습니다.
 
@@ -56,6 +60,7 @@ public class UserController {
         return userService.userCheck(userDetails);
     }
 
+<<<<<<< HEAD
     /*성훈 - 마이페이지 내 정보 보기*/
     @GetMapping("/api/mypage")
     public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -73,4 +78,23 @@ public class UserController {
         return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
 
     }
+=======
+//    /*성훈 - 마이페이지 내 정보 보기*/
+//    @GetMapping("/api/mypage")
+//    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return userService.showMyPage(userDetails);
+//    }
+
+//    /*성훈 - 마이페이지 내 정보 수정*/
+//    @PutMapping("/api/mypage")
+//    public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
+//                                             @RequestParam("profile") List<MultipartFile> multipartFile,
+//                                             @RequestParam("address") String address,
+//                                             @RequestParam("storeInfo") String storeInfo,
+//                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
+//        return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
+//
+//    }
+>>>>>>> 81bdec794485c192c88db30e73f8e1c5319bbe54
 }
