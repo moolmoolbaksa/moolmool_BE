@@ -11,6 +11,7 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
+import java.util.List;
 
 // 성훈 - 평점 평가페이지 - 평점 보여주기
 @RequiredArgsConstructor
@@ -23,14 +24,26 @@ public class ScoreService {
 
     // 성훈 - 평가 페이지 보여주기
     public OppentScoreResponseDto showOppentScore(Long barterId, UserDetailsImpl userDetails) {
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
 
         // 거래내역을 조회
-        Barter mybarter = barterRepository.getById(barterId);
+        Barter myBarter = barterRepository.getById(barterId);
         Long userId = userDetails.getUserId();
 
+        List<Barter> checkBartList = barterRepository.findAllByBuyerIdOrSellerId(userId, userId);
+        for (Barter eachBarter : checkBartList){
+            Long checkBartId = eachBarter.getId();
+
+            // 사용자 거래내역이 아닐경우
+            if (!checkBartId.equals(barterId)) { throw new IllegalArgumentException("barter not found"); }
+        }
+
+
         // 만약 바이어Id와 로그인 유저가 동일하면, 상대방의 아이디를 셀러Id로 식별
-        if (mybarter.getBuyerId().equals(userId)) {
-            Long oppenetId = mybarter.getSellerId();
+        if (myBarter.getBuyerId().equals(userId)) {
+            Long oppenetId = myBarter.getSellerId();
             User OppentUser = userRepository.getById(oppenetId);
             // 상대방의 정보를 조회
             return new OppentScoreResponseDto(
@@ -41,7 +54,7 @@ public class ScoreService {
             );
         }
         // 만약 바이어Id와 로그인 유저Id가 다르다면, 상대방의 아이디를 바이어Id로 식별
-        Long oppenetId = mybarter.getBuyerId();
+        Long oppenetId = myBarter.getBuyerId();
         User OppentUser = userRepository.getById(oppenetId);
         // 상대방의 정보를 조회
         return new OppentScoreResponseDto(
@@ -55,9 +68,10 @@ public class ScoreService {
     // 성훈 - 상대 평점주기
 
     @Transactional
-
-
     public GradeScoreResponseDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
 
         // 상대 userId
         Long oppentUserId = gradeScoreRequestDto.getUserId();
