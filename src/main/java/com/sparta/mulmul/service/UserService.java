@@ -5,7 +5,6 @@ import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
-import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
     private final BagRepository bagRepository;
 
     // 회원가입 처리
