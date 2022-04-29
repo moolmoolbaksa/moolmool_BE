@@ -79,12 +79,17 @@ public class BarterService {
                 }
             }
 
+
             // 거래Id와 모든 거래 물품을 넣어준다
             BarterResponseDto barterResponse = new BarterResponseDto(
                     barterId,
                     myBarterList,
                     barterList);
             barterResponseDtoList.add(barterResponse);
+        }
+
+        for(BarterResponseDto barterResponseDto : barterResponseDtoList){
+            System.out.println("완성본 " + barterResponseDto.getMyItem().toString());
         }
 
         return barterResponseDtoList;

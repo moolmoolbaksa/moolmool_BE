@@ -18,4 +18,6 @@ public class MulmulApplication {
                 .run(args);
     }
 
+    static { System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true"); }
+
 }

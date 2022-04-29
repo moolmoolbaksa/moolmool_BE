@@ -1,7 +1,6 @@
 package com.sparta.mulmul.service;
 
 
-import com.sparta.mulmul.dto.BagTestDto;
 import com.sparta.mulmul.dto.ItemDetailResponseDto;
 import com.sparta.mulmul.dto.ItemRequestDto;
 import com.sparta.mulmul.dto.ItemResponseDto;
@@ -17,6 +16,7 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +63,23 @@ public class ItemService {
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
+        if(category.isEmpty()){
+            List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
+            List<ItemResponseDto> items = new ArrayList<>();
+            for(Item item : itemList){
+                ItemResponseDto itemResponseDto = new ItemResponseDto(
+                        item.getId(),
+                        item.getTitle(),
+                        item.getContents(),
+                        item.getItemImg().split(",")[0],
+                        item.getAddress(),
+                        item.getScrabCnt(),
+                        item.getViewCnt(),
+                        item.getStatus());
+                items.add(itemResponseDto);
+                }
+            return items;
+            }
        List<Item> itemList = itemRepository.findAllByCategory(category);
        List<ItemResponseDto> items = new ArrayList<>();
        Long userId = userDetails.getUserId();
@@ -162,6 +179,29 @@ public class ItemService {
         }
     }
 
+    // 이승재 / 아이템 수정 (미리 구현)
+    @Transactional
+    public void updateItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails, Long itemId) {
+        Item item = itemRepository.findById(itemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        List<String> imgUrlList = itemRequestDto.getImgUrl();
+        List<String> favoredList = itemRequestDto.getFavored();
+        String imgUrl = String.join(",", imgUrlList);
+        String favored = String.join(",", favoredList);
+        if(item.getBag().getUserId().equals(userDetails.getUserId())){
+            item.itemUpdate(itemRequestDto, imgUrl, favored);
+        }
+    }
 
 
+    // 이승재 / 아이템 삭제 (미리 구현)
+    public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
+        Item item = itemRepository.findById(itemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        if(item.getBag().getUserId().equals(userDetails.getUserId())){
+            itemRepository.deleteById(itemId);
+        }
+    }
 }

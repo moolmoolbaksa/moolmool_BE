@@ -23,10 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MyUserService {
 
-        @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
-
-    private final AmazonS3 amazonS3;
 
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;

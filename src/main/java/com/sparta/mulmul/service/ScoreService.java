@@ -10,7 +10,6 @@ import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 
 // 성훈 - 평점 평가페이지 - 평점 보여주기
@@ -54,8 +53,12 @@ public class ScoreService {
     }
 
     // 성훈 - 상대 평점주기
+
     @Transactional
+
+
     public GradeScoreResponseDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
+
         // 상대 userId
         Long oppentUserId = gradeScoreRequestDto.getUserId();
         // A/B/C/D/F 평가주기

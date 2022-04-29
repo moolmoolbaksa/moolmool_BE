@@ -1,6 +1,7 @@
 package com.sparta.mulmul.security;
 
 import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,16 +14,6 @@ public class UserDetailsImpl implements UserDetails {
     private final Long userId;
     private final String nickname;
     private final String profile;
-
-    public UserDetailsImpl(UserRequestDto requestDto){
-        this.userId = requestDto.getUserId();
-        this.nickname = requestDto.getNickname();
-        this.profile = requestDto.getProfile();
-    }
-
-    public static UserDetailsImpl fromUserRequestDto(UserRequestDto requestDto){
-        return new UserDetailsImpl(requestDto);
-    }
 
     public Long getUserId() { return userId; }
     public String getNickname() { return nickname; }
@@ -57,5 +48,35 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
+    }
+
+    public UserDetailsImpl(UserRequestDto requestDto){
+        this.userId = requestDto.getUserId();
+        this.nickname = requestDto.getNickname();
+        this.profile = requestDto.getProfile();
+    }
+
+    public UserDetailsImpl(User user){
+        this.userId = user.getId();
+        this.nickname = user.getNickname();
+        this.profile = user.getProfile();
+    }
+
+    public UserDetailsImpl(){
+        this.userId = null;
+        this.nickname = null;
+        this.profile = null;
+    }
+
+    public static UserDetailsImpl fromUserRequestDto(UserRequestDto requestDto){
+        return new UserDetailsImpl(requestDto);
+    }
+
+    public static UserDetailsImpl fromUser(User user){
+        return new UserDetailsImpl(user);
+    }
+
+    public static UserDetailsImpl createEmpty(){
+        return new UserDetailsImpl();
     }
 }
