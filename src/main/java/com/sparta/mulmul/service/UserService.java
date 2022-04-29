@@ -1,6 +1,7 @@
 package com.sparta.mulmul.service;
 
 
+
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Item;
@@ -9,15 +10,19 @@ import com.sparta.mulmul.dto.UserCheckResponseDto;
 import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.model.Bag;
 
+import com.sparta.mulmul.dto.UserCheckResponseDto;
+import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
+import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import com.sparta.mulmul.repository.ItemRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +32,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
 
-//    @Value("${cloud.aws.s3.bucket}")
-//    private String bucket;
-//
-//    private final AmazonS3 amazonS3;
 
 
     private final PasswordEncoder passwordEncoder;
@@ -106,6 +107,7 @@ public class UserService {
     }
 
 
+
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
         Long userId = userDetails.getUserId();
@@ -114,7 +116,7 @@ public class UserService {
 
         // 한 유저의 모든 아이템을 보여줌
         List<Item> myItemList = itemRepository.findAllByBagId(myBagId);
-        List<ItemResponseDto> itemResponseDtosList = new ArrayList<>();
+        List<ItemUserResponseDto> itemResponseDtosList = new ArrayList<>();
 
         String nickname = user.getNickname();
         String profile = "프로필.jpg";
@@ -127,8 +129,8 @@ public class UserService {
         for (Item items : myItemList) {
             Long itemId = items.getId();
             String itemImg = items.getItemImg();
-            ItemUserResponseDto itemResponseDto = new ItemUserResponseDto(itemId, itemImg);
-            itemResponseDtosList.add(itemResponseDto);
+            ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg);
+            itemResponseDtosList.add(itemUserResponseDto);
         }
 
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
@@ -215,4 +217,5 @@ public class UserService {
 //    }
 
     }
+
 }

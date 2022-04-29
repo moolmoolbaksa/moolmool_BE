@@ -64,13 +64,10 @@ public class User {
         return new User(requestDto, password);
     }
 
-<<<<<<< HEAD
-=======
+
     public static User fromKakaoUserWithPassword(KakaoUserInfoDto kakaoUserInfo, String password){
         return new User(kakaoUserInfo, password);
     }
-
->>>>>>> 81bdec794485c192c88db30e73f8e1c5319bbe54
     public void update(String nickname, String profile, String address, String storInfo) {
         this.nickname = nickname;
         this.profile = profile;

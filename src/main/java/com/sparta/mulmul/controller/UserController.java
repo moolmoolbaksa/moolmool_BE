@@ -61,23 +61,24 @@ public class UserController {
     }
 
 
-    /*성훈 - 마이페이지 내 정보 보기*/
-    @GetMapping("/api/mypage")
-    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return userService.showMyPage(userDetails);
-    }
 
-    /*성훈 - 마이페이지 내 정보 수정*/
-    @PutMapping("/api/mypage")
-    public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
-                                             @RequestParam("profile") List<MultipartFile> multipartFile,
-                                             @RequestParam("address") String address,
-                                             @RequestParam("storeInfo") String storeInfo,
-                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
-        return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
-
-    }
+//    /*성훈 - 마이페이지 내 정보 보기*/
+//    @GetMapping("/api/mypage")
+//    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return userService.showMyPage(userDetails);
+//    }
+//
+//    /*성훈 - 마이페이지 내 정보 수정*/
+//    @PutMapping("/api/mypage")
+//    public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
+//                                             @RequestParam("profile") List<MultipartFile> multipartFile,
+//                                             @RequestParam("address") String address,
+//                                             @RequestParam("storeInfo") String storeInfo,
+//                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
+//        return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
+//
+//    }
 
 //    /*성훈 - 마이페이지 내 정보 보기*/
 //    @GetMapping("/api/mypage")

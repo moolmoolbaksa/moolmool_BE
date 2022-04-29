@@ -6,7 +6,9 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sparta.mulmul.model.Image;
+import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.ImageRepository;
+import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +32,7 @@ public class AwsS3Service {
 
     private final AmazonS3 amazonS3;
     private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
     public List<String> uploadFile(List<MultipartFile> multipartFiles) {
         List<String> imageUrlList = new ArrayList<>();
@@ -84,11 +87,21 @@ public class AwsS3Service {
             objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());
 
-            // 기존 의미지 삭제
-//            String nowImageUrl = userRepository.findbyId(user.getId)
-//            if (nowFileName == fileName){
-//                amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
-//            }
+            // 이미지에 대한 url
+            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
+
+            // 기존 ImageRepository에서 삭제
+            Long userId = userDetails.getUserId();
+            User user = userRepository.getById(userId);
+
+            String userImgUrl = user.getProfile();
+            if (userImgUrl != null){
+                Image nowImage = imageRepository.findByImgUrl(userImgUrl);
+                String nowFileName = nowImage.getFileName();
+                Long nowImgeId = nowImage.getId();
+                amazonS3.deleteObject(new DeleteObjectRequest(bucket, nowFileName));
+                imageRepository.deleteById(nowImgeId);
+            }
 
             try(InputStream inputStream = file.getInputStream()) {
                 amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
@@ -96,7 +109,7 @@ public class AwsS3Service {
             } catch(IOException e) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
             }
-            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
+
             Image image = new Image(fileName, imgUrl);
             imageRepository.save(image);
             imageUrlList.add(imgUrl);
