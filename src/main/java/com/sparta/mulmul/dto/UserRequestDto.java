@@ -35,7 +35,7 @@ public class UserRequestDto {
     public static UserRequestDto fromUser(User user){
         return new UserRequestDto(user);
     }
-    public static UserRequestDto createTokenValueOf(Long userId, String nickname, String profile){
+    public static UserRequestDto createTokenOf(Long userId, String nickname, String profile){
         return new UserRequestDto(userId, nickname, profile);
     }
 

@@ -29,4 +29,9 @@ public class Bag {
     public void update(int itemCnt){
         this.itemCnt = itemCnt;
     }
+
+    public Bag(User user){
+        this.userId = user.getId();
+        this.itemCnt = 0;
+    }
 }
