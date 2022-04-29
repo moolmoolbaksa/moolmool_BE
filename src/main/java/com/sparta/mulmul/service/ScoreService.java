@@ -1,7 +1,6 @@
 package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.GradeScoreRequestDto;
-import com.sparta.mulmul.dto.GradeScoreResponseDto;
 import com.sparta.mulmul.dto.OppentScoreResponseDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.User;
@@ -68,7 +67,7 @@ public class ScoreService {
     // 성훈 - 상대 평점주기
 
     @Transactional
-    public GradeScoreResponseDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
+    public void gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 ()-> new IllegalArgumentException("유저 정보가 없습니다.")
         );
@@ -138,7 +137,5 @@ public class ScoreService {
                 oppentRaterCnt,
                 oppentDegree
         );
-
-        return new GradeScoreResponseDto(true);
     }
 }

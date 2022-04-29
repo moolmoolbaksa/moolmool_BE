@@ -1,7 +1,6 @@
 package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.GradeScoreRequestDto;
-import com.sparta.mulmul.dto.GradeScoreResponseDto;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.OppentScoreResponseDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
