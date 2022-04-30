@@ -19,7 +19,6 @@ public class BarterController {
     @GetMapping("/api/myhistory")
     public List<BarterResponseDto> showMyBarter (@AuthenticationPrincipal UserDetailsImpl userDetails){
         return barterService.showMyBarter(userDetails);
-
     }
 
 }

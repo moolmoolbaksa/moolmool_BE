@@ -40,6 +40,5 @@ public class MyUserController {
                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
         return myUserService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
-
     }
 }
