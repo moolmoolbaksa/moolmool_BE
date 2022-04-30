@@ -8,15 +8,17 @@ import java.util.List;
 
 @Getter
 @Builder
-public class BarterResponseDto {
+public class CompleteBarterDto {
     private Long barterId;
+    private boolean isGraded;
     private LocalDateTime date;
     private List<MyBarterDto> myItem;
     private List<MyBarterDto> barterItem;
 
 
-    public  BarterResponseDto(Long barterId, LocalDateTime date, List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
+    public CompleteBarterDto(Long barterId, boolean isGraded, LocalDateTime date, List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
         this.barterId = barterId;
+        this.isGraded = isGraded;
         this.date = date;
         this.myItem = myItem;
         this.barterItem = barterItem;

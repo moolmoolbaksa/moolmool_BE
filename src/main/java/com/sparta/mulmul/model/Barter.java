@@ -31,5 +31,8 @@ public class Barter extends Timestamped{
     @Column(nullable = false)
     private String barter;
 
+    // 거래내역상태 0 : 거래중 / 1 : 거래완료 / 2 : 평가 완료
+    @Column(nullable = false)
+    private int status;
 
 }

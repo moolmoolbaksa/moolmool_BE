@@ -24,11 +24,11 @@ public class ScoreService {
     // 성훈 - 평가 페이지 보여주기
     public OppentScoreResponseDto showOppentScore(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+                ()-> new IllegalArgumentException("user not found")
         );
 
         // 거래내역을 조회
-        Barter myBarter = barterRepository.getById(barterId);
+        Barter myBarter = barterRepository.findById(barterId).orElseThrow(()-> new IllegalArgumentException("barter not found"));;
         Long userId = userDetails.getUserId();
 
         List<Barter> checkBartList = barterRepository.findAllByBuyerIdOrSellerId(userId, userId);
@@ -43,7 +43,7 @@ public class ScoreService {
         // 만약 바이어Id와 로그인 유저가 동일하면, 상대방의 아이디를 셀러Id로 식별
         if (myBarter.getBuyerId().equals(userId)) {
             Long oppenetId = myBarter.getSellerId();
-            User OppentUser = userRepository.getById(oppenetId);
+            User OppentUser = userRepository.findById(oppenetId).orElseThrow(()-> new IllegalArgumentException("user not found"));;
             // 상대방의 정보를 조회
             return new OppentScoreResponseDto(
                     oppenetId,
@@ -54,7 +54,7 @@ public class ScoreService {
         }
         // 만약 바이어Id와 로그인 유저Id가 다르다면, 상대방의 아이디를 바이어Id로 식별
         Long oppenetId = myBarter.getBuyerId();
-        User OppentUser = userRepository.getById(oppenetId);
+        User OppentUser = userRepository.findById(oppenetId).orElseThrow(()-> new IllegalArgumentException("user not found"));;
         // 상대방의 정보를 조회
         return new OppentScoreResponseDto(
                 oppenetId,
@@ -69,7 +69,7 @@ public class ScoreService {
     @Transactional
     public void gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+                ()-> new IllegalArgumentException("user not found")
         );
 
         // 상대 userId
@@ -77,7 +77,7 @@ public class ScoreService {
         // A/B/C/D/F 평가주기
         String gradeScore = gradeScoreRequestDto.getScore();
         // 상대찾기
-        User oppentUser = userRepository.getById(oppentUserId);
+        User oppentUser = userRepository.findById(oppentUserId).orElseThrow(()-> new IllegalArgumentException("user not found"));
         // 상대 등급
         String oppentDegree;
         // 상대의 총점수

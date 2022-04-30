@@ -30,13 +30,11 @@ public class MyUserService {
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                () -> new IllegalArgumentException("유저 정보가 없습니다.")
+                () -> new IllegalArgumentException("user not found")
         );
         Long userId = userDetails.getUserId();
         Long myBagId = bagRepository.findByUserId(userId).getId();
 
-        // 모든 아이템조회
-        List<Item> allItem = itemRepository.findAll();
         // 한 유저의 모든 아이템을 보여줌
         List<Item> myItemList = itemRepository.findAllByBagId(myBagId);
         List<ItemUserResponseDto> myItemResponseList = new ArrayList<>();
@@ -56,7 +54,7 @@ public class MyUserService {
             Long scrapItemId = eachScrap.getItemId();
             // 찜한 아이템
            Item scrapItem = itemRepository.findById(scrapItemId).orElseThrow(
-                   () -> new IllegalArgumentException("not found scrapItem")
+                   () -> new IllegalArgumentException("scrapItem not found")
            );
 
             ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
@@ -84,7 +82,7 @@ public class MyUserService {
     @Transactional
     public UserEditResponseDto editMyPage(String nickname, String address, String storeInfo, List<String> imgUrl, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                () -> new IllegalArgumentException("유저 정보가 없습니다.")
+                () -> new IllegalArgumentException("user not found")
         );
         String profile = null;
         for (String imgUrls : imgUrl) {
