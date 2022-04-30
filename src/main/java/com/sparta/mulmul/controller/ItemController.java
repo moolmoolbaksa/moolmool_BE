@@ -87,4 +87,11 @@ public class ItemController {
     }
 
 
+    // 이승재 / 유저 스토어 목록 보기
+
+    @GetMapping("/api/{userId}/store")
+    private UserStoreResponseDto showStore(@PathVariable Long userId){
+        return itemService.showStore(userId);
+    }
+
 }

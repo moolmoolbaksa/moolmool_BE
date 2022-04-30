@@ -129,7 +129,8 @@ public class UserService {
         for (Item items : myItemList) {
             Long itemId = items.getId();
             String itemImg = items.getItemImg();
-            ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg);
+            String status = items.getStatus();
+            ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
             itemResponseDtosList.add(itemUserResponseDto);
         }
 

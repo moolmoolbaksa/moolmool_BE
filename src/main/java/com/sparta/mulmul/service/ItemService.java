@@ -1,9 +1,7 @@
 package com.sparta.mulmul.service;
 
 
-import com.sparta.mulmul.dto.ItemDetailResponseDto;
-import com.sparta.mulmul.dto.ItemRequestDto;
-import com.sparta.mulmul.dto.ItemResponseDto;
+import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Scrab;
@@ -203,5 +201,34 @@ public class ItemService {
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
             itemRepository.deleteById(itemId);
         }
+    }
+
+
+    // 이승재 / 유저 스토어 목록 보기
+    public UserStoreResponseDto showStore(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
+        String nickname = user.getNickname();
+        String profile = user.getProfile();
+        float grade = user.getGrade();
+        String degree = user.getDegree();
+        String address = user.getAddress();
+        String storeInfo = user.getStoreInfo();
+
+        Long userBadId = bagRepositroy.findByUserId(userId).getId();
+        List<Item> myItemList = itemRepository.findAllByBagId(userBadId);
+        List<ItemUserResponseDto> itemUserResponseDtos = new ArrayList<>();
+
+        for(Item item : myItemList){
+            Long itemId = item.getId();
+            String itemImg = item.getItemImg();
+            String status = item.getStatus();
+            ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
+            itemUserResponseDtos.add(itemUserResponseDto);
+        }
+
+        return new UserStoreResponseDto(nickname, profile, degree, grade, address, storeInfo, itemUserResponseDtos);
+
     }
 }
