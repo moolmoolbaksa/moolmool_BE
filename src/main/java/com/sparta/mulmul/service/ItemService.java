@@ -166,12 +166,17 @@ public class ItemService {
         Long userId = userDetails.getUserId();
         Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userId, itemId);
         if(scrab.isPresent()){
-            Long scrabId = scrabRepository.findByUserIdAndItemId(userId, itemId).get().getId();
-            scrabRepository.deleteById(scrabId);
+            Long scrabId = scrab.get().getId();
+            Scrab scrab1 = scrabRepository.findById(scrabId).orElseThrow(
+                    ()-> new IllegalArgumentException("구독 정보가 없습니다.")
+            );
+            scrab1.update(scrabId, false);
+//            scrabRepository.deleteById(scrabId);
         }else{
             Scrab newScrab = Scrab.builder()
                     .userId(userId)
                     .itemId(itemId)
+                    .scrab(true)
                     .build();
             scrabRepository.save(newScrab);
         }
