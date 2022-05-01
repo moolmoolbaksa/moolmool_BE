@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Barter extends Timestamped{
+public class Barter extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,5 +34,10 @@ public class Barter extends Timestamped{
     // 거래내역상태 0 : 거래중 / 1 : 거래완료 / 2 : 평가 완료
     @Column(nullable = false)
     private int status;
+
+
+    public void updatebarter(int status) {
+        this.status = status;
+    }
 
 }
