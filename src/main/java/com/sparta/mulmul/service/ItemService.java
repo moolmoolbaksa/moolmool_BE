@@ -67,6 +67,7 @@ public class ItemService {
             for(Item item : itemList){
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
                         item.getId(),
+                        item.getCategory(),
                         item.getTitle(),
                         item.getContents(),
                         item.getItemImg().split(",")[0],
@@ -90,6 +91,7 @@ public class ItemService {
            }
            ItemResponseDto itemResponseDto = new ItemResponseDto(
                    item.getId(),
+                   item.getCategory(),
                    item.getTitle(),
                    item.getContents(),
                    item.getItemImg().split(",")[0],

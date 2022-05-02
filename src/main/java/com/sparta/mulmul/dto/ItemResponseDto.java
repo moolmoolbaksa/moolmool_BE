@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ItemResponseDto {
     private Long itemId;
+    private String categroy;
     private String title;
     private String contents;
     private String image;
@@ -23,6 +24,7 @@ public class ItemResponseDto {
 
     // 이승재 / 전체 아이템 조회(카테고리별)
     public ItemResponseDto(Long itemId,
+                           String categroy,
                            String title,
                            String contents,
                            String image,
@@ -32,6 +34,7 @@ public class ItemResponseDto {
                            String status,
                            boolean isScrab) {
         this.itemId = itemId;
+        this.categroy = categroy;
         this.title = title;
         this.contents = contents;
         this.image = image;
@@ -42,7 +45,10 @@ public class ItemResponseDto {
         this.isScrab = isScrab;
     }
 
+
+    // 이승재 / 카테고리 값이 없을떄
     public ItemResponseDto(Long itemId,
+                           String categroy,
                            String title,
                            String contents,
                            String image,
@@ -51,6 +57,7 @@ public class ItemResponseDto {
                            int viewCnt,
                            String status) {
         this.itemId = itemId;
+        this.categroy = categroy;
         this.title = title;
         this.contents = contents;
         this.image = image;

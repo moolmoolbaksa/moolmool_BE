@@ -51,6 +51,7 @@ public class ItemController {
             @RequestParam("type") String type,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long itemId
+
     ){
         List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
         ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
