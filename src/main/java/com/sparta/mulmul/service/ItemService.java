@@ -3,10 +3,7 @@ package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.model.*;
-import com.sparta.mulmul.repository.BagRepository;
-import com.sparta.mulmul.repository.ItemRepository;
-import com.sparta.mulmul.repository.ScrabRepository;
-import com.sparta.mulmul.repository.UserRepository;
+import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +21,7 @@ public class ItemService {
     private final BagRepository bagRepositroy;
     private final ScrabRepository scrabRepository;
     private final UserRepository userRepository;
+    private final BarterRepository barterRepository;
 
     // 이승재 / 보따리 아이템 등록하기
     public void createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
@@ -279,11 +277,24 @@ public class ItemService {
            buyerItem.statusUpdate(1);
         }
 
+        //Long 형태인 아이디들을 String 형태로 변환
+        List<String> buyerItemIds = new ArrayList<>();
+        for(Long itemId : requestTradeDto.getBuyerItemIds()) {
+            buyerItemIds.add(itemId.toString());
+        }
+
+        //String barter 값 생성
+        String StringbuyerItemIds = String.join(",", buyerItemIds);
+        String[] barterList = new String[]{StringbuyerItemIds, requestTradeDto.getSellerItemId().toString()};
+        String StringBarter = String.join(";", barterList);
         // 거래 내역 생성
         Barter barter = Barter.builder()
                 .buyerId(userDetails.getUserId())
                 .sellerId(requestTradeDto.getSellerId())
-                .b
+                .barter(StringBarter)
+                .status(1)
+                .build();
+        barterRepository.save(barter);
         }
     }
-}
+
