@@ -1,13 +1,12 @@
 package com.sparta.mulmul.dto;
 
-import lombok.Builder;
+
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-@Builder
-public class MyPageResponseDto {
+public class UserStoreResponseDto {
     private String nickname;
     private String profile;
     private String degree;
@@ -16,8 +15,8 @@ public class MyPageResponseDto {
     private String storeInfo;
     private List<ItemUserResponseDto> itemList;
 
-    // 성훈 - 마이페이지 전체 조회
-    public MyPageResponseDto(String nickname, String profile, String degree, float grade, String address, String storeInfo, List<ItemUserResponseDto> itemList) {
+    // 이승재 / 유저 스토어 목록 보기
+    public UserStoreResponseDto(String nickname, String profile, String degree, float grade, String address, String storeInfo, List<ItemUserResponseDto> itemList){
         this.nickname = nickname;
         this.profile = profile;
         this.degree = degree;

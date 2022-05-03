@@ -1,10 +1,7 @@
 package com.sparta.mulmul.service;
 
 
-import com.sparta.mulmul.dto.BagTestDto;
-import com.sparta.mulmul.dto.ItemDetailResponseDto;
-import com.sparta.mulmul.dto.ItemRequestDto;
-import com.sparta.mulmul.dto.ItemResponseDto;
+import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Scrab;
@@ -17,6 +14,7 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +38,7 @@ public class ItemService {
 
         // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
-         bag.update(bag.getItemCnt()+1);
+        bag.update(bag.getItemCnt()+1);
 
 
         Item item = Item.builder()
@@ -63,30 +61,49 @@ public class ItemService {
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
-       List<Item> itemList = itemRepository.findAllByCategory(category);
-       List<ItemResponseDto> items = new ArrayList<>();
-       Long userId = userDetails.getUserId();
-       for(Item item : itemList) {
-           boolean isScrab;
-           if(scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()){
-               isScrab  = true;
-           }else{
-               isScrab = false;
-           }
-           ItemResponseDto itemResponseDto = new ItemResponseDto(
-                   item.getId(),
-                   item.getTitle(),
-                   item.getContents(),
-                   item.getItemImg().split(",")[0],
-                   item.getAddress(),
-                   item.getScrabCnt(),
-                   item.getViewCnt(),
-                   item.getStatus(),
-                   isScrab);
-           items.add(itemResponseDto);
+        if(category.isEmpty()){
+            List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
+            List<ItemResponseDto> items = new ArrayList<>();
+            for(Item item : itemList){
+                ItemResponseDto itemResponseDto = new ItemResponseDto(
+                        item.getId(),
+                        item.getCategory(),
+                        item.getTitle(),
+                        item.getContents(),
+                        item.getItemImg().split(",")[0],
+                        item.getAddress(),
+                        item.getScrabCnt(),
+                        item.getViewCnt(),
+                        item.getStatus());
+                items.add(itemResponseDto);
+            }
+            return items;
+        }
+        List<Item> itemList = itemRepository.findAllByCategory(category);
+        List<ItemResponseDto> items = new ArrayList<>();
+        Long userId = userDetails.getUserId();
+        for(Item item : itemList) {
+            boolean isScrab;
+            if(scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()){
+                isScrab  = true;
+            }else{
+                isScrab = false;
+            }
+            ItemResponseDto itemResponseDto = new ItemResponseDto(
+                    item.getId(),
+                    item.getCategory(),
+                    item.getTitle(),
+                    item.getContents(),
+                    item.getItemImg().split(",")[0],
+                    item.getAddress(),
+                    item.getScrabCnt(),
+                    item.getViewCnt(),
+                    item.getStatus(),
+                    isScrab);
+            items.add(itemResponseDto);
 
-       }
-       return items;
+        }
+        return items;
     }
 
 
@@ -151,17 +168,74 @@ public class ItemService {
         Long userId = userDetails.getUserId();
         Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userId, itemId);
         if(scrab.isPresent()){
-            Long scrabId = scrabRepository.findByUserIdAndItemId(userId, itemId).get().getId();
-            scrabRepository.deleteById(scrabId);
+            Long scrabId = scrab.get().getId();
+            Scrab scrab1 = scrabRepository.findById(scrabId).orElseThrow(
+                    ()-> new IllegalArgumentException("구독 정보가 없습니다.")
+            );
+            scrab1.update(scrabId, false);
+//            scrabRepository.deleteById(scrabId);
         }else{
             Scrab newScrab = Scrab.builder()
                     .userId(userId)
                     .itemId(itemId)
+                    .scrab(true)
                     .build();
             scrabRepository.save(newScrab);
         }
     }
 
+    // 이승재 / 아이템 수정 (미리 구현)
+    @Transactional
+    public void updateItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails, Long itemId) {
+        Item item = itemRepository.findById(itemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        List<String> imgUrlList = itemRequestDto.getImgUrl();
+        List<String> favoredList = itemRequestDto.getFavored();
+        String imgUrl = String.join(",", imgUrlList);
+        String favored = String.join(",", favoredList);
+        if(item.getBag().getUserId().equals(userDetails.getUserId())){
+            item.itemUpdate(itemRequestDto, imgUrl, favored);
+        }
+    }
 
 
+    // 이승재 / 아이템 삭제 (미리 구현)
+    public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
+        Item item = itemRepository.findById(itemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        if(item.getBag().getUserId().equals(userDetails.getUserId())){
+            itemRepository.deleteById(itemId);
+        }
+    }
+
+
+    // 이승재 / 유저 스토어 목록 보기
+    public UserStoreResponseDto showStore(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
+        String nickname = user.getNickname();
+        String profile = user.getProfile();
+        float grade = user.getGrade();
+        String degree = user.getDegree();
+        String address = user.getAddress();
+        String storeInfo = user.getStoreInfo();
+
+        Long userBadId = bagRepositroy.findByUserId(userId).getId();
+        List<Item> myItemList = itemRepository.findAllByBagId(userBadId);
+        List<ItemUserResponseDto> itemUserResponseDtos = new ArrayList<>();
+
+        for(Item item : myItemList){
+            Long itemId = item.getId();
+            String itemImg = item.getItemImg();
+            String status = item.getStatus();
+            ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
+            itemUserResponseDtos.add(itemUserResponseDto);
+        }
+
+        return new UserStoreResponseDto(nickname, profile, degree, grade, address, storeInfo, itemUserResponseDtos);
+
+    }
 }

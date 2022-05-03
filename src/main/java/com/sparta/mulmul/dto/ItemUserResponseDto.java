@@ -5,12 +5,14 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ItemUserResponseDto extends ItemResponseDto {
+public class ItemUserResponseDto{
     private Long itemId;
     private String itemImg;
+    private String status;
 
-    public ItemUserResponseDto(Long itemId, String itemImg) {
+    public ItemUserResponseDto(Long itemId, String itemImg, String status) {
         this.itemId = itemId;
         this.itemImg = itemImg;
+        this.status = status;
     }
 }

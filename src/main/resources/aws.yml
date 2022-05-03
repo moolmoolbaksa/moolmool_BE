@@ -1,8 +1,8 @@
 cloud:
   aws:
     credentials:
-      accessKey: AKIAZJHGNPP24RCH5IOV
-      secretKey: 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
+      accessKey: AKIAZJHGNPP23ULU6H73
+      secretKey: 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
       instanceProfile : true
     s3:
       bucket: gotgam
@@ -10,9 +10,9 @@ cloud:
       static: ap-northeast-2
     stack:
       auto: false
-#spring:
-#  servlet:
-#    multipart:
-#      max-file-size: 10MB
-#      max-request-size: 10MB
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 

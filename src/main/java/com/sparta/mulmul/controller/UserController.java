@@ -18,7 +18,11 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+
+    private final AwsS3Service awsS3Service;
+
 //    private final AwsS3Service awsS3Service;
+
 
     // 아래에서 부터 주어지는 return 값은 논의 후 한 가지 방법으로 바뀔 수 있습니다.
 
@@ -46,8 +50,12 @@ public class UserController {
     // 주소, 프로필 이미지 설정
     @PostMapping("/user/info")
     public ResponseEntity<OkDto> setUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                             @RequestBody UserRequestDto requestDto) {
-        userService.setUserInfo(userDetails, requestDto);
+                                             @RequestParam("address") String address,
+                                             @RequestParam("profile") List<MultipartFile> multipartFiles,
+                                             @RequestParam("storeInfo") String storeInfo) {
+
+        List<String> profile = awsS3Service.uploadFile(multipartFiles);
+        userService.setUserInfo(userDetails, new UserRequestDto(address, profile.get(0), storeInfo));
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
@@ -55,6 +63,26 @@ public class UserController {
     public UserCheckResponseDto userCheck(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userService.userCheck(userDetails);
     }
+
+
+
+//    /*성훈 - 마이페이지 내 정보 보기*/
+//    @GetMapping("/api/mypage")
+//    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        return userService.showMyPage(userDetails);
+//    }
+//
+//    /*성훈 - 마이페이지 내 정보 수정*/
+//    @PutMapping("/api/mypage")
+//    public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
+//                                             @RequestParam("profile") List<MultipartFile> multipartFile,
+//                                             @RequestParam("address") String address,
+//                                             @RequestParam("storeInfo") String storeInfo,
+//                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
+//        return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
+//
+//    }
 
 //    /*성훈 - 마이페이지 내 정보 보기*/
 //    @GetMapping("/api/mypage")
@@ -73,4 +101,5 @@ public class UserController {
 //        return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
 //
 //    }
+
 }

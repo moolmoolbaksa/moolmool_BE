@@ -1,6 +1,7 @@
 package com.sparta.mulmul.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,13 +9,15 @@ import javax.persistence.*;
 
 
 // 성훈 - 거래내역
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Entity
-public class Barter{
-    @GeneratedValue(strategy = GenerationType.AUTO)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Barter extends Timestamped{
+
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "barter_id", nullable = false)
     private Long id;
 
