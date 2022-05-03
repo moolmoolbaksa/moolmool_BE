@@ -18,7 +18,7 @@ public class ItemResponseDto {
     private String address;
     private int scrabCnt;
     private int viewCnt;
-    private String status;
+    private int status;
     private boolean isScrab;
 
 
@@ -31,7 +31,7 @@ public class ItemResponseDto {
                            String address,
                            int scrabCnt,
                            int viewCnt,
-                           String status,
+                           int status,
                            boolean isScrab) {
         this.itemId = itemId;
         this.categroy = categroy;
@@ -55,7 +55,7 @@ public class ItemResponseDto {
                            String address,
                            int scrabCnt,
                            int viewCnt,
-                           String status) {
+                           int status) {
         this.itemId = itemId;
         this.categroy = categroy;
         this.title = title;

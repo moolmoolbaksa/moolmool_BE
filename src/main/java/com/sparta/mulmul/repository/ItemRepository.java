@@ -11,6 +11,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     List<Item> findAllByOrderByCreatedAtDesc();
 
-//    // 성훈
-//    List<Item> findAllByUserId(Long userId);
+
 }

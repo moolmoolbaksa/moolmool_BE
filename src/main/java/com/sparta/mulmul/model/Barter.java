@@ -31,5 +31,8 @@ public class Barter extends Timestamped{
     @Column(nullable = false)
     private String barter;
 
+    @Column(nullable = false)
+    private int status;
+
 
 }

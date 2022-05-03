@@ -14,10 +14,10 @@ public class MyBarterDto {
     private String title;
     private String itemImg;
     private LocalDateTime date;
-    private String status;
+    private int status;
 
     //성훈 - 거래내역
-    public MyBarterDto(Long itemId, String title, String itemImg, LocalDateTime date, String status) {
+    public MyBarterDto(Long itemId, String title, String itemImg, LocalDateTime date, int status) {
         this.itemId = itemId;
         this.title = title;
         this.itemImg = itemImg;

@@ -49,7 +49,7 @@ public class MyUserService {
         for (Item items : myItemList) {
             Long itemId = items.getId();
             String itemImg = items.getItemImg();
-            String status = items.getStatus();
+            int status = items.getStatus();
             ItemUserResponseDto itemResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
             myItemResponseDtosList.add(itemResponseDto);
         }

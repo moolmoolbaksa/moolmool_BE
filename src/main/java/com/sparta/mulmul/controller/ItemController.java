@@ -1,6 +1,7 @@
 package com.sparta.mulmul.controller;
 
 
+import com.mysql.cj.x.protobuf.Mysqlx;
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.AwsS3Service;
@@ -8,6 +9,7 @@ import com.sparta.mulmul.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -93,6 +95,20 @@ public class ItemController {
     @GetMapping("/api/{userId}/store")
     private UserStoreResponseDto showStore(@PathVariable Long userId){
         return itemService.showStore(userId);
+    }
+
+
+    // 이승재 / 교환신청하기 전 정보
+    @GetMapping("/api/trade")
+    private TradeInfoDto showTradeInfo(@RequestParam Long itemId, @RequestParam Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return itemService.showTradeInfo(itemId, userId, userDetails);
+    }
+
+    // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
+    @PostMapping("/api/trade")
+    private ResponseEntity<OkDto> requestTrade(@RequestBody RequestTradeDto requestTradeDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        itemService.requestTrade(requestTradeDto, userDetails);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
 }

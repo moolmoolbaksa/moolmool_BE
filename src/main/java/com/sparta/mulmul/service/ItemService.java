@@ -2,10 +2,7 @@ package com.sparta.mulmul.service;
 
 
 import com.sparta.mulmul.dto.*;
-import com.sparta.mulmul.model.Bag;
-import com.sparta.mulmul.model.Item;
-import com.sparta.mulmul.model.Scrab;
-import com.sparta.mulmul.model.User;
+import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.ScrabRepository;
@@ -49,7 +46,7 @@ public class ItemService {
                 .scrabCnt(0)
                 .commentCnt(0) // 사용할지 안할지 확정안됨
                 .viewCnt(0)
-                .status("대기중")
+                .status(0)
                 .itemImg(imgUrl)
                 .type(itemRequestDto.getType())
                 .favored(favored)
@@ -230,12 +227,63 @@ public class ItemService {
         for(Item item : myItemList){
             Long itemId = item.getId();
             String itemImg = item.getItemImg();
-            String status = item.getStatus();
+            int status = item.getStatus();
             ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
             itemUserResponseDtos.add(itemUserResponseDto);
         }
 
         return new UserStoreResponseDto(nickname, profile, degree, grade, address, storeInfo, itemUserResponseDtos);
 
+    }
+
+    // 이승재 / 교환신청하기 전 정보
+    public TradeInfoDto showTradeInfo(Long itemid, Long userId,  UserDetailsImpl userDetails) {
+        Long myBadId = bagRepositroy.findByUserId(userDetails.getUserId()).getId();
+
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
+        String opponentNickName = user.getNickname();
+        String myNickName = userDetails.getNickname();
+
+        List<Item> myItemList = itemRepository.findAllByBagId(myBadId);
+
+        Item item = itemRepository.findById(itemid).orElseThrow(
+                () -> new IllegalArgumentException("아이템이 없습니다.")
+        );
+
+        String opponentImage = item.getItemImg().split(",")[0];
+        List<TradeInfoImagesDto> tradeInfoImagesDtoArrayList = new ArrayList<>();
+        for(Item items : myItemList){
+            String itemImage = items.getItemImg().split(",")[0];
+            Long itemId = items.getId();
+            TradeInfoImagesDto tradeInfoImagesDto = new TradeInfoImagesDto(itemImage, itemId);
+            tradeInfoImagesDtoArrayList.add(tradeInfoImagesDto);
+        }
+
+        return new TradeInfoDto(opponentNickName, opponentImage, myNickName, tradeInfoImagesDtoArrayList);
+    }
+
+
+    // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
+    public void requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
+        // 아이템 상태 업데이트
+        Item sellerItem = itemRepository.findById(requestTradeDto.getSellerItemId()).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        sellerItem.statusUpdate(1);
+        for(Long buyerItemIds : requestTradeDto.getBuyerItemIds()) {
+           Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
+                   ()-> new IllegalArgumentException("아이템이 없습니다.")
+           );
+           buyerItem.statusUpdate(1);
+        }
+
+        // 거래 내역 생성
+        Barter barter = Barter.builder()
+                .buyerId(userDetails.getUserId())
+                .sellerId(requestTradeDto.getSellerId())
+                .b
+        }
     }
 }

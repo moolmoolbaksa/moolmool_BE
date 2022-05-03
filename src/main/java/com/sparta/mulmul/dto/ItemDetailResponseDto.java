@@ -16,7 +16,7 @@ public class ItemDetailResponseDto {
     private String nickname;
     private float grade;
     private String profile;
-    private String status;
+    private int status;
     private List<String> images;
     private List<String> bagImages;
     private String  title;
@@ -32,7 +32,7 @@ public class ItemDetailResponseDto {
                            String nickname,
                            float v,
                            String profile,
-                           String status,
+                           int status,
                            List<String> itemImgList,
                            List<String> bagImages,
                            String title,
