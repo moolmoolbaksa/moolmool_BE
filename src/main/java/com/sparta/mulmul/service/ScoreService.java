@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Objects;
 
 // 성훈 - 평점 평가페이지 - 평점 보여주기
 @RequiredArgsConstructor

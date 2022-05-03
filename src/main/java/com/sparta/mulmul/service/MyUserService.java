@@ -1,8 +1,10 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.dto.ItemUserResponseDto;
+import com.sparta.mulmul.dto.MyPageResponseDto;
+import com.sparta.mulmul.dto.UserEditDtailResponseDto;
+import com.sparta.mulmul.dto.UserEditResponseDto;
 import com.sparta.mulmul.model.Item;
-import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.ItemRepository;
@@ -15,7 +17,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +34,9 @@ public class MyUserService {
                 () -> new IllegalArgumentException("user not found")
         );
         Long userId = userDetails.getUserId();
-        Long myBagId = bagRepository.findByUserId(userId).getId();
 
         // 한 유저의 모든 아이템을 보여줌
-        List<Item> myItemList = itemRepository.findAllByBagId(myBagId);
+        List<Item> myItemList = itemRepository.findAllMyItem(userId);
         List<ItemUserResponseDto> myItemResponseList = new ArrayList<>();
         // 내 보유 아이템을 리스트 형식으로 담기
         for (Item items : myItemList) {
@@ -47,22 +47,21 @@ public class MyUserService {
             );
             myItemResponseList.add(itemResponseDto);
         }
-
-        List<Scrab> scrabList = scrabRepository.findAllByUserId(userId);
         List<ItemUserResponseDto> myScrapItemList = new ArrayList<>();
-        for (Scrab eachScrap : scrabList) {
-            Long scrapItemId = eachScrap.getItemId();
-            // 찜한 아이템
-           Item scrapItem = itemRepository.findById(scrapItemId).orElseThrow(
-                   () -> new IllegalArgumentException("scrapItem not found")
-           );
-
+        List<Item> myScrabItemList = itemRepository.findByAllMyScrabItem(userId);
+        int cnt = 0;
+        for (Item scrapItem : myScrabItemList) {
             ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
                     scrapItem.getId(),
                     scrapItem.getItemImg(),
                     scrapItem.getStatus()
             );
+            cnt++;
             myScrapItemList.add(scrabitemDto);
+            // 5번 담으면 멈춘다
+            if (cnt == 5) {
+                break;
+            }
         }
 
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
