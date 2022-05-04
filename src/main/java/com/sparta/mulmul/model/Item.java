@@ -73,7 +73,7 @@ public class Item extends Timestamped{
     }
 
     // 이승재 / 아이템 상태 업데이트
-    public void statusUpdate(int Status){
+    public void statusUpdate(int status){
         this.status = status;
     }
 }

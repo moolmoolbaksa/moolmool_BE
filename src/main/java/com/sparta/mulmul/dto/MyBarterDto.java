@@ -19,8 +19,7 @@ public class MyBarterDto {
         this.itemId = itemId;
         this.title = title;
         this.itemImg = itemImg;
-        this.date = date;
-        this.status = status;
+
     }
 
 
