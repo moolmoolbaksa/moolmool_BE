@@ -113,8 +113,10 @@ public class ItemService {
         List<Item> userItemList = itemRepository.findAllByBagId(item.getBag().getId());
         List<String> bagImages = new ArrayList<>();
         for(Item item1 : userItemList){
-            String repImg =item1.getItemImg().split(",")[0];
-            bagImages.add(repImg);
+            if(item1.getId()!=itemId) {
+                String repImg = item1.getItemImg().split(",")[0];
+                bagImages.add(repImg);
+            }
         }
         // 이승재 / 아이템 조회수 계산
         int viewCnt = item.getViewCnt();
@@ -300,7 +302,52 @@ public class ItemService {
 
 
     // 이승재 교환신청 확인 페이지
-//    public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
-//    }
+    public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
+        Barter barter = barterRepository.findById(baterId).orElseThrow(
+                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+        );
+        User buyer = userRepository.findById(barter.getBuyerId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저정보가 없습니다.")
+        );
+        User seller = userRepository.findById(barter.getSellerId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저정보가 없습니다.")
+        );
+
+        // 판매자 및 구매자 닉네임
+        String buyerNickName = buyer.getNickname();
+        String sellerNickName = seller.getNickname();
+
+        // 판매자 아이템 이미지
+        Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
+        Item item = itemRepository.findById(sellerItemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        String sellerItemImage = item.getItemImg().split(",")[0];
+
+        // 구매자 아이템 이미지들
+        String buyerItem = barter.getBarter().split(";")[0];
+        List<Long> buyerItemId = new ArrayList<>();
+        for(int i = 0; i<buyerItem.split(",").length; i++){
+            buyerItemId.add(Long.valueOf(buyerItem.split(",")[i]));
+        }
+        List<String> buyerItemImages = new ArrayList<>();
+        for(Long id : buyerItemId){
+            Item item1 = itemRepository.findById(id).orElseThrow(
+                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+            );
+            String buyerItemImage = item1.getItemImg().split(",")[0];
+            buyerItemImages.add(buyerItemImage);
+        }
+        return new TradeDecisionDto(buyerNickName, sellerNickName, sellerItemImage, buyerItemImages);
+    }
+
+
+    // 이승재 교환신청 확인 페이지 수락 버튼
+    public void acceptTrade(Long batedId) {
+        Barter barter = barterRepository.findById(batedId).orElseThrow(
+                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+        );
+        barter.statusUpdate(2);
+    }
 }
 

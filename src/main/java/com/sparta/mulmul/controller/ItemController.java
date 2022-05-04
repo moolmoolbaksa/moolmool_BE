@@ -113,8 +113,15 @@ public class ItemController {
 
 
     // 이승재 교환신청 확인 페이지
-//    @GetMapping("/api/trade/decision")
-//    private TradeDecisionDto tradeDecision(@RequestParam Long baterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-//        return  itemService.tradeDecision(baterId, userDetails);
-//    }
+    @GetMapping("/api/trade/decision")
+    private TradeDecisionDto tradeDecision(@RequestParam Long baterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return  itemService.tradeDecision(baterId, userDetails);
+    }
+
+    // 이승재 교환신청 확인 페이지 수락 버튼
+    @PutMapping("/api/trade/decision")
+    private ResponseEntity<OkDto> acceptTrade(@RequestParam Long batedId){
+        itemService.acceptTrade(batedId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
 }
