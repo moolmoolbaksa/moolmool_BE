@@ -343,11 +343,56 @@ public class ItemService {
 
 
     // 이승재 교환신청 확인 페이지 수락 버튼
-    public void acceptTrade(Long batedId) {
-        Barter barter = barterRepository.findById(batedId).orElseThrow(
+    public void acceptTrade(Long baterId) {
+        Barter barter = barterRepository.findById(baterId).orElseThrow(
                 ()-> new IllegalArgumentException("거래내역이 없습니다.")
         );
+        // 거래내역 상태 업데이트
         barter.statusUpdate(2);
+
+        //아이템 상태 업데이트
+        Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
+        Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        sellerItem.statusUpdate(2);
+        String buyerItem = barter.getBarter().split(";")[0];
+        List<Long> buyerItemId = new ArrayList<>();
+        for(int i = 0; i<buyerItem.split(",").length; i++){
+            buyerItemId.add(Long.valueOf(buyerItem.split(",")[i]));
+        }
+        for(Long id : buyerItemId){
+            Item item = itemRepository.findById(id).orElseThrow(
+                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+            );
+            item.statusUpdate(2);
+        }
+    }
+
+    public void deleteTrade(Long baterId) {
+        //아이템 상태 업데이트
+        Barter barter = barterRepository.findById(baterId).orElseThrow(
+                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+        );
+        Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
+        Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        sellerItem.statusUpdate(0);
+        String buyerItem = barter.getBarter().split(";")[0];
+        List<Long> buyerItemId = new ArrayList<>();
+        for(int i = 0; i<buyerItem.split(",").length; i++){
+            buyerItemId.add(Long.valueOf(buyerItem.split(",")[i]));
+        }
+        for(Long id : buyerItemId){
+            Item item = itemRepository.findById(id).orElseThrow(
+                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+            );
+            item.statusUpdate(0);
+        }
+
+        // 거래내역 삭제
+        barterRepository.deleteById(baterId);
     }
 }
 
