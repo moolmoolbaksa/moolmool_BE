@@ -111,4 +111,10 @@ public class ItemController {
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
+
+    // 이승재 교환신청 확인 페이지
+//    @GetMapping("/api/trade/decision")
+//    private TradeDecisionDto tradeDecision(@RequestParam Long baterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        return  itemService.tradeDecision(baterId, userDetails);
+//    }
 }

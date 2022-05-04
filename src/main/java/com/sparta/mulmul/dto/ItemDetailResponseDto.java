@@ -14,6 +14,7 @@ import java.util.List;
 public class ItemDetailResponseDto {
     private Long userId;
     private String nickname;
+    private String degree;
     private float grade;
     private String profile;
     private int status;
@@ -30,6 +31,7 @@ public class ItemDetailResponseDto {
     // 이승재 / 아이템 상세페이지
     public ItemDetailResponseDto(Long i,
                            String nickname,
+                           String degree,
                            float v,
                            String profile,
                            int status,
@@ -43,6 +45,7 @@ public class ItemDetailResponseDto {
                            boolean isScarb) {
         this.userId = i;
         this.nickname = nickname;
+        this.degree = degree;
         this.grade = v;
         this.profile = profile;
         this.status = status;

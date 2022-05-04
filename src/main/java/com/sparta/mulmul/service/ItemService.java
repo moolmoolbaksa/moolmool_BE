@@ -142,6 +142,7 @@ public class ItemService {
                 //userdetails.getuserId
                 (long)1,
                 user.getNickname(),
+                user.getDegree(),
                 user.getGrade(),
                 user.getProfile(),
                 item.getStatus(),
@@ -296,5 +297,10 @@ public class ItemService {
                 .build();
         barterRepository.save(barter);
         }
-    }
+
+
+    // 이승재 교환신청 확인 페이지
+//    public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
+//    }
+}
 
