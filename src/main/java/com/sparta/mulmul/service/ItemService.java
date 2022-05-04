@@ -60,6 +60,8 @@ public class ItemService {
             List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
             List<ItemResponseDto> items = new ArrayList<>();
             for(Item item : itemList){
+                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+                int scrabCnt = scrabs.size();
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
                         item.getId(),
                         item.getCategory(),
@@ -67,7 +69,7 @@ public class ItemService {
                         item.getContents(),
                         item.getItemImg().split(",")[0],
                         item.getAddress(),
-                        item.getScrabCnt(),
+                        scrabCnt,
                         item.getViewCnt(),
                         item.getStatus());
                 items.add(itemResponseDto);
@@ -84,6 +86,8 @@ public class ItemService {
            }else{
                isScrab = false;
            }
+           List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+           int scrabCnt = scrabs.size();
            ItemResponseDto itemResponseDto = new ItemResponseDto(
                    item.getId(),
                    item.getCategory(),
@@ -91,7 +95,7 @@ public class ItemService {
                    item.getContents(),
                    item.getItemImg().split(",")[0],
                    item.getAddress(),
-                   item.getScrabCnt(),
+                   scrabCnt,
                    item.getViewCnt(),
                    item.getStatus(),
                    isScrab);
@@ -139,6 +143,9 @@ public class ItemService {
         for(int i = 0; i<item.getItemImg().split(",").length; i++){
             itemImgList.add(item.getItemImg().split(",")[i]);
         }
+        List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
+        int scrabCnt = scrabs.size();
+
 
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 //userdetails.getuserId
@@ -154,14 +161,14 @@ public class ItemService {
                 item.getContents(),
                 item.getCreatedAt(),
                 item.getViewCnt(),
-                item.getScrabCnt(),
+                scrabCnt,
                 isSrab
         );
         return itemDetailResponseDto;
     }
 
     // 이승재 / 아이템 구독하기
-    public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
+    public void scrabItem(Long itemId, UserDetailsImpl userDetails) { 
 
         Long userId = userDetails.getUserId();
         Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userId, itemId);
@@ -172,15 +179,23 @@ public class ItemService {
             );
             scrab1.update(scrabId, false);
 //            scrabRepository.deleteById(scrabId);
-        }else{
-            Scrab newScrab = Scrab.builder()
-                    .userId(userId)
-                    .itemId(itemId)
-                    .scrab(true)
-                    .build();
-            scrabRepository.save(newScrab);
+        }else {
+            Item item = itemRepository.findById(itemId).orElseThrow(
+                    () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+            );
+            if (userDetails.getUserId().equals(item.getBag().getUserId())) {
+                throw new IllegalArgumentException("본인 아이템입니다.");
+            }else {
+
+                Scrab newScrab = Scrab.builder()
+                        .userId(userId)
+                        .itemId(itemId)
+                        .scrab(true)
+                        .build();
+                scrabRepository.save(newScrab);
+            }
         }
-    }
+        }
 
     // 이승재 / 아이템 수정 (미리 구현)
     @Transactional
