@@ -18,11 +18,8 @@ public class BarterResponseDto {
     }
 
     public void addNotFin(BarterNotFinDto notFinBarter) {
-        System.out.println("거래중르라라랄" + notFinBarter.getBarterId());
         this.notFinBarter = notFinBarter;
-        System.out.println("거래중르라라랄111" + notFinBarter.getBarterId());
         this.finBarter = null;
-        System.out.println("거래중르라라랄222" + notFinBarter.getBarterId());
     }
 
     public void addFin(BarterFinDto finBarter) {

@@ -21,4 +21,10 @@ public class MyBarterDto {
         this.itemImg = itemImg;
     }
 
+
+    public void add(Long eachBuyerId, String buyerItemTitle, String buyerItemImg) {
+        this.itemId = eachBuyerId;
+        this.title = buyerItemTitle;
+        this.itemImg = buyerItemImg;
+    }
 }

@@ -26,14 +26,14 @@ public class BarterService {
     private final ItemRepository itemRepository;
 
     // 성훈 - 거래내역서 보기
-    public BarterResponseDto showMyBarter(UserDetailsImpl userDetails) {
+    public List<BarterResponseDto> showMyBarter(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
         );
 
         Long userId = userDetails.getUserId();
         // (거래 물품리스트들과 거래내역의 Id값)이 포함된 거래내역 리스트를 담을 Dto
-        BarterResponseDto totalBarter = null;
+        List<BarterResponseDto> totalList = new ArrayList<>();
         // 유저의 거래내역 리스트를 전부 조회한다
         List<Barter> mybarterList = barterRepository.findAllByBuyerIdOrSellerId(userId, userId);
         // 상대방 아이디
@@ -45,7 +45,6 @@ public class BarterService {
         // barterId, buyerId, SellerId를 분리한다.
         for (Barter barters : mybarterList) {
             Long barterId = barters.getId();
-            System.out.println("바터아이디 " + barterId);
             LocalDateTime date = barters.getModifiedAt();
             // 거래 물품리스트를 담을 Dto -> 내것과 상대것을 담는다
             List<MyBarterDto> myBarterList = new ArrayList<>();
@@ -61,7 +60,6 @@ public class BarterService {
             // 바이어(유저)의 물품을 찾아서 정보를 넣기
             for (String buyerItemId : buyerItemIdList) {
                 Long itemId = Long.parseLong(buyerItemId);
-                System.out.println("바이어 아이템 아이디 " + itemId);
                 Item buyerItem = itemRepository.findById(itemId).orElseThrow(
                         () -> new IllegalArgumentException("buyerItem not found")
                 );
@@ -80,10 +78,9 @@ public class BarterService {
                     myPosition = "buyer";
                 } else {
                     barterList.add(buyerItemList);
-                    opponentId = barters.getSellerId();
+                    opponentId = barters.getBuyerId();
                     myPosition = "seller";
                 }
-                System.out.println("바이어아이템 아이디 :" + buyerItem.getId());
             }
 
             //셀러(유저)의 물품을 찾아서 정보를 넣기
@@ -104,25 +101,14 @@ public class BarterService {
                 } else {
                     barterList.add(sellerItemList);
                 }
-                System.out.println("셀러아이템 아이디 :" + sellerItem.getItemImg());
             }
 
             // 상대 유저 정보
             User opponentUser = userRepository.findById(opponentId).orElseThrow(
                     () -> new IllegalArgumentException("유저 정보가 없습니다.")
             );
-            System.out.println("유저 네임 :" + opponentUser.getNickname());
             // 거래상태 정보 1 : 신청중 / 2 : 거래중 / 3 : 거래완료 / 4 : 평가완료
             int status = barters.getStatus();
-            System.out.println("상태 정보 : " + status);
-            System.out.println("거래내역아이디"+barterId);
-            System.out.println("상대아이디"+opponentId);
-            System.out.println("상대이름"+opponentUser.getNickname());
-            System.out.println("상대 이미지"+opponentUser.getProfile());
-            System.out.println("상태"+status);
-            System.out.println("내포지션"+myPosition);
-            System.out.println("내리스트"+myBarterList);
-            System.out.println("너리스트"+barterList);
 
 
             if (status == 2 || status == 1) {
@@ -136,14 +122,9 @@ public class BarterService {
                         myBarterList,
                         barterList
                 );
-                BarterFinDto barterFin = new BarterFinDto();
-//                BarterResponseDto barterResponseDto = new BarterResponseDto(
-//                        barterNotFin,
-//                        barterFin
-//                );
-                assert totalBarter != null;
-                totalBarter.addNotFin(barterNotFin);
-                System.out.println("상태 2 야호" + status);
+
+                BarterResponseDto totalBarter = new BarterResponseDto(barterNotFin, null);
+                totalList.add(totalBarter);
                 // 거래완료, 평가완료일 경우
             } else if (status == 3 || status == 4) {
                 BarterFinDto barterFin = new BarterFinDto(
@@ -157,15 +138,12 @@ public class BarterService {
                         myBarterList,
                         barterList
                 );
-//                BarterResponseDto barterResponseDto = new BarterResponseDto(
-//                        barterNotFin,
-//                        barterFin
-//                );
-                assert totalBarter != null;
-                totalBarter.addFin(barterFin);
-                System.out.println("상태 4 야호" + status);
+
+                BarterResponseDto totalBarter = new BarterResponseDto(null, barterFin);
+                totalList.add(totalBarter);
+
             }
         }
-        return totalBarter;
+        return totalList;
     }
 }
