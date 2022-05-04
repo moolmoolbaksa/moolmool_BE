@@ -34,8 +34,8 @@ public class Barter extends Timestamped{
     @Column(nullable = false)
     private int status;
 
-    // 이승재 / 거래내역 상태 변환
-    public void statusUpdate(int status){
+
+    public void updateBarter(int status){
         this.status = status;
     }
 

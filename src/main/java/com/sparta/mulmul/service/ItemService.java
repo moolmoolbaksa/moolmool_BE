@@ -348,7 +348,7 @@ public class ItemService {
                 ()-> new IllegalArgumentException("거래내역이 없습니다.")
         );
         // 거래내역 상태 업데이트
-        barter.statusUpdate(2);
+        barter.updateBarter(2);
 
         //아이템 상태 업데이트
         Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
@@ -392,7 +392,7 @@ public class ItemService {
         }
 
         // 거래내역 삭제
-        barterRepository.deleteById(baterId);
+       barterRepository.deleteById(baterId);
     }
 }
 
