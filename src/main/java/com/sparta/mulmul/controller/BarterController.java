@@ -1,7 +1,5 @@
 package com.sparta.mulmul.controller;
 
-import com.sparta.mulmul.dto.BarterFinDto;
-import com.sparta.mulmul.dto.BarterNotFinDto;
 import com.sparta.mulmul.dto.BarterResponseDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.BarterService;
@@ -22,6 +20,5 @@ public class BarterController {
     public List<BarterResponseDto> showMyBarter (@AuthenticationPrincipal UserDetailsImpl userDetails){
         return barterService.showMyBarter(userDetails);
     }
-
 
 }
