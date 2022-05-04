@@ -363,6 +363,7 @@ public class ItemService {
 
 
     // 이승재 교환신청 확인 페이지 수락 버튼
+    @Transactional
     public void acceptTrade(Long baterId) {
         Barter barter = barterRepository.findById(baterId).orElseThrow(
                 ()-> new IllegalArgumentException("거래내역이 없습니다.")
@@ -389,6 +390,7 @@ public class ItemService {
         }
     }
 
+    @Transactional
     public void deleteTrade(Long baterId) {
         //아이템 상태 업데이트
         Barter barter = barterRepository.findById(baterId).orElseThrow(
