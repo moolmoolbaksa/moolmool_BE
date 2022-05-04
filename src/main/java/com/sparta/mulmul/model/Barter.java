@@ -36,8 +36,9 @@ public class Barter extends Timestamped{
     private int status;
 
 
-    public void updatebarter(int status) {
+    public void updateBarter(int status) {
         this.status = status;
     }
+    }
 
-}
+

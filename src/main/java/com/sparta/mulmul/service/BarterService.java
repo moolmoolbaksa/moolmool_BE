@@ -183,6 +183,40 @@ public class BarterService {
         // 거래내역 삭제
         barterRepository.deleteById(barterId);
     }
+
+
+    // 성훈 - 거래 완료 - 프론트랑 테스트해보기
+    public void OkayBarter(Long barterId, UserDetailsImpl userDetails) {
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                () -> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
+        Long userId = user.getId();
+        Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("거래내역이 없습니다."));
+        // 거래중인 상태가 아니면 예외처리
+        if (myBarter.getStatus() != 2){
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+        }
+
+        String[] barterIdList = myBarter.getBarter().split(";");
+        String[] buyerItemId = barterIdList[0].split(",");
+        String sellerItemId = barterIdList[1];
+
+
+        for (String eachBuyer : buyerItemId) {
+            Long buyerId = Long.valueOf(eachBuyer);
+            Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
+                    () -> new IllegalArgumentException("buyerItem not found"));
+            buyerItem.statusUpdate(3);
+        }
+        //셀러(유저)의 물품을 찾아서 정보를 넣기
+        Long sellerId = Long.parseLong(sellerItemId);
+        Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
+                () -> new IllegalArgumentException("sellerItem not found")
+        );
+        sellerItem.statusUpdate(3);
+        myBarter.updateBarter(3);
+        System.out.println("내거래 상태 : " + myBarter.getStatus());
+    }
 }
 
 

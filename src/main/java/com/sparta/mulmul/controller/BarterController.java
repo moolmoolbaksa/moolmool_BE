@@ -22,10 +22,17 @@ public class BarterController {
         return barterService.showMyBarter(userDetails);
     }
 
-    //엄성훈 / 교환신청 취소
+    //엄성훈 - 교환신청 취소
     @DeleteMapping("/api/myhistory")
     public ResponseEntity<OkDto> deleteItem(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         barterService.deleteBarter(barterId, userDetails);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
+    //엄성훈 - 교환신청
+    @PutMapping("/api/myhistory/handshake")
+    public ResponseEntity<OkDto> OkayItem(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        barterService.OkayBarter(barterId, userDetails);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 

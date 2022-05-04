@@ -152,10 +152,8 @@ public class ScoreService {
             Long barterId = gradeScoreRequestDto.getBarterId();
             Barter barter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
             // 이미 평가를 완료한 경우
-            if (barter.getStatus() <= 2) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "거래가 완료되지 않았습니다.");
-            } else if (barter.getStatus() >= 4) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "이미 평가한 거래내역입니다.");
+            if (barter.getStatus() != 3){
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
                 // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
             } else if ((oppentUserId != barter.getBuyerId()) && (oppentUserId != barter.getSellerId())) {
                 throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
@@ -193,7 +191,29 @@ public class ScoreService {
                     oppentRaterCnt,
                     oppentDegree
             );
+
+            // 거래완료인 상태가 아니면 예외처리
+
+
+            String[] barterIdList = barter.getBarter().split(";");
+            String[] buyerItemId = barterIdList[0].split(",");
+            String sellerItemId = barterIdList[1];
+
+            int status = 4;
+            for (String eachBuyer : buyerItemId) {
+                Long buyerId = Long.valueOf(eachBuyer);
+                Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
+                        () -> new IllegalArgumentException("buyerItem not found"));
+                buyerItem.statusUpdate(status);
+            }
+            //셀러(유저)의 물품을 찾아서 정보를 넣기
+            Long sellerId = Long.parseLong(sellerItemId);
+            Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
+                    () -> new IllegalArgumentException("sellerItem not found")
+            );
+            sellerItem.statusUpdate(status);
             // 유저 정보를 업데이트 이후 status를 거래완료(3) -> 평가완료(4)으로 업데이트를 한다.
-            barter.updatebarter(4);
+            barter.updateBarter(status);
+
         }
 }
