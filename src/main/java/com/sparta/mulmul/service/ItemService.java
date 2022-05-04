@@ -103,7 +103,7 @@ public class ItemService {
 
 
     // 이승재 / 아이템 상세페이지
-    public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
+    public ItemDetailResponseDto getItemDetail(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
@@ -129,7 +129,7 @@ public class ItemService {
             isSarb = false;
         }
 
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+        User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
                 ()-> new IllegalArgumentException("유저 정보가 없습니다.")
         );
 
