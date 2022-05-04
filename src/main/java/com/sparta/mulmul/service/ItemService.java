@@ -124,11 +124,11 @@ public class ItemService {
         item.update(viewCnt);
 
         // 이승재 / 아이템 구독 정보 유저 정보를 통해 확인
-        boolean isSarb;
+        Boolean isSrab;
         if(scrabRepository.findByUserIdAndItemId(userDetails.getUserId(), itemId).isPresent()){
-            isSarb = true;
+            isSrab = true;
         }else{
-            isSarb = false;
+            isSrab = false;
         }
 
         User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
@@ -155,7 +155,7 @@ public class ItemService {
                 item.getCreatedAt(),
                 item.getViewCnt(),
                 item.getScrabCnt(),
-                isSarb
+                isSrab
         );
         return itemDetailResponseDto;
     }
