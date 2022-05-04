@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Barter extends Timestamped {
+public class Barter extends Timestamped{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

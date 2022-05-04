@@ -5,6 +5,8 @@ import com.sparta.mulmul.dto.UserEditResponseDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.AwsS3Service;
 import com.sparta.mulmul.service.MyUserService;
+import com.sparta.mulmul.service.UserService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,5 +42,12 @@ public class MyUserController {
                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
         return myUserService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
+
+    }
+
+    // 이승재 / 찜한 아이템 보여주기
+    @GetMapping("/api/mypage/scrab")
+    public MyScrabItemDto scrabItem(@AuthenticationPrincipal UserDetailsImpl userDetails){
+
     }
 }

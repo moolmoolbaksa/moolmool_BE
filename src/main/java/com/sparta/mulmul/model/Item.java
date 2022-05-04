@@ -41,7 +41,7 @@ public class Item extends Timestamped{
     private int viewCnt;
 
     @Column(nullable = false)
-    private String status;
+    private int status;
 
     @Column(length = 1000)
     private String itemImg;
@@ -61,6 +61,7 @@ public class Item extends Timestamped{
         this.viewCnt = viewCnt;
     }
 
+
     // 이승재 / 아이템 수정
     public void itemUpdate(ItemRequestDto itemRequestDto, String imgUrl, String favored) {
         this.title = itemRequestDto.getTitle();
@@ -69,5 +70,10 @@ public class Item extends Timestamped{
         this.favored = imgUrl;
         this.itemImg = favored;
         this.type = itemRequestDto.getType();
+    }
+
+    // 이승재 / 아이템 상태 업데이트
+    public void statusUpdate(int Status){
+        this.status = status;
     }
 }
