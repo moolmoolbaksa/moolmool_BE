@@ -107,6 +107,7 @@ public class ItemService {
 
 
     // 이승재 / 아이템 상세페이지
+    @Transactional
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
@@ -145,7 +146,7 @@ public class ItemService {
         }
         List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
         int scrabCnt = scrabs.size();
-
+        item.scrabCntUpdate(itemId, scrabCnt);
 
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 //userdetails.getuserId
@@ -168,6 +169,7 @@ public class ItemService {
     }
 
     // 이승재 / 아이템 구독하기
+    @Transactional
     public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
         Long userId = userDetails.getUserId();
@@ -177,9 +179,12 @@ public class ItemService {
             Scrab scrab1 = scrabRepository.findById(scrabId).orElseThrow(
                     ()-> new IllegalArgumentException("구독 정보가 없습니다.")
             );
-            scrab1.update(scrabId, false);
-//            scrabRepository.deleteById(scrabId);
-        }else {
+            if(scrab1.getScrab().equals(true)) {
+                scrab1.update(scrabId, false);
+            }else{
+                scrab1.update(scrabId, true);
+            }
+        }else{
             Item item = itemRepository.findById(itemId).orElseThrow(
                     () -> new IllegalArgumentException("아이템 정보가 없습니다.")
             );

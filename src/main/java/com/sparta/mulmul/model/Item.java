@@ -78,4 +78,10 @@ public class Item extends Timestamped{
         this.id = id;
         this.status = status;
     }
+
+    // 이승재 / 아이템 구독 정보 업데이트
+    public void scrabCntUpdate(Long id, int scrabCnt){
+        this.id = id;
+        this.scrabCnt = scrabCnt;
+    }
 }

@@ -26,9 +26,9 @@ public class Scrab {
     private Long itemId;
 
     @Column(nullable = false)
-    private boolean scrab;
+    private Boolean scrab;
 
-    public void update(Long scrabId, boolean scrab){
+    public void update(Long scrabId, Boolean scrab){
         this.id = scrabId;
         this.scrab = scrab;
     }
