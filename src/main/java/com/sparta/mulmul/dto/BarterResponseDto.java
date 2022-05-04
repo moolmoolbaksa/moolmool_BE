@@ -9,16 +9,24 @@ import java.util.List;
 @Getter
 @Builder
 public class BarterResponseDto {
-    private Long barterId;
-    private LocalDateTime date;
-    private List<MyBarterDto> myItem;
-    private List<MyBarterDto> barterItem;
+    private BarterNotFinDto notFinBarter;
+    private BarterFinDto finBarter;
 
+    public BarterResponseDto(BarterNotFinDto notFinBarter, BarterFinDto finBarter) {
+        this.notFinBarter = notFinBarter;
+        this.finBarter = finBarter;
+    }
 
-    public  BarterResponseDto(Long barterId, LocalDateTime date, List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
-        this.barterId = barterId;
-        this.date = date;
-        this.myItem = myItem;
-        this.barterItem = barterItem;
+    public void addNotFin(BarterNotFinDto notFinBarter) {
+        System.out.println("거래중르라라랄" + notFinBarter.getBarterId());
+        this.notFinBarter = notFinBarter;
+        System.out.println("거래중르라라랄111" + notFinBarter.getBarterId());
+        this.finBarter = null;
+        System.out.println("거래중르라라랄222" + notFinBarter.getBarterId());
+    }
+
+    public void addFin(BarterFinDto finBarter) {
+        this.notFinBarter = null;
+        this.finBarter = finBarter;
     }
 }

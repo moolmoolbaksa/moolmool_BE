@@ -1,7 +1,7 @@
 package com.sparta.mulmul.controller;
 
+import com.sparta.mulmul.dto.BarterNotFinDto;
 import com.sparta.mulmul.dto.BarterResponseDto;
-import com.sparta.mulmul.dto.CompleteBarterDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.BarterService;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +18,9 @@ public class BarterController {
 
     /*성훈 - 거래중인 내역보기*/
     @GetMapping("/api/myhistory")
-    public List<BarterResponseDto> showMyBarter (@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public BarterResponseDto showMyBarter (@AuthenticationPrincipal UserDetailsImpl userDetails){
         return barterService.showMyBarter(userDetails);
     }
 
-    /*성훈 - 거래완료된 내역보기*/
-    @GetMapping("/api/myhistory/complete")
-    public List<CompleteBarterDto> showMyCompleteBarter (@AuthenticationPrincipal UserDetailsImpl userDetails){
-        return barterService.showMyCompleteBarter(userDetails);
-    }
 
 }
