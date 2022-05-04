@@ -125,7 +125,7 @@ public class ItemService {
         // 이승재 / 아이템 조회수 계산
         int viewCnt = item.getViewCnt();
         viewCnt += 1;
-        item.update(viewCnt);
+        item.update(itemId, viewCnt);
 
         // 이승재 / 아이템 구독 정보 유저 정보를 통해 확인
         Boolean isSrab;
@@ -168,7 +168,7 @@ public class ItemService {
     }
 
     // 이승재 / 아이템 구독하기
-    public void scrabItem(Long itemId, UserDetailsImpl userDetails) { 
+    public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
         Long userId = userDetails.getUserId();
         Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userId, itemId);
@@ -287,12 +287,12 @@ public class ItemService {
         Item sellerItem = itemRepository.findById(requestTradeDto.getSellerItemId()).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
-        sellerItem.statusUpdate(1);
+        sellerItem.statusUpdate(sellerItem.getId(), 1);
         for(Long buyerItemIds : requestTradeDto.getBuyerItemIds()) {
            Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
                    ()-> new IllegalArgumentException("아이템이 없습니다.")
            );
-           buyerItem.statusUpdate(1);
+           buyerItem.statusUpdate(buyerItemIds, 1);
         }
 
         //Long 형태인 아이디들을 String 형태로 변환
@@ -370,7 +370,7 @@ public class ItemService {
         Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
-        sellerItem.statusUpdate(2);
+        sellerItem.statusUpdate(sellerItemId, 2);
         String buyerItem = barter.getBarter().split(";")[0];
         List<Long> buyerItemId = new ArrayList<>();
         for(int i = 0; i<buyerItem.split(",").length; i++){
@@ -380,7 +380,7 @@ public class ItemService {
             Item item = itemRepository.findById(id).orElseThrow(
                     ()-> new IllegalArgumentException("아이템이 없습니다.")
             );
-            item.statusUpdate(2);
+            item.statusUpdate(id,2);
         }
     }
 
@@ -393,7 +393,7 @@ public class ItemService {
         Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
-        sellerItem.statusUpdate(0);
+        sellerItem.statusUpdate(sellerItemId,0);
         String buyerItem = barter.getBarter().split(";")[0];
         List<Long> buyerItemId = new ArrayList<>();
         for(int i = 0; i<buyerItem.split(",").length; i++){
@@ -403,7 +403,7 @@ public class ItemService {
             Item item = itemRepository.findById(id).orElseThrow(
                     ()-> new IllegalArgumentException("아이템이 없습니다.")
             );
-            item.statusUpdate(0);
+            item.statusUpdate(id,0);
         }
 
         // 거래내역 삭제

@@ -57,7 +57,8 @@ public class Item extends Timestamped{
 
 
     // 이승재 / 아이템 상세 페이지 접속할 때마다 조회수 올리기
-    public void update(int viewCnt){
+    public void update(Long id, int viewCnt){
+        this.id = id;
         this.viewCnt = viewCnt;
     }
 
@@ -73,7 +74,8 @@ public class Item extends Timestamped{
     }
 
     // 이승재 / 아이템 상태 업데이트
-    public void statusUpdate(int Status){
+    public void statusUpdate(Long id, int status){
+        this.id = id;
         this.status = status;
     }
 }
