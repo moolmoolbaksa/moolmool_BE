@@ -1,6 +1,11 @@
 package com.sparta.mulmul.service;
 
+
 import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.dto.ItemUserResponseDto;
+import com.sparta.mulmul.dto.MyPageResponseDto;
+import com.sparta.mulmul.dto.UserEditDtailResponseDto;
+import com.sparta.mulmul.dto.UserEditResponseDto;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.model.User;
@@ -23,6 +28,7 @@ public class MyUserService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final ScrabRepository scrabRepository;
+
 
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
@@ -49,7 +55,7 @@ public class MyUserService {
         for (Item scrapItem : myScrabItemList) {
             ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
                     scrapItem.getId(),
-                    scrapItem.getItemImg(),
+                    scrapItem.getItemImg().split(",")[0],
                     scrapItem.getStatus()
             );
             cnt++;
@@ -121,5 +127,6 @@ public class MyUserService {
             myScrabItemDtoList.add(myScrabItemDto);
         }
         return myScrabItemDtoList;
+
     }
 }

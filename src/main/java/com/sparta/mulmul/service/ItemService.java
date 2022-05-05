@@ -61,7 +61,12 @@ public class ItemService {
             List<ItemResponseDto> items = new ArrayList<>();
             for(Item item : itemList){
                 List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                int scrabCnt = scrabs.size();
+                int scrabCnt = 0;
+                for(Scrab scrab1 : scrabs){
+                    if(scrab1.getScrab().equals(true)){
+                        scrabCnt++;
+                    }
+                }
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
                         item.getId(),
                         item.getCategory(),
@@ -87,7 +92,12 @@ public class ItemService {
                isScrab = false;
            }
            List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-           int scrabCnt = scrabs.size();
+           int scrabCnt = 0;
+           for(Scrab scrab1 : scrabs){
+               if(scrab1.getScrab().equals(true)){
+                   scrabCnt++;
+               }
+           }
            ItemResponseDto itemResponseDto = new ItemResponseDto(
                    item.getId(),
                    item.getCategory(),
@@ -129,11 +139,14 @@ public class ItemService {
         item.update(itemId, viewCnt);
 
         // 이승재 / 아이템 구독 정보 유저 정보를 통해 확인
-        Boolean isSrab;
-        if(scrabRepository.findByUserIdAndItemId(userDetails.getUserId(), itemId).isPresent()){
-            isSrab = true;
-        }else{
-            isSrab = false;
+        Boolean isSrab = false;
+        Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userDetails.getUserId(), itemId);
+        if(scrab.isPresent()){
+            if(scrab.get().getScrab().equals(true)){
+                isSrab = true;
+            }else{
+                isSrab = false;
+            }
         }
 
         User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
@@ -145,12 +158,19 @@ public class ItemService {
             itemImgList.add(item.getItemImg().split(",")[i]);
         }
         List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
-        int scrabCnt = scrabs.size();
+        int scrabCnt = 0;
+       for(Scrab scrab1 : scrabs){
+           if(scrab1.getScrab().equals(true)){
+               scrabCnt++;
+           }
+       }
+
         item.scrabCntUpdate(itemId, scrabCnt);
 
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 //userdetails.getuserId
-                (long)1,
+                user.getId(),
+                itemId,
                 user.getNickname(),
                 user.getDegree(),
                 user.getGrade(),
@@ -188,6 +208,8 @@ public class ItemService {
             Item item = itemRepository.findById(itemId).orElseThrow(
                     () -> new IllegalArgumentException("아이템 정보가 없습니다.")
             );
+            System.out.println(userDetails.getUserId());
+            System.out.println(item.getBag().getUserId());
             if (userDetails.getUserId().equals(item.getBag().getUserId())) {
                 throw new IllegalArgumentException("본인 아이템입니다.");
             }else {

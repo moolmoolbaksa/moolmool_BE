@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ItemDetailResponseDto {
     private Long userId;
+    private Long itemId;
     private String nickname;
     private String degree;
     private float grade;
@@ -30,6 +31,7 @@ public class ItemDetailResponseDto {
 
     // 이승재 / 아이템 상세페이지
     public ItemDetailResponseDto(Long i,
+                           Long itemId,
                            String nickname,
                            String degree,
                            float v,
@@ -44,6 +46,7 @@ public class ItemDetailResponseDto {
                            int scrabCnt,
                            Boolean isScrab) {
         this.userId = i;
+        this.itemId = itemId;
         this.nickname = nickname;
         this.degree = degree;
         this.grade = v;
