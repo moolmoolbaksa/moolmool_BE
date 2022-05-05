@@ -20,7 +20,7 @@ public class ChatMessage extends CreationDate {
     private Long roomId;
 
     @Column(nullable = false)
-    private Long userId;
+    private Long senderId;
 
     @Column(nullable = false)
     private String message;
@@ -30,17 +30,22 @@ public class ChatMessage extends CreationDate {
     private MessageTypeEnum type;
 
     @Column(nullable = false)
-    private Boolean isRead = false;
+    private Boolean isRead;
 
-    public static ChatMessage fromMessageRequestDto(MessageRequestDto requestDto) {
+    public static ChatMessage createOf(MessageRequestDto requestDto, Long roomId) {
 
         ChatMessage message = new ChatMessage();
 
-        message.roomId = requestDto.getRoomId();
-        message.userId = requestDto.getUserId();
+        message.roomId = roomId;
+        message.senderId = requestDto.getUserId();
         message.message = requestDto.getMessage();
+        message.isRead = requestDto.getIsRead();
 
         return message;
+    }
+
+    public void read() {
+        this.isRead = true;
     }
 
 }

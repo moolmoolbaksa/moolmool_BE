@@ -1,6 +1,5 @@
 package com.sparta.mulmul.websocket;
 
-
 import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
@@ -39,9 +38,9 @@ public class StompHandler implements ChannelInterceptor {
                 Long userId = jwtDecoder.decodeTokenByUserId(token);
                 String nickname = jwtDecoder.decodeTokenByNickname(token);
 
-                WsUser principal = WsUser.fromUserRequestDto(UserRequestDto.createOf(userId, nickname));
+                WsUser wsUser = WsUser.fromUserRequestDto(UserRequestDto.createOf(userId, nickname));
 
-                accessor.setUser(principal);
+                accessor.setUser(wsUser);
 
             } catch (Exception e) {
                 throw new AccessDeniedException("유효하지 않은 토큰입니다.");

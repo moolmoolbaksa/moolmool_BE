@@ -21,6 +21,27 @@ public class UserController {
 
     private final AwsS3Service awsS3Service;
 
+    // 회원가입
+    @PostMapping("/user/signup")
+    public ResponseEntity<OkDto> signup(@RequestBody UserRequestDto requestDto) {
+        userService.signup(requestDto);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
+    // 아이디 중복 체크
+    @PostMapping("/user/id-check")
+    public ResponseEntity<OkDto> idCheck(@RequestBody UserRequestDto requestDto) {
+        userService.checkBy("username", requestDto);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
+    // 닉네임 중복 체크
+    @PostMapping("/user/nickname-check")
+    public ResponseEntity<OkDto> nickCheck(@RequestBody UserRequestDto requestDto) {
+        userService.checkBy("nickname", requestDto);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
     // 주소, 프로필 이미지 설정
     @PostMapping("/user/info")
     public ResponseEntity<OkDto> setUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails,
