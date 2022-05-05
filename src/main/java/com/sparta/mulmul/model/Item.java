@@ -76,4 +76,8 @@ public class Item extends Timestamped{
     public void statusUpdate(int status){
         this.status = status;
     }
+
+    public void statusEditUpdate(int status){
+        this.status = status;
+    }
 }
