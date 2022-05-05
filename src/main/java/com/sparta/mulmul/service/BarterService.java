@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -152,7 +153,6 @@ public class BarterService {
 
 
     // 교환신청 취소 물건상태 2(교환중) -> 0(물품등록한 상태), 거래내역 삭제
-    @Transactional
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
@@ -174,21 +174,20 @@ public class BarterService {
             Long buyerId = Long.valueOf(eachBuyer);
             Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
                     () -> new IllegalArgumentException("buyerItem not found"));
-            buyerItem.statusUpdate(setStatus);
+            buyerItem.statusUpdate(buyerItem.getId(), setStatus);
         }
         //셀러(유저)의 물품을 찾아서 정보를 넣기
         Long sellerId = Long.parseLong(sellerItemId);
         Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
                 () -> new IllegalArgumentException("sellerItem not found")
         );
-        sellerItem.statusUpdate(setStatus);
+        sellerItem.statusUpdate(sellerItem.getId(), setStatus);
         // 거래내역 삭제
         barterRepository.deleteById(barterId);
     }
 
 
     // 성훈 - 거래 완료 - 프론트랑 테스트해보기
-    @Transactional
     public void OkayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
@@ -209,14 +208,14 @@ public class BarterService {
             Long buyerId = Long.valueOf(eachBuyer);
             Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
                     () -> new IllegalArgumentException("buyerItem not found"));
-            buyerItem.statusEditUpdate(3);
+            buyerItem.statusUpdate(buyerItem.getId,3);
         }
         //셀러(유저)의 물품을 찾아서 정보를 넣기
         Long sellerId = Long.parseLong(sellerItemId);
         Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
                 () -> new IllegalArgumentException("sellerItem not found")
         );
-        sellerItem.statusEditUpdate(3);
+        sellerItem.statusUpdate(sellerItem.getId,3);
         myBarter.updateBarter(3);
         System.out.println("내거래 상태 : " + myBarter.getStatus());
     }

@@ -60,6 +60,8 @@ public class ItemService {
             List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
             List<ItemResponseDto> items = new ArrayList<>();
             for(Item item : itemList){
+                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+                int scrabCnt = scrabs.size();
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
                         item.getId(),
                         item.getCategory(),
@@ -67,7 +69,7 @@ public class ItemService {
                         item.getContents(),
                         item.getItemImg().split(",")[0],
                         item.getAddress(),
-                        item.getScrabCnt(),
+                        scrabCnt,
                         item.getViewCnt(),
                         item.getStatus());
                 items.add(itemResponseDto);
@@ -84,6 +86,8 @@ public class ItemService {
            }else{
                isScrab = false;
            }
+           List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+           int scrabCnt = scrabs.size();
            ItemResponseDto itemResponseDto = new ItemResponseDto(
                    item.getId(),
                    item.getCategory(),
@@ -91,7 +95,7 @@ public class ItemService {
                    item.getContents(),
                    item.getItemImg().split(",")[0],
                    item.getAddress(),
-                   item.getScrabCnt(),
+                   scrabCnt,
                    item.getViewCnt(),
                    item.getStatus(),
                    isScrab);
@@ -103,6 +107,7 @@ public class ItemService {
 
 
     // 이승재 / 아이템 상세페이지
+    @Transactional
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
@@ -113,20 +118,22 @@ public class ItemService {
         List<Item> userItemList = itemRepository.findAllByBagId(item.getBag().getId());
         List<String> bagImages = new ArrayList<>();
         for(Item item1 : userItemList){
-            String repImg =item1.getItemImg().split(",")[0];
-            bagImages.add(repImg);
+            if(item1.getId()!=itemId) {
+                String repImg = item1.getItemImg().split(",")[0];
+                bagImages.add(repImg);
+            }
         }
         // 이승재 / 아이템 조회수 계산
         int viewCnt = item.getViewCnt();
         viewCnt += 1;
-        item.update(viewCnt);
+        item.update(itemId, viewCnt);
 
         // 이승재 / 아이템 구독 정보 유저 정보를 통해 확인
-        boolean isSarb;
+        Boolean isSrab;
         if(scrabRepository.findByUserIdAndItemId(userDetails.getUserId(), itemId).isPresent()){
-            isSarb = true;
+            isSrab = true;
         }else{
-            isSarb = false;
+            isSrab = false;
         }
 
         User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
@@ -137,6 +144,9 @@ public class ItemService {
         for(int i = 0; i<item.getItemImg().split(",").length; i++){
             itemImgList.add(item.getItemImg().split(",")[i]);
         }
+        List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
+        int scrabCnt = scrabs.size();
+        item.scrabCntUpdate(itemId, scrabCnt);
 
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 //userdetails.getuserId
@@ -152,13 +162,14 @@ public class ItemService {
                 item.getContents(),
                 item.getCreatedAt(),
                 item.getViewCnt(),
-                item.getScrabCnt(),
-                isSarb
+                scrabCnt,
+                isSrab
         );
         return itemDetailResponseDto;
     }
 
     // 이승재 / 아이템 구독하기
+    @Transactional
     public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
         Long userId = userDetails.getUserId();
@@ -168,17 +179,28 @@ public class ItemService {
             Scrab scrab1 = scrabRepository.findById(scrabId).orElseThrow(
                     ()-> new IllegalArgumentException("구독 정보가 없습니다.")
             );
-            scrab1.update(scrabId, false);
-//            scrabRepository.deleteById(scrabId);
+            if(scrab1.getScrab().equals(true)) {
+                scrab1.update(scrabId, false);
+            }else{
+                scrab1.update(scrabId, true);
+            }
         }else{
-            Scrab newScrab = Scrab.builder()
-                    .userId(userId)
-                    .itemId(itemId)
-                    .scrab(true)
-                    .build();
-            scrabRepository.save(newScrab);
+            Item item = itemRepository.findById(itemId).orElseThrow(
+                    () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+            );
+            if (userDetails.getUserId().equals(item.getBag().getUserId())) {
+                throw new IllegalArgumentException("본인 아이템입니다.");
+            }else {
+
+                Scrab newScrab = Scrab.builder()
+                        .userId(userId)
+                        .itemId(itemId)
+                        .scrab(true)
+                        .build();
+                scrabRepository.save(newScrab);
+            }
         }
-    }
+        }
 
     // 이승재 / 아이템 수정 (미리 구현)
     @Transactional
@@ -270,12 +292,12 @@ public class ItemService {
         Item sellerItem = itemRepository.findById(requestTradeDto.getSellerItemId()).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
-        sellerItem.statusUpdate(1);
+        sellerItem.statusUpdate(sellerItem.getId(), 1);
         for(Long buyerItemIds : requestTradeDto.getBuyerItemIds()) {
            Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
                    ()-> new IllegalArgumentException("아이템이 없습니다.")
            );
-           buyerItem.statusUpdate(1);
+           buyerItem.statusUpdate(buyerItemIds, 1);
         }
 
         //Long 형태인 아이디들을 String 형태로 변환
@@ -300,7 +322,99 @@ public class ItemService {
 
 
     // 이승재 교환신청 확인 페이지
-//    public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
-//    }
+    public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
+        Barter barter = barterRepository.findById(baterId).orElseThrow(
+                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+        );
+        User buyer = userRepository.findById(barter.getBuyerId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저정보가 없습니다.")
+        );
+        User seller = userRepository.findById(barter.getSellerId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저정보가 없습니다.")
+        );
+
+        // 판매자 및 구매자 닉네임
+        String buyerNickName = buyer.getNickname();
+        String sellerNickName = seller.getNickname();
+
+        // 판매자 아이템 이미지
+        Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
+        Item item = itemRepository.findById(sellerItemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        String sellerItemImage = item.getItemImg().split(",")[0];
+
+        // 구매자 아이템 이미지들
+        String buyerItem = barter.getBarter().split(";")[0];
+        List<Long> buyerItemId = new ArrayList<>();
+        for(int i = 0; i<buyerItem.split(",").length; i++){
+            buyerItemId.add(Long.valueOf(buyerItem.split(",")[i]));
+        }
+        List<String> buyerItemImages = new ArrayList<>();
+        for(Long id : buyerItemId){
+            Item item1 = itemRepository.findById(id).orElseThrow(
+                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+            );
+            String buyerItemImage = item1.getItemImg().split(",")[0];
+            buyerItemImages.add(buyerItemImage);
+        }
+        return new TradeDecisionDto(buyerNickName, sellerNickName, sellerItemImage, buyerItemImages);
+    }
+
+
+    // 이승재 교환신청 확인 페이지 수락 버튼
+    @Transactional
+    public void acceptTrade(Long baterId) {
+        Barter barter = barterRepository.findById(baterId).orElseThrow(
+                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+        );
+        // 거래내역 상태 업데이트
+        barter.updateBarter(2);
+
+        //아이템 상태 업데이트
+        Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
+        Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        sellerItem.statusUpdate(sellerItemId, 2);
+        String buyerItem = barter.getBarter().split(";")[0];
+        List<Long> buyerItemId = new ArrayList<>();
+        for(int i = 0; i<buyerItem.split(",").length; i++){
+            buyerItemId.add(Long.valueOf(buyerItem.split(",")[i]));
+        }
+        for(Long id : buyerItemId){
+            Item item = itemRepository.findById(id).orElseThrow(
+                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+            );
+            item.statusUpdate(id,2);
+        }
+    }
+
+    @Transactional
+    public void deleteTrade(Long baterId) {
+        //아이템 상태 업데이트
+        Barter barter = barterRepository.findById(baterId).orElseThrow(
+                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+        );
+        Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
+        Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        sellerItem.statusUpdate(sellerItemId,0);
+        String buyerItem = barter.getBarter().split(";")[0];
+        List<Long> buyerItemId = new ArrayList<>();
+        for(int i = 0; i<buyerItem.split(",").length; i++){
+            buyerItemId.add(Long.valueOf(buyerItem.split(",")[i]));
+        }
+        for(Long id : buyerItemId){
+            Item item = itemRepository.findById(id).orElseThrow(
+                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+            );
+            item.statusUpdate(id,0);
+        }
+
+        // 거래내역 삭제
+       barterRepository.deleteById(baterId);
+    }
 }
 

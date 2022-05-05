@@ -27,12 +27,11 @@ public class JWTAuthProvider implements AuthenticationProvider {
             userDetails = UserDetailsImpl.createEmpty();
         } else {
             Long userId = jwtDecoder.decodeTokenByUserId(token);
-            String nickname = jwtDecoder.decodeTokenBy("nickname", token);
-            String profile = jwtDecoder.decodeTokenBy("profile", token);
+            String nickname = jwtDecoder.decodeTokenByNickname(token);
 
             userDetails = UserDetailsImpl
                     .fromUserRequestDto(
-                            UserRequestDto.createTokenOf(userId, nickname, profile)
+                            UserRequestDto.createOf(userId, nickname)
                     );
         }
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

@@ -204,14 +204,14 @@ public class ScoreService {
                 Long buyerId = Long.valueOf(eachBuyer);
                 Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
                         () -> new IllegalArgumentException("buyerItem not found"));
-                buyerItem.statusEditUpdate(status);
+                buyerItem.statusUpdate(buyerItem.getId(), status);
             }
             //셀러(유저)의 물품을 찾아서 정보를 넣기
             Long sellerId = Long.parseLong(sellerItemId);
             Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
                     () -> new IllegalArgumentException("sellerItem not found")
             );
-            sellerItem.statusEditUpdate(status);
+            sellerItem.statusUpdate(sellerItem.getId(), status);
             // 유저 정보를 업데이트 이후 status를 거래완료(3) -> 평가완료(4)으로 업데이트를 한다.
             barter.updateBarter(status);
 

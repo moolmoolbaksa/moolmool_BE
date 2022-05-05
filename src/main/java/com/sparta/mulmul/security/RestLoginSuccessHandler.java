@@ -1,7 +1,7 @@
 package com.sparta.mulmul.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.mulmul.dto.FirstSignupCheckDto;
+import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.security.jwt.JwtTokenUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -27,9 +27,7 @@ public class RestLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         response.setContentType("application/json;charset=utf-8");
 
         ObjectMapper mapper = new ObjectMapper();
-        String result = mapper.writeValueAsString(
-                FirstSignupCheckDto.fromProfile(userDetails.getProfile())
-        );
+        String result = mapper.writeValueAsString( OkDto.valueOf("true") );
         response.getWriter().write(result);
     }
 

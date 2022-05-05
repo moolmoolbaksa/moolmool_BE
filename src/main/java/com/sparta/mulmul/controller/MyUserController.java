@@ -46,7 +46,7 @@ public class MyUserController {
 
     }
 
-//    // 이승재 / 찜한 아이템 보여주기
+    // 이승재 / 찜한 아이템 보여주기
 //    @GetMapping("/api/mypage/scrab")
 //    public MyScrabItemDto scrabItem(@AuthenticationPrincipal UserDetailsImpl userDetails){
 //
