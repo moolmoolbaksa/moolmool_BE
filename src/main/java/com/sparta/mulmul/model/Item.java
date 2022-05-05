@@ -62,6 +62,7 @@ public class Item extends Timestamped{
         this.viewCnt = viewCnt;
     }
 
+
     // 이승재 / 아이템 수정
     public void itemUpdate(ItemRequestDto itemRequestDto, String imgUrl, String favored) {
         this.title = itemRequestDto.getTitle();
@@ -83,5 +84,4 @@ public class Item extends Timestamped{
         this.id = id;
         this.scrabCnt = scrabCnt;
     }
-
 }

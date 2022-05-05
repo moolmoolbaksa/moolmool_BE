@@ -21,32 +21,6 @@ public class UserController {
 
     private final AwsS3Service awsS3Service;
 
-//    private final AwsS3Service awsS3Service;
-
-
-    // 아래에서 부터 주어지는 return 값은 논의 후 한 가지 방법으로 바뀔 수 있습니다.
-
-    // 회원가입
-    @PostMapping("/user/signup")
-    public ResponseEntity<OkDto> signup(@RequestBody UserRequestDto requestDto) {
-        userService.signup(requestDto);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
-    }
-
-    // 아이디 중복 체크
-    @PostMapping("/user/id-check")
-    public ResponseEntity<OkDto> idCheck(@RequestBody UserRequestDto requestDto) {
-        userService.checkBy("username", requestDto);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
-    }
-
-    // 닉네임 중복 체크
-    @PostMapping("/user/nickname-check")
-    public ResponseEntity<OkDto> nickCheck(@RequestBody UserRequestDto requestDto) {
-        userService.checkBy("nickname", requestDto);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
-    }
-
     // 주소, 프로필 이미지 설정
     @PostMapping("/user/info")
     public ResponseEntity<OkDto> setUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -63,43 +37,5 @@ public class UserController {
     public UserCheckResponseDto userCheck(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userService.userCheck(userDetails);
     }
-
-
-
-//    /*성훈 - 마이페이지 내 정보 보기*/
-//    @GetMapping("/api/mypage")
-//    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return userService.showMyPage(userDetails);
-//    }
-//
-//    /*성훈 - 마이페이지 내 정보 수정*/
-//    @PutMapping("/api/mypage")
-//    public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
-//                                             @RequestParam("profile") List<MultipartFile> multipartFile,
-//                                             @RequestParam("address") String address,
-//                                             @RequestParam("storeInfo") String storeInfo,
-//                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
-//        return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
-//
-//    }
-
-//    /*성훈 - 마이페이지 내 정보 보기*/
-//    @GetMapping("/api/mypage")
-//    public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return userService.showMyPage(userDetails);
-//    }
-
-//    /*성훈 - 마이페이지 내 정보 수정*/
-//    @PutMapping("/api/mypage")
-//    public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
-//                                             @RequestParam("profile") List<MultipartFile> multipartFile,
-//                                             @RequestParam("address") String address,
-//                                             @RequestParam("storeInfo") String storeInfo,
-//                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
-//        return userService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
-//
-//    }
 
 }

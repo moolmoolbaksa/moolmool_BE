@@ -59,7 +59,6 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
         }
         else if ( tokenPayload == null ){ jwtToken = new JwtPreProcessingToken("null"); }
         else { jwtToken = new JwtPreProcessingToken(
-
                     extractor.extract(tokenPayload, request));
         }
 

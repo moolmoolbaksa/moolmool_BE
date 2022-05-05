@@ -29,9 +29,9 @@ public class User {
     private Long kakaoId;
 
     private String address;
-    private String profile;
+    private String profile = "http://kaihuastudio.com/common/img/default_profile.png";
     private String storeInfo;
-    private String degree;
+    private String degree = "물물어린이";
     private int raterCount;
     private float totalGrade;
     private float grade;
@@ -40,7 +40,7 @@ public class User {
     public void initProfile(UserRequestDto requestDto){
 
         this.address = requestDto.getAddress();
-        if ( requestDto.getProfile() == null ) { this.profile = "setDefaultURL"; }
+        if ( requestDto.getProfile() == null ) { this.profile = "http://kaihuastudio.com/common/img/default_profile.png"; }
         else { this.profile = requestDto.getProfile(); }
         this.storeInfo = requestDto.getStoreInfo();
 

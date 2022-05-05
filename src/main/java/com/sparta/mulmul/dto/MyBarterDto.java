@@ -13,17 +13,19 @@ public class MyBarterDto {
     private Long itemId;
     private String title;
     private String itemImg;
-    private LocalDateTime date;
-    private int status;
-
 
     //성훈 - 거래내역
-    public MyBarterDto(Long itemId, String title, String itemImg, LocalDateTime date, int status) {
+    public MyBarterDto(Long itemId, String title, String itemImg) {
         this.itemId = itemId;
         this.title = title;
         this.itemImg = itemImg;
-        this.date = date;
-        this.status = status;
+
     }
 
+
+    public void add(Long eachBuyerId, String buyerItemTitle, String buyerItemImg) {
+        this.itemId = eachBuyerId;
+        this.title = buyerItemTitle;
+        this.itemImg = buyerItemImg;
+    }
 }

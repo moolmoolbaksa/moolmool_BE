@@ -127,7 +127,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("GET,/user/kakao");
 
         skipPathList.add("GET,/favicon.ico");
+
         // 웹소켓 허용
+        skipPathList.add("POST,/ws/chat/**");
+        skipPathList.add("GET,/ws/chat/**");
         skipPathList.add("GET,/ws-stomp/**/**");
         skipPathList.add("GET,/ws-stomp/**");
         FilterSkipMatcher matcher = new FilterSkipMatcher(

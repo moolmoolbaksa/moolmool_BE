@@ -1,10 +1,11 @@
 package com.sparta.mulmul.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.KakaoUserInfoDto;
+import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
+import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.security.jwt.JwtTokenUtils;
@@ -26,6 +27,7 @@ public class KakaoUserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final BagRepository bagRepository;
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private RestTemplate rt = new RestTemplate();
@@ -97,10 +99,14 @@ public class KakaoUserService {
 
         if (kakaoUser == null) {
             String password = passwordEncoder.encode(UUID.randomUUID().toString());
+
             kakaoUser = userRepository.save(
                     User.fromKakaoUserWithPassword(kakaoUserInfo, password)
             );
+
+            bagRepository.save(new Bag(kakaoUser));
         }
+
         return kakaoUser;
     }
 

@@ -92,7 +92,7 @@ public class AwsS3Service {
 
             // 기존 ImageRepository에서 삭제
             Long userId = userDetails.getUserId();
-            User user = userRepository.getById(userId);
+            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("user not found"));;
 
             String userImgUrl = user.getProfile();
             if (userImgUrl != null){
