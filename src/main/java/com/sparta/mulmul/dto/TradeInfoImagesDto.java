@@ -12,4 +12,5 @@ public class TradeInfoImagesDto {
         this.itemId = itemId;
         this.image = itemImage;
     }
+
 }

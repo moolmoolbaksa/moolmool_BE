@@ -50,8 +50,12 @@ public class UserController {
     // 주소, 프로필 이미지 설정
     @PostMapping("/user/info")
     public ResponseEntity<OkDto> setUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                             @RequestBody UserRequestDto requestDto) {
-        userService.setUserInfo(userDetails, requestDto);
+                                             @RequestParam("address") String address,
+                                             @RequestParam("profile") List<MultipartFile> multipartFiles,
+                                             @RequestParam("storeInfo") String storeInfo) {
+
+        List<String> profile = awsS3Service.uploadFile(multipartFiles);
+        userService.setUserInfo(userDetails, new UserRequestDto(address, profile.get(0), storeInfo));
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 

@@ -4,10 +4,9 @@ import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.AwsS3Service;
 import com.sparta.mulmul.service.MyUserService;
-import com.sparta.mulmul.service.UserService;
-import lombok.Getter;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

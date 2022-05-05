@@ -4,6 +4,12 @@ package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
+
+import com.sparta.mulmul.repository.BagRepository;
+import com.sparta.mulmul.repository.ItemRepository;
+import com.sparta.mulmul.repository.ScrabRepository;
+import com.sparta.mulmul.repository.UserRepository;
+
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +39,7 @@ public class ItemService {
 
         // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
-         bag.update(bag.getItemCnt()+1);
+        bag.update(bag.getItemCnt()+1);
 
 
         Item item = Item.builder()
@@ -62,6 +68,7 @@ public class ItemService {
             for(Item item : itemList){
                 List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
                 int scrabCnt = scrabs.size();
+
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
                         item.getId(),
                         item.getCategory(),
@@ -69,6 +76,7 @@ public class ItemService {
                         item.getContents(),
                         item.getItemImg().split(",")[0],
                         item.getAddress(),
+
                         scrabCnt,
                         item.getViewCnt(),
                         item.getStatus());
@@ -99,11 +107,11 @@ public class ItemService {
                    item.getViewCnt(),
                    item.getStatus(),
                    isScrab);
-           items.add(itemResponseDto);
+                items.add(itemResponseDto);
+            }
+            return items;
+        }
 
-       }
-       return items;
-    }
 
 
     // 이승재 / 아이템 상세페이지
@@ -229,6 +237,8 @@ public class ItemService {
     }
 
 
+
+
     // 이승재 / 유저 스토어 목록 보기
     public UserStoreResponseDto showStore(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -248,7 +258,9 @@ public class ItemService {
         for(Item item : myItemList){
             Long itemId = item.getId();
             String itemImg = item.getItemImg();
+
             int status = item.getStatus();
+
             ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
             itemUserResponseDtos.add(itemUserResponseDto);
         }
@@ -256,6 +268,7 @@ public class ItemService {
         return new UserStoreResponseDto(nickname, profile, degree, grade, address, storeInfo, itemUserResponseDtos);
 
     }
+
 
     // 이승재 / 교환신청하기 전 정보
     public TradeInfoDto showTradeInfo(Long itemid, Long userId,  UserDetailsImpl userDetails) {
@@ -417,4 +430,6 @@ public class ItemService {
        barterRepository.deleteById(baterId);
     }
 }
+
+
 

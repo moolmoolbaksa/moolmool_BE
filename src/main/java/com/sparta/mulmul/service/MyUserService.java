@@ -50,6 +50,7 @@ public class MyUserService {
             Long itemId = items.getId();
             String itemImg = items.getItemImg();
             int status = items.getStatus();
+
             ItemUserResponseDto itemResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
             myItemResponseDtosList.add(itemResponseDto);
         }

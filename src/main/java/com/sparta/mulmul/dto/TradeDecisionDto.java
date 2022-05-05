@@ -17,4 +17,5 @@ public class TradeDecisionDto {
         this.sellerItemImage = sellerItemImage;
         this.buyerItemImages = buyerItemImages;
     }
+
 }

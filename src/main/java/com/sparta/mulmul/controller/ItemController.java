@@ -1,7 +1,6 @@
 package com.sparta.mulmul.controller;
 
 
-import com.mysql.cj.x.protobuf.Mysqlx;
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.AwsS3Service;
@@ -9,7 +8,6 @@ import com.sparta.mulmul.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,10 +30,10 @@ public class ItemController {
             @RequestParam("contents") String contents,
             @RequestParam("images") List<MultipartFile> multipartFiles,
             @RequestParam("type") String type,
-        @AuthenticationPrincipal UserDetailsImpl userDetails
+            @AuthenticationPrincipal UserDetailsImpl userDetails
 
     ){
-         List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
+        List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
         ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
         itemService.createItem(itemRequestDto, userDetails);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
@@ -132,3 +130,5 @@ public class ItemController {
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 }
+
+

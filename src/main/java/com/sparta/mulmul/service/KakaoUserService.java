@@ -10,16 +10,12 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.security.jwt.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.TOKEN_TYPE;
@@ -31,27 +27,32 @@ public class KakaoUserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    private HttpHeaders headers = new HttpHeaders();
-    private RestTemplate rt = new RestTemplate();
     private ObjectMapper objectMapper = new ObjectMapper();
+    private RestTemplate rt = new RestTemplate();
 
     public String kakaoLogin(String code) throws JsonProcessingException {
-
+        // 카카오 서버로 요청
         String accessToken = getAccessToken(code);
+        // 카카오 서버로 재차 요청 by access token
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
-        return getJwtToken(kakaoUserInfo);
-
+        // 회원가입과 로그인 처리 및 유저 정보 받아오기
+        User kakaoUser = registerUserIfNeeded(kakaoUserInfo);
+        // 토큰 만들기
+        return getJwtToken(kakaoUser);
     }
 
     private String getAccessToken(String code) throws JsonProcessingException {
 
+        HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "6117b8849303b224556a558baf39dcb9");
-        body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
+        body.add("client_id", "6c57a62de555a589bbaaabdc73a9e011");
+//        body.add("client_id", "6117b8849303b224556a558baf39dcb9");
+        body.add("redirect_uri", "http://localhost:3000/auth/kakao/callback");
+//        body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
         body.add("code", code);
 
         // HTTP 요청 보내기
@@ -65,27 +66,17 @@ public class KakaoUserService {
         );
 
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
-        String responseBody = response.getBody();
-        System.out.println(responseBody);
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return jsonNode.get("access_token").asText();
+        return objectMapper.readTree(response.getBody()).get("access_token").asText();
     }
 
     private KakaoUserInfoDto getKakaoUserInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
+        HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
-
-        rt.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        rt.setErrorHandler(new DefaultResponseErrorHandler(){
-            public boolean hasError(ClientHttpResponse response) throws IOException {
-                HttpStatus statusCode = response.getStatusCode();
-                return statusCode.series() == HttpStatus.Series.SERVER_ERROR;
-            }
-        });
 
         ResponseEntity<String> response = rt.exchange(
                 "https://kapi.kakao.com/v2/user/me",
@@ -94,15 +85,11 @@ public class KakaoUserService {
                 String.class
         );
 
-        String responseBody = response.getBody();
-        System.out.println(responseBody);
-        JsonNode jsonNode = objectMapper.readTree(responseBody);
-
         return KakaoUserInfoDto
-                .fromJsonNode(jsonNode);
+                .fromJsonNode(objectMapper.readTree(response.getBody()));
     }
 
-    private String getJwtToken(KakaoUserInfoDto kakaoUserInfo) {
+    private User registerUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
         // DB 에 중복된 Kakao Id 가 있는지 확인
         Long kakaoId = kakaoUserInfo.getId();
         User kakaoUser = userRepository.findByKakaoId(kakaoId)
@@ -114,10 +101,13 @@ public class KakaoUserService {
                     User.fromKakaoUserWithPassword(kakaoUserInfo, password)
             );
         }
+        return kakaoUser;
+    }
 
+    // JWT 토큰 추출
+    private String getJwtToken(User kakaoUser){
         return TOKEN_TYPE + " " + JwtTokenUtils.generateJwtToken(
                 UserDetailsImpl.fromUser(kakaoUser)
         );
     }
-
 }

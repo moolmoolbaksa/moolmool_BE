@@ -49,7 +49,6 @@ public class UserService {
         String EncodedPassword = passwordEncoder.encode(requestDto.getPassword());
         // 회원가입 및 반환
 
-
         bagRepository.save(new Bag(userRepository.save(
                 User.withPassword(requestDto, EncodedPassword)
         ))
@@ -60,28 +59,31 @@ public class UserService {
     // 아이디 중복 체크
     public void checkBy(String userInfo, UserRequestDto requestDto){
 
-        if (userInfo.equals("username")) { // username에 대한 중복 체크 시행
-            if ( userRepository
-                    .findByUsername(requestDto.getUsername())
-                    .isPresent() )
-            { throw new IllegalArgumentException("이메일이 중복됩니다.");}
-        } else if (userInfo.equals("nickname")) { // nickname에 대한 중복 체크 시행
-            if ( userRepository
-                    .findByNickname(requestDto.getNickname())
-                    .isPresent() )
-            { throw new IllegalArgumentException("닉네임이 중복됩니다.");}
-        } else if (userInfo.equals("usernameAndNickname")) {
-            if ( userRepository
-                    .findByUsername(requestDto.getUsername())
-                    .isPresent() )
-            { throw new IllegalArgumentException("이메일이 중복됩니다.");}
-            if ( userRepository
-                    .findByNickname(requestDto.getNickname())
-                    .isPresent() )
-            { throw new IllegalArgumentException("닉네임이 중복됩니다.");}
-        }
-        else { // 메소드 인자 입력 오류
-            throw new IllegalArgumentException("\"username\", \"nickname\", \"usernameAndNickname\"을 인자로 중복체크를 시행해 주세요.");
+        switch (userInfo) {
+            case "username":  // username에 대한 중복 체크 시행
+                if (userRepository
+                        .existsByUsername(requestDto.getUsername())) {
+                    throw new IllegalArgumentException("이메일이 중복됩니다.");
+                }
+                break;
+            case "nickname":  // nickname에 대한 중복 체크 시행
+                if (userRepository
+                        .existsByNickname(requestDto.getNickname())) {
+                    throw new IllegalArgumentException("닉네임이 중복됩니다.");
+                }
+                break;
+            case "usernameAndNickname": // username과 nickname에 대한 중복 체크 시행
+                if (userRepository
+                        .existsByUsername(requestDto.getUsername())) {
+                    throw new IllegalArgumentException("이메일이 중복됩니다.");
+                }
+                if (userRepository
+                        .existsByNickname(requestDto.getNickname())) {
+                    throw new IllegalArgumentException("닉네임이 중복됩니다.");
+                }
+                break;
+            default:  // 메소드 인자 입력 오류
+                throw new IllegalArgumentException("\"username\", \"nickname\", \"usernameAndNickname\"을 인자로 중복체크를 시행해 주세요.");
         }
     }
 
@@ -130,6 +132,7 @@ public class UserService {
             Long itemId = items.getId();
             String itemImg = items.getItemImg();
             int status = items.getStatus();
+
             ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
             itemResponseDtosList.add(itemUserResponseDto);
         }

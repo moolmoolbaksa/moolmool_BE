@@ -124,12 +124,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("POST,/user/login");
         skipPathList.add("POST,/user/id-check");
         skipPathList.add("POST,/user/nickname-check");
-        skipPathList.add("GET,/user/kakao/callback");
+        skipPathList.add("GET,/user/kakao");
 
         skipPathList.add("GET,/favicon.ico");
         // 웹소켓 허용
-        skipPathList.add("GET,/ws/chat/**");
-        skipPathList.add("GET,/ws/chat/**/**");
         skipPathList.add("GET,/ws-stomp/**/**");
         skipPathList.add("GET,/ws-stomp/**");
         FilterSkipMatcher matcher = new FilterSkipMatcher(
@@ -157,7 +155,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedOrigin(("https://kapi.kakao.com/v2/user/me"));
+        configuration.addAllowedOrigin("https://kapi.kakao.com/v2/user/me");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.addExposedHeader(AUTH_HEADER);

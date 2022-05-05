@@ -8,10 +8,12 @@ import lombok.NoArgsConstructor;
 public class OkDto {
     private Boolean ok;
 
-    public OkDto(String value){
-        if ( value.equals("true")){ this.ok = true; }
-        else if ( value.equals("false") ){ this.ok = false; }
-    }
+    public static OkDto valueOf(String value){
 
-    public static OkDto valueOf(String value){ return new OkDto(value); }
+        OkDto okDto = new OkDto();
+        if ( value.equals("true")){ okDto.ok = true; }
+        else if ( value.equals("false") ){ okDto.ok = false; }
+
+        return okDto;
+    }
 }

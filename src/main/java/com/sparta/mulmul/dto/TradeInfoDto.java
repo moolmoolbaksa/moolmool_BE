@@ -18,4 +18,5 @@ public class TradeInfoDto {
         this.myNickName = myNickName;
         this.myImages = tradeInfoImagesDtoArrayList;
     }
+
 }

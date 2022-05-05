@@ -9,4 +9,5 @@ public class MyScrabItemDto {
     private String title;
     private String contents;
     private String image;
+
 }

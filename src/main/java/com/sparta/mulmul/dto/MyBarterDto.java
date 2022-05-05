@@ -16,6 +16,7 @@ public class MyBarterDto {
     private LocalDateTime date;
     private int status;
 
+
     //성훈 - 거래내역
     public MyBarterDto(Long itemId, String title, String itemImg, LocalDateTime date, int status) {
         this.itemId = itemId;
