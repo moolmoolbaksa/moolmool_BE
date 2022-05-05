@@ -1,6 +1,5 @@
 package com.sparta.mulmul.config;
 
-import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.FilterSkipMatcher;
 import com.sparta.mulmul.security.RestFailureHandler;
 import com.sparta.mulmul.security.RestLoginSuccessHandler;
@@ -26,6 +25,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
 
 @Configuration
 @EnableWebSecurity
@@ -57,7 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 접근 완전 허용 (CSRF, FrameOptions 무시)
         web
                 .ignoring()
-                .antMatchers("/h2-console/**");
+                .antMatchers("/h2-console/**")
+                .antMatchers("/chat/**");
     }
 
     @Override
@@ -122,9 +124,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("POST,/user/login");
         skipPathList.add("POST,/user/id-check");
         skipPathList.add("POST,/user/nickname-check");
+        skipPathList.add("GET,/user/kakao");
 
         skipPathList.add("GET,/favicon.ico");
 
+        // 웹소켓 허용
+        skipPathList.add("POST,/ws/chat/**");
+        skipPathList.add("GET,/ws/chat/**");
+        skipPathList.add("GET,/ws-stomp/**/**");
+        skipPathList.add("GET,/ws-stomp/**");
         FilterSkipMatcher matcher = new FilterSkipMatcher(
                 skipPathList,
                 "/**"
@@ -150,8 +158,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("https://kapi.kakao.com/v2/user/me");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
+        configuration.addExposedHeader(AUTH_HEADER);
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

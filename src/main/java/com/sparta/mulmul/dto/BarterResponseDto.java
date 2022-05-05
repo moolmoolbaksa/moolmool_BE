@@ -3,17 +3,27 @@ package com.sparta.mulmul.dto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder
 public class BarterResponseDto {
-    private Long barterId;
-    private List<BarterItemResponseDto> myItem;
+    private BarterNotFinDto notFinBarter;
+    private BarterFinDto finBarter;
 
-    // 성훈 - 거래내역
-    public  BarterResponseDto(Long barterId, List<BarterItemResponseDto> myItem) {
-        this.barterId = barterId;
-        this.myItem = myItem;
+    public BarterResponseDto(BarterNotFinDto notFinBarter, BarterFinDto finBarter) {
+        this.notFinBarter = notFinBarter;
+        this.finBarter = finBarter;
+    }
+
+    public void addNotFin(BarterNotFinDto notFinBarter) {
+        this.notFinBarter = notFinBarter;
+        this.finBarter = null;
+    }
+
+    public void addFin(BarterFinDto finBarter) {
+        this.notFinBarter = null;
+        this.finBarter = finBarter;
     }
 }

@@ -1,6 +1,7 @@
 package com.sparta.mulmul.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.security.jwt.JwtTokenUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -8,9 +9,6 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RestLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
@@ -26,19 +24,11 @@ public class RestLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         // Token 생성
         final String token = JwtTokenUtils.generateJwtToken(userDetails);
         response.addHeader(AUTH_HEADER, TOKEN_TYPE + " " + token);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json;charset=utf-8");
 
-        Map<String,Object> res = new HashMap<>();
-        res.put("ok", true);
-        if ( userDetails.getProfile() == null ) { res.put("isFirst", true); }
-        else { res.put("isFirst", false); }
-
-        OutputStream out = response.getOutputStream();
         ObjectMapper mapper = new ObjectMapper();
-        mapper.writerWithDefaultPrettyPrinter().writeValue(out, res);
-        out.flush();
+        String result = mapper.writeValueAsString( OkDto.valueOf("true") );
+        response.getWriter().write(result);
     }
 
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtPreProcessingToken;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -17,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * Token 을 내려주는 Filter 가 아닌  client 에서 받아지는 Token 을 서버 사이드에서 검증하는 클레스 SecurityContextHolder 보관소에 해당
@@ -42,22 +40,27 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
             HttpServletResponse response
     ) throws AuthenticationException, IOException {
 
+        JwtPreProcessingToken jwtToken;
+
         // JWT 값을 담아주는 변수 TokenPayload
-        // 회원가입시에 작동됩니다.
         String tokenPayload = request.getHeader("Authorization");
-        if (tokenPayload == null) {
-            response.setContentType("application/json");
-            response.setCharacterEncoding("utf-8");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            OutputStream out = response.getOutputStream();
+        String method = request.getMethod();
+
+        if ( tokenPayload == null && !method.equals("GET") ) {
+
+            response.setContentType("application/json;charset=utf-8");
+            response.setStatus(HttpServletResponse.SC_OK);
+
             ObjectMapper mapper = new ObjectMapper();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(out, ResponseEntity.badRequest().body(OkDto.valueOf("false")).getBody());
-            out.flush();
+            String result = mapper.writeValueAsString(OkDto.valueOf("false"));
+            response.getWriter().write(result);
+
             return null;
         }
-
-        JwtPreProcessingToken jwtToken = new JwtPreProcessingToken(
-                extractor.extract(tokenPayload, request));
+        else if ( tokenPayload == null ){ jwtToken = new JwtPreProcessingToken("null"); }
+        else { jwtToken = new JwtPreProcessingToken(
+                    extractor.extract(tokenPayload, request));
+        }
 
         return super
                 .getAuthenticationManager()

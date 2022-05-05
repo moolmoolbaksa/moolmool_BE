@@ -20,17 +20,20 @@ public class JWTAuthProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication)
             throws AuthenticationException {
+
         String token = (String) authentication.getPrincipal();
+        UserDetailsImpl userDetails;
+        if ( token.equals("null") ){
+            userDetails = UserDetailsImpl.createEmpty();
+        } else {
+            Long userId = jwtDecoder.decodeTokenByUserId(token);
+            String nickname = jwtDecoder.decodeTokenByNickname(token);
 
-        Long userId = jwtDecoder.decodeTokenByUserId(token);
-        String nickname = jwtDecoder.decodeTokenBy("nickname", token);
-        String profile = jwtDecoder.decodeTokenBy("profile", token);
-
-        UserDetailsImpl userDetails = UserDetailsImpl
-                .fromUserRequestDto(
-                        UserRequestDto.createTokenValueOf(userId, nickname, profile)
-                );
-
+            userDetails = UserDetailsImpl
+                    .fromUserRequestDto(
+                            UserRequestDto.createOf(userId, nickname)
+                    );
+        }
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 

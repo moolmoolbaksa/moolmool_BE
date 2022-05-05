@@ -14,9 +14,10 @@ import java.util.List;
 public class ItemDetailResponseDto {
     private Long userId;
     private String nickname;
+    private String degree;
     private float grade;
     private String profile;
-    private String status;
+    private int status;
     private List<String> images;
     private List<String> bagImages;
     private String  title;
@@ -24,15 +25,16 @@ public class ItemDetailResponseDto {
     private LocalDateTime date;
     private int viewCnt;
     private int scrabCnt;
-    private boolean isScarb;
+    private Boolean isScrab;
 
 
     // 이승재 / 아이템 상세페이지
     public ItemDetailResponseDto(Long i,
                            String nickname,
+                           String degree,
                            float v,
                            String profile,
-                           String status,
+                           int status,
                            List<String> itemImgList,
                            List<String> bagImages,
                            String title,
@@ -40,9 +42,10 @@ public class ItemDetailResponseDto {
                            LocalDateTime createdAt,
                            int viewCnt,
                            int scrabCnt,
-                           boolean isScarb) {
+                           Boolean isScrab) {
         this.userId = i;
         this.nickname = nickname;
+        this.degree = degree;
         this.grade = v;
         this.profile = profile;
         this.status = status;
@@ -53,6 +56,6 @@ public class ItemDetailResponseDto {
         this.date = createdAt;
         this.viewCnt = viewCnt;
         this.scrabCnt = scrabCnt;
-        this.isScarb = isScarb;
+        this.isScrab = isScrab;
     }
 }
