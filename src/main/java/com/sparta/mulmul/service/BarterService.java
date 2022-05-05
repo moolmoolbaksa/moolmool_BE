@@ -208,14 +208,14 @@ public class BarterService {
             Long buyerId = Long.valueOf(eachBuyer);
             Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
                     () -> new IllegalArgumentException("buyerItem not found"));
-            buyerItem.statusUpdate(buyerItem.getId,3);
+            buyerItem.statusUpdate(buyerItem.getId(),3);
         }
         //셀러(유저)의 물품을 찾아서 정보를 넣기
         Long sellerId = Long.parseLong(sellerItemId);
         Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
                 () -> new IllegalArgumentException("sellerItem not found")
         );
-        sellerItem.statusUpdate(sellerItem.getId,3);
+        sellerItem.statusUpdate(sellerItem.getId(),3);
         myBarter.updateBarter(3);
         System.out.println("내거래 상태 : " + myBarter.getStatus());
     }
