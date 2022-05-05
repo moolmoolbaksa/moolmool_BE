@@ -165,6 +165,10 @@ public class BarterService {
         if (mybarter.getStatus() != 2){
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
+        // 거래외 사람이 취소를 할 경우
+        if (!mybarter.getBuyerId().equals(userId) && !mybarter.getSellerId().equals(userId)){
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+        }
 
 
         String[] barterIdList = mybarter.getBarter().split(";");
@@ -201,6 +205,7 @@ public class BarterService {
         if (myBarter.getStatus() != 2){
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
+
 
         String[] barterIdList = myBarter.getBarter().split(";");
         String[] buyerItemId = barterIdList[0].split(",");
