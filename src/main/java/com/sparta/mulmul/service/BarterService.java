@@ -38,12 +38,13 @@ public class BarterService {
         Long userId = userDetails.getUserId();
         // (거래 물품리스트들과 거래내역의 Id값)이 포함된 거래내역 리스트를 담을 Dto
         List<BarterResponseDto> totalList = new ArrayList<>();
-        // 유저의 거래내역 리스트를 전부 조회한다
-        List<Barter> mybarterList = barterRepository.findAllMybarter(userId);
         // 상대방 아이디
         Long opponentId = null;
         // 나의 포지션
         String myPosition = null;
+
+        // 유저의 거래내역 리스트를 전부 조회한다
+        List<Barter> mybarterList = barterRepository.findAllByBuyerIdOrSellerId(userId, userId);
 
         // 내가 거래한 거래리스트를 대입한다.
         // barterId, buyerId, SellerId를 분리한다.

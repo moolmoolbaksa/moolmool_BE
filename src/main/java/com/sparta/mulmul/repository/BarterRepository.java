@@ -11,6 +11,5 @@ import java.util.List;
 
 public interface BarterRepository extends JpaRepository<Barter, Long> {
 
-    @Query("SELECT b FROM Barter b WHERE b.buyerId = : userId ")
-    List<Barter> findAllMybarter(@Param("userId") Long userId);
+    List<Barter> findAllByBuyerIdOrSellerId(Long userId, Long userId1);
 }
