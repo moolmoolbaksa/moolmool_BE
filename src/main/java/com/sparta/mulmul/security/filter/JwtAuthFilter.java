@@ -46,6 +46,8 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
         String tokenPayload = request.getHeader("Authorization");
         String method = request.getMethod();
 
+        System.out.println(tokenPayload);
+
         if ( tokenPayload == null && !method.equals("GET") ) {
 
             response.setContentType("application/json;charset=utf-8");
