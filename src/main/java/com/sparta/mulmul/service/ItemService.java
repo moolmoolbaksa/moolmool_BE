@@ -76,7 +76,6 @@ public class ItemService {
                         item.getContents(),
                         item.getItemImg().split(",")[0],
                         item.getAddress(),
-
                         scrabCnt,
                         item.getViewCnt(),
                         item.getStatus());
