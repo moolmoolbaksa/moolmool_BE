@@ -7,12 +7,12 @@ import lombok.Getter;
 @Builder
 public class ItemUserResponseDto{
     private Long itemId;
-    private String itemImg;
+    private String image;
     private int status;
 
-    public ItemUserResponseDto(Long itemId, String itemImg, int status) {
+    public ItemUserResponseDto(Long itemId, String image, int status) {
         this.itemId = itemId;
-        this.itemImg = itemImg;
+        this.image = image;
         this.status = status;
     }
 }

@@ -153,6 +153,7 @@ public class BarterService {
 
 
     // 교환신청 취소 물건상태 2(교환중) -> 0(물품등록한 상태), 거래내역 삭제
+    @Transactional
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
@@ -164,6 +165,7 @@ public class BarterService {
         if (mybarter.getStatus() != 2){
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
+
 
         String[] barterIdList = mybarter.getBarter().split(";");
         String[] buyerItemId = barterIdList[0].split(",");
@@ -188,6 +190,7 @@ public class BarterService {
 
 
     // 성훈 - 거래 완료 - 프론트랑 테스트해보기
+    @Transactional
     public void OkayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")

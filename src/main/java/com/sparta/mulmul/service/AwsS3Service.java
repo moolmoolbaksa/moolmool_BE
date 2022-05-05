@@ -95,7 +95,8 @@ public class AwsS3Service {
             User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("user not found"));;
 
             String userImgUrl = user.getProfile();
-            if (userImgUrl != null){
+
+           if (!userImgUrl.equals("http://kaihuastudio.com/common/img/default_profile.png")) {
                 Image nowImage = imageRepository.findByImgUrl(userImgUrl);
                 String nowFileName = nowImage.getFileName();
                 Long nowImgeId = nowImage.getId();

@@ -78,12 +78,10 @@ public class User {
     }
 
     public void updateScore(float totalGrade, float grade, int raterCount, String degree) {
-
         this.totalGrade = totalGrade;
         this.grade = grade;
         this.raterCount = raterCount;
         this.degree = degree;
-
     }
 
 }
