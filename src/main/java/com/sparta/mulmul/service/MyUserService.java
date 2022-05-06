@@ -28,10 +28,6 @@ public class MyUserService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final ScrabRepository scrabRepository;
-<<<<<<< HEAD
-
-=======
->>>>>>> 843d031c59b81ec34f3745d050cbb145f2a42e3d
 
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
@@ -56,18 +52,6 @@ public class MyUserService {
         List<Item> myScrabItemList = itemRepository.findByAllMyScrabItem(userId);
         int cnt = 0;
         for (Item scrapItem : myScrabItemList) {
-<<<<<<< HEAD
-            ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
-                    scrapItem.getId(),
-                    scrapItem.getItemImg().split(",")[0],
-                    scrapItem.getStatus()
-            );
-            cnt++;
-            myScrapItemList.add(scrabitemDto);
-            // 5번 담으면 멈춘다
-            if (cnt == 5) {
-                break;
-=======
             Scrab myScrab = scrabRepository.getById(scrapItem.getId());
             if (myScrab.getScrab().equals(true)) {
                 ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
@@ -81,7 +65,6 @@ public class MyUserService {
                 if (cnt == 3) {
                     break;
                 }
->>>>>>> 843d031c59b81ec34f3745d050cbb145f2a42e3d
             }
         }
 
@@ -98,54 +81,56 @@ public class MyUserService {
         );
     }
 
-    // 성훈_마이페이지_내 정보수정
-    @Transactional
-    public UserEditResponseDto editMyPage(String nickname, String address, String storeInfo, List<String> imgUrl, UserDetailsImpl userDetails) {
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                () -> new IllegalArgumentException("user not found")
-        );
-        String profile = null;
-        for (String imgUrls : imgUrl) {
-            profile = imgUrls;
-        }
-
-        // 유저 정보를 수정
-        user.update(
-                nickname,
-                profile,
-                address,
-                storeInfo
-        );
-
-        // 수정된 정보를 Response하기위해 정보를 넣어 줌
-        UserEditDtailResponseDto userEditDtailResponseDto = new UserEditDtailResponseDto(
-                nickname,
-                profile,
-                address,
-                storeInfo
-        );
-
-        // 요청값 반환
-        return new UserEditResponseDto(true, userEditDtailResponseDto);
-    }
-
-    // 이승재 / 찜한 아이템 보여주기
-    public List<MyScrabItemDto> scrabItem(UserDetailsImpl userDetails) {
-        List<Scrab> scrabList = scrabRepository.findAllByUserId(userDetails.getUserId());
-
-        List<MyScrabItemDto> myScrabItemDtoList = new ArrayList<>();
-        for(Scrab scrab : scrabList){
-            Item item = itemRepository.findById(scrab.getItemId()).orElseThrow(
-                    ()-> new IllegalArgumentException("아이템 정보가 없습니다.")
+        // 성훈_마이페이지_내 정보수정
+        @Transactional
+        public UserEditResponseDto editMyPage (String nickname, String address, String
+        storeInfo, List < String > imgUrl, UserDetailsImpl userDetails){
+            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                    () -> new IllegalArgumentException("user not found")
             );
-            Long itemId = item.getId();
-            String title = item.getTitle();
-            String contents = item.getContents();
-            String image = item.getItemImg().split(",")[0];
-            MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image);
-            myScrabItemDtoList.add(myScrabItemDto);
-        }
-        return myScrabItemDtoList;
+            String profile = null;
+            for (String imgUrls : imgUrl) {
+                profile = imgUrls;
+            }
 
+            // 유저 정보를 수정
+            user.update(
+                    nickname,
+                    profile,
+                    address,
+                    storeInfo
+            );
+
+            // 수정된 정보를 Response하기위해 정보를 넣어 줌
+            UserEditDtailResponseDto userEditDtailResponseDto = new UserEditDtailResponseDto(
+                    nickname,
+                    profile,
+                    address,
+                    storeInfo
+            );
+
+            // 요청값 반환
+            return new UserEditResponseDto(true, userEditDtailResponseDto);
+        }
+
+        // 이승재 / 찜한 아이템 보여주기
+        public List<MyScrabItemDto> scrabItem (UserDetailsImpl userDetails){
+            List<Scrab> scrabList = scrabRepository.findAllByUserId(userDetails.getUserId());
+
+            List<MyScrabItemDto> myScrabItemDtoList = new ArrayList<>();
+            for (Scrab scrab : scrabList) {
+                Item item = itemRepository.findById(scrab.getItemId()).orElseThrow(
+                        () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+                );
+                Long itemId = item.getId();
+                String title = item.getTitle();
+                String contents = item.getContents();
+                String image = item.getItemImg().split(",")[0];
+                MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image);
+                myScrabItemDtoList.add(myScrabItemDto);
+            }
+            return myScrabItemDtoList;
+
+        }
     }
-}
+

@@ -2,6 +2,7 @@ package com.sparta.mulmul.service;
 
 
 import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -126,11 +127,13 @@ public class ItemService {
 
         // 아이템에 해당하는 보따리에 담겨있는 모든 아이템 이미지 가져오기
         List<Item> userItemList = itemRepository.findAllByBagId(item.getBag().getId());
-        List<String> bagImages = new ArrayList<>();
+        List<DetailPageBagDto> bagInfos = new ArrayList<>();
         for(Item item1 : userItemList){
             if(item1.getId()!=itemId) {
-                String repImg = item1.getItemImg().split(",")[0];
-                bagImages.add(repImg);
+                String bagImg = item1.getItemImg().split(",")[0];
+                Long bagItemId = item1.getId();
+                DetailPageBagDto detailPageBagDto = new DetailPageBagDto(bagImg, bagItemId);
+                bagInfos.add(detailPageBagDto);
             }
         }
         // 이승재 / 아이템 조회수 계산
@@ -177,7 +180,7 @@ public class ItemService {
                 user.getProfile(),
                 item.getStatus(),
                 itemImgList,
-                bagImages,
+                bagInfos,
                 item.getTitle(),
                 item.getContents(),
                 item.getCreatedAt(),

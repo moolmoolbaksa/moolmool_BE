@@ -1,6 +1,7 @@
 package com.sparta.mulmul.dto;
 
 
+import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +21,7 @@ public class ItemDetailResponseDto {
     private String profile;
     private int status;
     private List<String> images;
-    private List<String> bagImages;
+    private List<DetailPageBagDto> bagInfos;
     private String  title;
     private String contents;
     private LocalDateTime date;
@@ -38,7 +39,7 @@ public class ItemDetailResponseDto {
                            String profile,
                            int status,
                            List<String> itemImgList,
-                           List<String> bagImages,
+                           List<DetailPageBagDto> bagInfos,
                            String title,
                            String contents,
                            LocalDateTime createdAt,
@@ -53,7 +54,7 @@ public class ItemDetailResponseDto {
         this.profile = profile;
         this.status = status;
         this.images = itemImgList;
-        this.bagImages = bagImages;
+        this.bagInfos = bagInfos;
         this.title = title;
         this.contents = contents;
         this.date = createdAt;
