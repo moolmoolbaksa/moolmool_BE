@@ -286,8 +286,7 @@ public class ItemService {
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new IllegalArgumentException("유저 정보가 없습니다.")
         );
-        String opponentNickName = user.getNickname();
-        String myNickName = userDetails.getNickname();
+        String sellerNickName = user.getNickname();
 
         List<Item> myItemList = itemRepository.findAllByBagId(myBadId);
 
@@ -295,7 +294,8 @@ public class ItemService {
                 () -> new IllegalArgumentException("아이템이 없습니다.")
         );
 
-        String opponentImage = item.getItemImg().split(",")[0];
+
+        String[] sellerImages = item.getItemImg().split(",");
         List<TradeInfoImagesDto> tradeInfoImagesDtoArrayList = new ArrayList<>();
         for(Item items : myItemList){
             String itemImage = items.getItemImg().split(",")[0];
@@ -304,18 +304,18 @@ public class ItemService {
             tradeInfoImagesDtoArrayList.add(tradeInfoImagesDto);
         }
 
-        return new TradeInfoDto(opponentNickName, opponentImage, myNickName, tradeInfoImagesDtoArrayList);
+        return new TradeInfoDto(sellerNickName, sellerImages,  tradeInfoImagesDtoArrayList);
     }
 
 
     // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
     public void requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
-        Item sellerItem = itemRepository.findById(requestTradeDto.getSellerItemId()).orElseThrow(
+        Item sellerItem = itemRepository.findById(requestTradeDto.getUserId()).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
         sellerItem.statusUpdate(sellerItem.getId(), 1);
-        for(Long buyerItemIds : requestTradeDto.getBuyerItemIds()) {
+        for(Long buyerItemIds : requestTradeDto.getMyItemIds()) {
            Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
                    ()-> new IllegalArgumentException("아이템이 없습니다.")
            );
@@ -324,18 +324,18 @@ public class ItemService {
 
         //Long 형태인 아이디들을 String 형태로 변환
         List<String> buyerItemIds = new ArrayList<>();
-        for(Long itemId : requestTradeDto.getBuyerItemIds()) {
+        for(Long itemId : requestTradeDto.getMyItemIds()) {
             buyerItemIds.add(itemId.toString());
         }
 
         //String barter 값 생성
         String StringbuyerItemIds = String.join(",", buyerItemIds);
-        String[] barterList = new String[]{StringbuyerItemIds, requestTradeDto.getSellerItemId().toString()};
+        String[] barterList = new String[]{StringbuyerItemIds, requestTradeDto.getItemId().toString()};
         String StringBarter = String.join(";", barterList);
         // 거래 내역 생성
         Barter barter = Barter.builder()
                 .buyerId(userDetails.getUserId())
-                .sellerId(requestTradeDto.getSellerId())
+                .sellerId(requestTradeDto.getUserId())
                 .barter(StringBarter)
                 .status(1)
                 .build();
