@@ -46,16 +46,22 @@ public class MyUserService {
             );
             myItemResponseList.add(itemResponseDto);
         }
+        List<Scrab> myScrabList = scrabRepository.findAllByUserId(userId);
         List<ItemUserResponseDto> myScrapItemList = new ArrayList<>();
-        List<Item> myScrabItemList = itemRepository.findByAllMyScrabItem(userId);
+
         int cnt = 0;
-        for (Item scrapItem : myScrabItemList) {
-            Scrab myScrab = scrabRepository.getById(scrapItem.getId());
-            if (myScrab.getScrab().equals(true)) {
+        for (Scrab myscrap : myScrabList) {
+
+            // 스크랩이 true이면
+            if (myscrap.getScrab().equals(true)) {
+
+                Long myScrapItemId = myscrap.getItemId();
+                Item scrabItem = itemRepository.findById(myScrapItemId).orElseThrow(
+                        () -> new IllegalArgumentException("Item not found"));
                 ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
-                        scrapItem.getId(),
-                        scrapItem.getItemImg(),
-                        scrapItem.getStatus()
+                        scrabItem.getId(),
+                        scrabItem.getItemImg().split(",")[0],
+                        scrabItem.getStatus()
                 );
                 cnt++;
                 myScrapItemList.add(scrabitemDto);

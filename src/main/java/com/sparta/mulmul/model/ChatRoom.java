@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter @Entity
 @NoArgsConstructor
-public class ChatRoom extends CreationDate {
+public class  ChatRoom extends CreationDate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
