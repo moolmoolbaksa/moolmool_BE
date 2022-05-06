@@ -28,7 +28,10 @@ public class MyUserService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final ScrabRepository scrabRepository;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 843d031c59b81ec34f3745d050cbb145f2a42e3d
 
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
@@ -53,6 +56,7 @@ public class MyUserService {
         List<Item> myScrabItemList = itemRepository.findByAllMyScrabItem(userId);
         int cnt = 0;
         for (Item scrapItem : myScrabItemList) {
+<<<<<<< HEAD
             ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
                     scrapItem.getId(),
                     scrapItem.getItemImg().split(",")[0],
@@ -63,6 +67,21 @@ public class MyUserService {
             // 5번 담으면 멈춘다
             if (cnt == 5) {
                 break;
+=======
+            Scrab myScrab = scrabRepository.getById(scrapItem.getId());
+            if (myScrab.getScrab().equals(true)) {
+                ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
+                        scrapItem.getId(),
+                        scrapItem.getItemImg(),
+                        scrapItem.getStatus()
+                );
+                cnt++;
+                myScrapItemList.add(scrabitemDto);
+                // 5번 담으면 멈춘다
+                if (cnt == 3) {
+                    break;
+                }
+>>>>>>> 843d031c59b81ec34f3745d050cbb145f2a42e3d
             }
         }
 
