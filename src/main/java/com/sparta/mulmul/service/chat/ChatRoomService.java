@@ -32,47 +32,57 @@ public class ChatRoomService {
     private final SimpMessageSendingOperations messagingTemplate;
     private final UserRepository userRepository;
 
-    private Map<Long, Object> tempRooms;
+    private Map<Long, Object> map;
 
     @PostConstruct
     private void init(){
-        tempRooms = new HashMap<>();
+        map = new HashMap<>();
     }
 
     // 채팅방 만들기
-    public void createRoom(UserDetailsImpl userDetails, UserRequestDto requestDto){
+    public String createRoom(UserDetailsImpl userDetails, UserRequestDto requestDto){
+
+        // 채팅 상대 찾아오기
+        Long opponentId = requestDto.getUserId();
+        User opponentUser = userRepository.findById(opponentId)
+                .orElseThrow( () -> new NullPointerException("존재하지 않는 회원입니다."));
+
+        // 채팅방 찾아오기
+        List<TempChatRoom> rooms = findRooms(userDetails.getUserId());
+
+        // 채팅방 중복 검사
+        for ( TempChatRoom room : rooms ) {
+            if ( room.getUserId() == requestDto.getUserId() ) { return room.getTempId(); } // 기존의 방의 고유번호를 리턴
+        }
 
         // DB에 채팅방 저장
         ChatRoom chatRoom = roomRepository.save(ChatRoom.createOf(userDetails, requestDto));
 
-        // 채팅 상대 찾아오기
-        Long userId = requestDto.getUserId();
-        User user = userRepository.findById(userId)
-                .orElseThrow( () -> new NullPointerException("존재하지 않는 회원입니다."));
-
         // Hash로 저장될 임시 채팅룸 만들고 기존 해쉬맵 데이터 가져오기
-        List<TempChatRoom> temp;
-
-        if ( tempRooms.get(userId) == null ) { temp = new ArrayList<>(); }
-        else { temp = (ArrayList<TempChatRoom>) tempRooms.get(userId); }
+        if ( map.get(userDetails.getUserId()) == null ) { rooms = new ArrayList<>(); }
+        else { rooms = (ArrayList<TempChatRoom>) map.get(userDetails.getUserId()); }
 
         // 데이터에 값 추가
-        TempChatRoom tempRoom = TempChatRoom.createOf(chatRoom, user);
-        temp.add(tempRoom);
+        TempChatRoom tempRoom = TempChatRoom.createOf(chatRoom, opponentUser);
+        rooms.add(tempRoom); // ArrayList의 add는 Boolean 값을 반환합니다.
 
         // 해쉬맵 값 변경
-        tempRooms.put(userId, tempRooms.get(userId));
+        map.put(userDetails.getUserId(), rooms);
 
-        // 업데이트 상황을 구독자에게 전달
-        messagingTemplate.convertAndSend("/sub/chat/rooms/" + userDetails.getUserId(), RoomUpdateDto.createOf(tempRoom));
+        System.out.println("채팅방 저장) 방 사이즈 증가를 확인합니다.: " + rooms.size());
+
+        return tempRoom.getTempId();
+
     }
 
     // 메시지 찾기, 페이징 처리
     @Transactional
     public List<MessageResponseDto> getMessage(String tempId, int page, UserDetailsImpl userDetails){
 
-        // 채팅룸 찾아오기
+        // 채팅방 찾아오기
         List<TempChatRoom> rooms = findRooms(userDetails.getUserId());
+        if ( rooms.size() < 1 ) { throw new IllegalArgumentException("해당 채팅방이 없습니다.");}
+
         // roomId 찾고 isRead == true로
         Long roomId = getRoomIdAndUpdate(rooms, tempId);
 
@@ -103,7 +113,7 @@ public class ChatRoomService {
         for ( TempChatRoom room : rooms ) {
             if ( room.getTempId().equals(tempId) ) {
                 rooms.remove(room);
-                if ( rooms.size() == 0 ) { tempRooms.remove(userId); } // 유저가 가진 방이 0이라면 해시에서 삭제
+                if ( rooms.size() == 0 ) { map.remove(userId); } // 유저가 가진 방이 0이라면 해시에서 삭제
                 break;
             }
         }
@@ -116,10 +126,19 @@ public class ChatRoomService {
         // 방 목록 찾기
         Long userId = userDetails.getUserId();
         List<TempChatRoom> rooms = findRooms(userId);
+        System.out.println("채팅방 찾기) 채팅방의 사이즈 : " + rooms.size());
 
         // responseDto 만들기
         List<RoomResponseDto> responseDtos = new ArrayList<>();
-        for (TempChatRoom room : rooms){ responseDtos.add(RoomResponseDto.createFrom(room)); }
+        for (TempChatRoom room : rooms){
+            System.out.println("채팅방의 메시지 : " + room.getMessage()); // 채팅방이 개설되었습니다.
+            responseDtos.add(RoomResponseDto.createFrom(room));
+        }
+
+        // 검증용 for문입니다.
+        for (RoomResponseDto responseDto : responseDtos ){
+            System.out.println("닉네임 : " + responseDto.getNickname());
+        }
 
         return responseDtos;
     }
@@ -142,12 +161,14 @@ public class ChatRoomService {
     // 채팅 메시지 구독주소로 발송하기
     public void sendMessage(String tempId, Long userId, MessageResponseDto responseDto){
 
+        // 방을 만들어 줘야함
         List<TempChatRoom> rooms = findRooms(userId);
         RoomMsgUpdateDto msgUpdateDto = null;
 
         for ( TempChatRoom room : rooms ) {
             if ( room.getTempId().equals(tempId) ) {
-                room.setMessage(responseDto.getMessage());
+                room.setMessage(responseDto.getMessage()); // 메시지
+                room.setDate(responseDto.getDate()); // 메시지 발신 날자
                 msgUpdateDto = RoomMsgUpdateDto.createFrom(room);
                 break;
             }
@@ -161,11 +182,11 @@ public class ChatRoomService {
 
     // tempRoom list 찾기
     private List<TempChatRoom> findRooms(Long userId){
-
+        System.out.println("find) 채팅룸을 찾는 이용자의 아이디 : " + userId);
         List<TempChatRoom> rooms;
 
-        if ( tempRooms.get(userId) == null ) { throw new NullPointerException("채팅방을 개설하지 않았습니다."); }
-        else { rooms = (ArrayList<TempChatRoom>) tempRooms.get(userId); }
+        if ( map.get(userId) == null ) { rooms = new ArrayList<>(); } // null 체크는 반드시 해야함
+        else { rooms = (ArrayList<TempChatRoom>) map.get(userId); }
 
         return rooms;
 

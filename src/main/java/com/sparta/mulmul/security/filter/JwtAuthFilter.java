@@ -46,8 +46,6 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
         String tokenPayload = request.getHeader("Authorization");
         String method = request.getMethod();
 
-        System.out.println(tokenPayload);
-
         if ( tokenPayload == null && !method.equals("GET") ) {
 
             response.setContentType("application/json;charset=utf-8");
@@ -59,9 +57,9 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
             return null;
         }
-        else if ( tokenPayload == null ){ jwtToken = new JwtPreProcessingToken("null"); }
+        else if ( tokenPayload == null ) { jwtToken = new JwtPreProcessingToken("null"); }
         else { jwtToken = new JwtPreProcessingToken(
-                    extractor.extract(tokenPayload, request));
+                extractor.extract(tokenPayload, request));
         }
 
         return super

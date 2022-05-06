@@ -58,8 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 접근 완전 허용 (CSRF, FrameOptions 무시)
         web
                 .ignoring()
-                .antMatchers("/h2-console/**")
-                .antMatchers("/chat/**");
+                .antMatchers("/h2-console/**");
     }
 
     @Override
@@ -128,11 +127,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         skipPathList.add("GET,/favicon.ico");
 
-        // 웹소켓 허용
-        skipPathList.add("POST,/ws/chat/**");
-        skipPathList.add("GET,/ws/chat/**");
-        skipPathList.add("GET,/ws-stomp/**/**");
-        skipPathList.add("GET,/ws-stomp/**");
         FilterSkipMatcher matcher = new FilterSkipMatcher(
                 skipPathList,
                 "/**"

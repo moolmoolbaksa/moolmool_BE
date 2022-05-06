@@ -20,9 +20,9 @@ public class ChatController {
     @MessageMapping("/chat/message")
     public void message(MessageRequestDto requestDto, WsUser wsUser) {
         // 메시지 저장, isRead를 전송받아 메시지 상태별로 읽음/안읽음 구분
-        MessageResponseDto responseDto = roomService.saveMessage(requestDto, wsUser);
+        MessageResponseDto responseDto = roomService.saveMessage(requestDto, wsUser); //DB에 저장
         // 메시지 발신
-        roomService.sendMessage(requestDto.getRoomId(), wsUser.getUserId(), responseDto);
+        roomService.sendMessage(requestDto.getRoomId(), wsUser.getUserId(), responseDto);// 메시지를 sub 주소로 발송해줌
     }
 
     // 커넥트와 디스커넥트 시에는 이 주소로 IN과 OUT의 type으로 요청을 보냅니다.
