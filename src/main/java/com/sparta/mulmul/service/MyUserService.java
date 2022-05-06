@@ -5,8 +5,10 @@ import com.sparta.mulmul.dto.MyPageResponseDto;
 import com.sparta.mulmul.dto.UserEditDtailResponseDto;
 import com.sparta.mulmul.dto.UserEditResponseDto;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.ItemRepository;
+import com.sparta.mulmul.repository.ScrabRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class MyUserService {
 
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final ScrabRepository scrabRepository;
 
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
@@ -47,16 +50,19 @@ public class MyUserService {
         List<Item> myScrabItemList = itemRepository.findByAllMyScrabItem(userId);
         int cnt = 0;
         for (Item scrapItem : myScrabItemList) {
-            ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
-                    scrapItem.getId(),
-                    scrapItem.getItemImg(),
-                    scrapItem.getStatus()
-            );
-            cnt++;
-            myScrapItemList.add(scrabitemDto);
-            // 5번 담으면 멈춘다
-            if (cnt == 5) {
-                break;
+            Scrab myScrab = scrabRepository.getById(scrapItem.getId());
+            if (myScrab.getScrab().equals(true)) {
+                ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
+                        scrapItem.getId(),
+                        scrapItem.getItemImg(),
+                        scrapItem.getStatus()
+                );
+                cnt++;
+                myScrapItemList.add(scrabitemDto);
+                // 5번 담으면 멈춘다
+                if (cnt == 3) {
+                    break;
+                }
             }
         }
 
