@@ -1,6 +1,7 @@
 package com.sparta.mulmul.dto;
 
 
+import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,13 +14,14 @@ import java.util.List;
 @NoArgsConstructor
 public class ItemDetailResponseDto {
     private Long userId;
+    private Long itemId;
     private String nickname;
     private String degree;
     private float grade;
     private String profile;
     private int status;
     private List<String> images;
-    private List<String> bagImages;
+    private List<DetailPageBagDto> bagInfos;
     private String  title;
     private String contents;
     private LocalDateTime date;
@@ -30,13 +32,14 @@ public class ItemDetailResponseDto {
 
     // 이승재 / 아이템 상세페이지
     public ItemDetailResponseDto(Long i,
+                           Long itemId,
                            String nickname,
                            String degree,
                            float v,
                            String profile,
                            int status,
                            List<String> itemImgList,
-                           List<String> bagImages,
+                           List<DetailPageBagDto> bagInfos,
                            String title,
                            String contents,
                            LocalDateTime createdAt,
@@ -44,13 +47,14 @@ public class ItemDetailResponseDto {
                            int scrabCnt,
                            Boolean isScrab) {
         this.userId = i;
+        this.itemId = itemId;
         this.nickname = nickname;
         this.degree = degree;
         this.grade = v;
         this.profile = profile;
         this.status = status;
         this.images = itemImgList;
-        this.bagImages = bagImages;
+        this.bagInfos = bagInfos;
         this.title = title;
         this.contents = contents;
         this.date = createdAt;

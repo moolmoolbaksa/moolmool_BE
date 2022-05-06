@@ -6,7 +6,7 @@ import java.util.List;
 
 @Getter
 public class RequestTradeDto {
-    private Long sellerId;
-    private Long sellerItemId;
-    private List<Long> buyerItemIds;
+    private Long userId;
+    private Long itemId;
+    private List<Long> myItemIds;
 }
