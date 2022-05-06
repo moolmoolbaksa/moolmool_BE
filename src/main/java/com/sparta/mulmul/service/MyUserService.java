@@ -48,16 +48,22 @@ public class MyUserService {
             );
             myItemResponseList.add(itemResponseDto);
         }
+        List<Scrab> myScrabList = scrabRepository.findAllByUserId(userId);
         List<ItemUserResponseDto> myScrapItemList = new ArrayList<>();
-        List<Item> myScrabItemList = itemRepository.findByAllMyScrabItem(userId);
+
         int cnt = 0;
-        for (Item scrapItem : myScrabItemList) {
-            Scrab myScrab = scrabRepository.getById(scrapItem.getId());
-            if (myScrab.getScrab().equals(true)) {
+        for (Scrab myscrap : myScrabList) {
+
+            // 스크랩이 true이면
+            if (myscrap.getScrab().equals(true)) {
+
+                Long myScrapItemId = myscrap.getItemId();
+                Item scrabItem = itemRepository.findById(myScrapItemId).orElseThrow(
+                        () -> new IllegalArgumentException("Item not found"));
                 ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
-                        scrapItem.getId(),
-                        scrapItem.getItemImg(),
-                        scrapItem.getStatus()
+                        scrabItem.getId(),
+                        scrabItem.getItemImg().split(",")[0],
+                        scrabItem.getStatus()
                 );
                 cnt++;
                 myScrapItemList.add(scrabitemDto);
@@ -119,15 +125,17 @@ public class MyUserService {
 
             List<MyScrabItemDto> myScrabItemDtoList = new ArrayList<>();
             for (Scrab scrab : scrabList) {
-                Item item = itemRepository.findById(scrab.getItemId()).orElseThrow(
-                        () -> new IllegalArgumentException("아이템 정보가 없습니다.")
-                );
-                Long itemId = item.getId();
-                String title = item.getTitle();
-                String contents = item.getContents();
-                String image = item.getItemImg().split(",")[0];
-                MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image);
-                myScrabItemDtoList.add(myScrabItemDto);
+                if(scrab.getScrab().equals(true)) {
+                    Item item = itemRepository.findById(scrab.getItemId()).orElseThrow(
+                            () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+                    );
+                    Long itemId = item.getId();
+                    String title = item.getTitle();
+                    String contents = item.getContents();
+                    String image = item.getItemImg().split(",")[0];
+                    MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image);
+                    myScrabItemDtoList.add(myScrabItemDto);
+                }
             }
             return myScrabItemDtoList;
 

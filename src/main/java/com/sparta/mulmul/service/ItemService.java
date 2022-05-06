@@ -272,7 +272,7 @@ public class ItemService {
 
         for(Item item : myItemList){
             Long itemId = item.getId();
-            String itemImg = item.getItemImg();
+            String itemImg = item.getItemImg().split(",")[0];
             int status = item.getStatus();
             ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
             itemUserResponseDtos.add(itemUserResponseDto);
