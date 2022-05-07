@@ -62,9 +62,13 @@ public class Barter extends Timestamped {
         this.isSellerTrad = isSellerTrad;
     }
 
-    public void updateScoreBarter(Boolean isBuyerScore, Boolean isSellerScore) {
+    public void updateScoreBuyer(Boolean isBuyerScore) {
 
         this.isBuyerScore = isBuyerScore;
+    }
+
+    public void updateScoreSeller(Boolean isSellerScore) {
+
         this.isSellerScore = isSellerScore;
     }
 }
