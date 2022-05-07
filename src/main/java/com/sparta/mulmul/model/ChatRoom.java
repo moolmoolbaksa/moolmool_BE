@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter @Entity
 @NoArgsConstructor
@@ -23,6 +22,12 @@ public class ChatRoom extends CreationDate {
 
     @Column(nullable = false)
     private Long acceptorId;
+
+    @Column(nullable = false)
+    private Boolean reqOut = false;
+
+    @Column(nullable = false)
+    private Boolean accOut = false;
 
     public static ChatRoom createOf(UserDetailsImpl userDetails, UserRequestDto requestDto){
 

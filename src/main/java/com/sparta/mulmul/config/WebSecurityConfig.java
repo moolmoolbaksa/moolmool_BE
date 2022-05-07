@@ -65,8 +65,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // POST 요청에 대한 CSRF를 추가로 무시해 줘야 접근이 가능합니다.
         http
-                .csrf()
-                .disable();
+                .csrf().disable()
+                .headers().frameOptions().sameOrigin();
 
         // cors 필터 등록
         http

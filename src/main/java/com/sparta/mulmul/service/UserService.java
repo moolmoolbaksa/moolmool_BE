@@ -74,11 +74,12 @@ public class UserService {
     @Transactional
     public void setUserInfo(UserDetailsImpl userDetails, UserRequestDto requestDto) {
 
+        System.out.println(requestDto.getAddress());
         User user = userRepository.findById(userDetails
                         .getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User's not found error"));
 
-        user.initProfile(requestDto);
+        user.initProfile(requestDto.getAddress());
     }
 
     // 로그인 체크하기

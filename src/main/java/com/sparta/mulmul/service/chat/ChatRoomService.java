@@ -44,6 +44,9 @@ public class ChatRoomService {
 
         // 채팅 상대 찾아오기
         Long opponentId = requestDto.getUserId();
+        if ( userDetails.getUserId() == opponentId ) {
+            throw new IllegalArgumentException("채팅 대상은 자기자신이 될 수 없습니다.");
+        }
         User opponentUser = userRepository.findById(opponentId)
                 .orElseThrow( () -> new NullPointerException("존재하지 않는 회원입니다."));
 
@@ -113,11 +116,13 @@ public class ChatRoomService {
         for ( TempChatRoom room : rooms ) {
             if ( room.getTempId().equals(tempId) ) {
                 rooms.remove(room);
-                if ( rooms.size() == 0 ) { map.remove(userId); } // 유저가 가진 방이 0이라면 해시에서 삭제
+                // 유저가 가진 방이 0이라면 해시에서 삭제
+                if ( rooms.size() == 0 ) { map.remove(userId); }
+                // DB 정보 업데이트 -> 방에서 나간 상태로
+
                 break;
             }
         }
-
     }
 
     // 사용자별 채팅방 전체 목록 가져오기
@@ -153,15 +158,14 @@ public class ChatRoomService {
 
         ChatMessage message = messageRepository.save(
                 ChatMessage
-                        .createOf(requestDto, roomId));
+                        .createOf(requestDto, roomId, wsUser.getUserId()));
 
         return MessageResponseDto.createOf(message, wsUser);
     }
 
-    // 채팅 메시지 구독주소로 발송하기
+    // 채팅 메시지 발송하기
     public void sendMessage(String tempId, Long userId, MessageResponseDto responseDto){
 
-        // 방을 만들어 줘야함
         List<TempChatRoom> rooms = findRooms(userId);
         RoomMsgUpdateDto msgUpdateDto = null;
 
@@ -175,9 +179,23 @@ public class ChatRoomService {
         }
         if ( msgUpdateDto == null ) { throw new NullPointerException("해당 채팅방을 찾을 수 없습니다."); }
 
-        // 발행된 메시지는 sub 프리픽스가 붙은 곳으로 전달됩니다. 클라이언트들이 subscribe 하고 있는 각 세션입니다.
+        // 발행된 메시지는 sub 프리픽스가 붙은 곳으로 전달됩니다. 클라이언트들이 subscribe 하고 있는 각 sub입니다.
         messagingTemplate.convertAndSend("/sub/chat/rooms/" + userId, msgUpdateDto);
         messagingTemplate.convertAndSend("/sub/chat/room/" + tempId, responseDto);
+        // 채팅 상대가 방이 없다면, 이 단계에서 만들어 줘야 합니다.
+//        if ( map.get(userDetails.getUserId()) == null ) { rooms = new ArrayList<>(); }
+//        else { rooms = (ArrayList<TempChatRoom>) map.get(userDetails.getUserId()); }
+//
+//        // 데이터에 값 추가
+//        TempChatRoom tempRoom = TempChatRoom.createOf(chatRoom, opponentUser);
+//        rooms.add(tempRoom); // ArrayList의 add는 Boolean 값을 반환합니다.
+//
+//        // 해쉬맵 값 변경
+//        map.put(userDetails.getUserId(), rooms);
+//
+//        System.out.println("채팅방 저장) 방 사이즈 증가를 확인합니다.: " + rooms.size());
+
+
     }
 
     // tempRoom list 찾기

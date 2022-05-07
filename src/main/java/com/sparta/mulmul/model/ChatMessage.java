@@ -32,14 +32,15 @@ public class ChatMessage extends CreationDate {
     @Column(nullable = false)
     private Boolean isRead;
 
-    public static ChatMessage createOf(MessageRequestDto requestDto, Long roomId) {
+    public static ChatMessage createOf(MessageRequestDto requestDto, Long roomId, Long senderId) {
 
         ChatMessage message = new ChatMessage();
 
         message.roomId = roomId;
-        message.senderId = requestDto.getUserId();
+        message.senderId = senderId;
         message.message = requestDto.getMessage();
         message.isRead = requestDto.getIsRead();
+        message.type = requestDto.getType();
 
         return message;
     }

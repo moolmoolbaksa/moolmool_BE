@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class StompHandler implements ChannelInterceptor {
 
     private final HeaderTokenExtractor extractor;
@@ -31,19 +30,24 @@ public class StompHandler implements ChannelInterceptor {
 
         assert accessor != null;
 
+        System.out.println("StompHandler: 엑세스 Header의 이름 : " + accessor.getFirstNativeHeader("Authorization"));
+
         if(accessor.getCommand() == StompCommand.CONNECT) {
 
             try {
                 String token = extractor.extract(accessor.getFirstNativeHeader("Authorization"));
+                System.out.println("StompHandler: 헤더에서 토큰 추출 완료");
                 Long userId = jwtDecoder.decodeTokenByUserId(token);
                 String nickname = jwtDecoder.decodeTokenByNickname(token);
-
+                System.out.println("StompHandler: 토큰 디코딩 완료");
                 WsUser wsUser = WsUser.fromUserRequestDto(UserRequestDto.createOf(userId, nickname));
+                System.out.println("StompHandler: WsUser 객체 생성");
 
                 accessor.setUser(wsUser);
+                System.out.println("StompHandler: StompHeaderAccessor에 Principal 설정");
 
             } catch (Exception e) {
-                throw new AccessDeniedException("유효하지 않은 토큰입니다.");
+                throw new AccessDeniedException("StompHandler: 유효하지 않은 토큰입니다.");
             }
         }
 
