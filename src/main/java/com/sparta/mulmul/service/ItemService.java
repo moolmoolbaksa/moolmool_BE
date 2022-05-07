@@ -169,9 +169,8 @@ public class ItemService {
        }
 
         item.scrabCntUpdate(itemId, scrabCnt);
-
+        String[] favored = item.getFavored().split(",");
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
-                //userdetails.getuserId
                 user.getId(),
                 itemId,
                 user.getNickname(),
@@ -186,6 +185,8 @@ public class ItemService {
                 item.getCreatedAt(),
                 item.getViewCnt(),
                 scrabCnt,
+                item.getType(),
+                favored,
                 isSrab
         );
         return itemDetailResponseDto;

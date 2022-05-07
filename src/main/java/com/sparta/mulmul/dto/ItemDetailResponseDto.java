@@ -27,6 +27,8 @@ public class ItemDetailResponseDto {
     private LocalDateTime date;
     private int viewCnt;
     private int scrabCnt;
+    private String type;
+    private String[] favored;
     private Boolean isScrab;
 
 
@@ -45,6 +47,8 @@ public class ItemDetailResponseDto {
                            LocalDateTime createdAt,
                            int viewCnt,
                            int scrabCnt,
+                           String type,
+                           String[] favored,
                            Boolean isScrab) {
         this.userId = i;
         this.itemId = itemId;
@@ -60,6 +64,8 @@ public class ItemDetailResponseDto {
         this.date = createdAt;
         this.viewCnt = viewCnt;
         this.scrabCnt = scrabCnt;
+        this.type = type;
+        this.favored = favored;
         this.isScrab = isScrab;
     }
 }
