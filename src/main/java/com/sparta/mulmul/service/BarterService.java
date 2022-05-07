@@ -42,6 +42,10 @@ public class BarterService {
         Long opponentId = null;
         // 나의 포지션
         String myPosition = null;
+        // 나의 거래완료 여부
+        Boolean myTradeCheck;
+        // 나의 평가완료 여부
+        Boolean myScoreCheck;
 
         // 유저의 거래내역 리스트를 전부 조회한다
         List<Barter> mybarterList = barterRepository.findAllByBuyerIdOrSellerId(userId, userId);
@@ -115,6 +119,15 @@ public class BarterService {
             // 거래상태 정보 1 : 신청중 / 2 : 거래중 / 3 : 거래완료 / 4 : 평가완료
             int status = barters.getStatus();
 
+            //내포지션이 바이어라면 거래내역의 상태 확인하기
+            if (myPosition.equals("buyer")) {
+                myTradeCheck = barters.getIsBuyerTrade();
+                myScoreCheck = barters.getIsBuyerScore();
+                //내포지션이 셀러라면 거래내역의 상태 확인하기
+            } else {
+                myTradeCheck = barters.getIsSellerTrade();
+                myScoreCheck = barters.getIsSellerScore();
+            }
 
             if (status == 2 || status == 1) {
                 BarterNotFinDto barterNotFin = new BarterNotFinDto(
@@ -124,6 +137,7 @@ public class BarterService {
                         opponentUser.getProfile(),
                         status,
                         myPosition,
+                        myTradeCheck,
                         myBarterList,
                         barterList
                 );
@@ -140,6 +154,7 @@ public class BarterService {
                         date,
                         status,
                         myPosition,
+                        myScoreCheck,
                         myBarterList,
                         barterList
                 );
@@ -216,8 +231,8 @@ public class BarterService {
             myBarter.updateTradSeller(true);
         }
 
-        Boolean buyerTrade = myBarter.getIsBuyerTrad();
-        Boolean sellerTrade = myBarter.getIsSellerTrad();
+        Boolean buyerTrade = myBarter.getIsBuyerTrade();
+        Boolean sellerTrade = myBarter.getIsSellerTrade();
 
         // 바이어와 셀러 모두 거래완료이면 (거래내역과 아이템)의 상태를 거래완료(status : 3)으로 변경
         if (buyerTrade && sellerTrade) {
@@ -239,7 +254,7 @@ public class BarterService {
             );
             sellerItem.statusUpdate(sellerItem.getId(), 3);
             myBarter.updateBarter(3);
-//            System.out.println("내거래 상태 : " + myBarter.getStatus());
+            System.out.println("내거래 상태 : " + myBarter.getStatus());
         }
 
     }

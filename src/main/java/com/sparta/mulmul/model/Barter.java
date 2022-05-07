@@ -36,10 +36,10 @@ public class Barter extends Timestamped {
     private int status;
 
     @Column(nullable = false)
-    private Boolean isBuyerTrad = false;
+    private Boolean isBuyerTrade = false;
 
     @Column(nullable = false)
-    private Boolean isSellerTrad = false;
+    private Boolean isSellerTrade = false;
 
     @Column(nullable = false)
     private Boolean isBuyerScore = false;
@@ -53,13 +53,13 @@ public class Barter extends Timestamped {
     }
 
 
-    public void updateTradBuyer(Boolean isBuyerTrad) {
+    public void updateTradBuyer(Boolean isBuyerTrade) {
 
-        this.isBuyerTrad = isBuyerTrad;
+        this.isBuyerTrade = isBuyerTrade;
     }
-    public void updateTradSeller(Boolean isSellerTrad) {
+    public void updateTradSeller(Boolean isSellerTrade) {
 
-        this.isSellerTrad = isSellerTrad;
+        this.isSellerTrade = isSellerTrade;
     }
 
     public void updateScoreBuyer(Boolean isBuyerScore) {

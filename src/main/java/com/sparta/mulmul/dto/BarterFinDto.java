@@ -1,5 +1,6 @@
 package com.sparta.mulmul.dto;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,12 +19,13 @@ public class BarterFinDto {
     private LocalDateTime date;
     private int status;
     private String myPosition;
+    private Boolean isScore;
     private List<MyBarterDto> myItem;
     private List<MyBarterDto> barterItem;
 
 
 
-    public BarterFinDto(Long barterId, Long opponentId, String opponentnickname, String opponentProfile, LocalDateTime date, int status, String myPosition,  List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
+    public BarterFinDto(Long barterId, Long opponentId, String opponentnickname, String opponentProfile, LocalDateTime date, int status, String myPosition, Boolean isScore, List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
         this.barterId = barterId;
         this.opponentId = opponentId;
         this.opponentnickname = opponentnickname;
@@ -31,6 +33,7 @@ public class BarterFinDto {
         this.date = date;
         this.status = status;
         this.myPosition = myPosition;
+        this.isScore = isScore;
         this.myItem = myItem;
         this.barterItem = barterItem;
     }
