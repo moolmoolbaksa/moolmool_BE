@@ -33,8 +33,8 @@ public class User {
     private String storeInfo;
     private String degree = "물물어린이";
     private int raterCount;
-    private float totalGrade;
-    private float grade = 50.0F;
+    private float totalGrade = 50.0F;
+    private float grade;
 
     // 회원 정보 초기화 (초기설정을 어떻게 해줄 것인지, 점수 알고리즘이 나오면 다시 만들어 보도록 합니다.)
     public void initProfile(UserRequestDto requestDto){
