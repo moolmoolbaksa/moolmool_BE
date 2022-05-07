@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Barter extends Timestamped{
+public class Barter extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,10 +35,38 @@ public class Barter extends Timestamped{
     @Column(nullable = false)
     private int status;
 
+    @Column(nullable = false)
+    private Boolean isBuyerTrad = false;
+
+    @Column(nullable = false)
+    private Boolean isSellerTrad = false;
+
+    @Column(nullable = false)
+    private Boolean isBuyerScore = false;
+
+    @Column(nullable = false)
+    private Boolean isSellerScore = false;
+
 
     public void updateBarter(int status) {
         this.status = status;
     }
+
+
+    public void updateTradBuyer(Boolean isBuyerTrad) {
+
+        this.isBuyerTrad = isBuyerTrad;
     }
+    public void updateTradSeller(Boolean isSellerTrad) {
+
+        this.isSellerTrad = isSellerTrad;
+    }
+
+    public void updateScoreBarter(Boolean isBuyerScore, Boolean isSellerScore) {
+
+        this.isBuyerScore = isBuyerScore;
+        this.isSellerScore = isSellerScore;
+    }
+}
 
 

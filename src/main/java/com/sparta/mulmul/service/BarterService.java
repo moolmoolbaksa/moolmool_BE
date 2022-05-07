@@ -194,40 +194,55 @@ public class BarterService {
     }
 
 
-    // 성훈 - 거래 완료 - 프론트랑 테스트해보기
+    // 성훈 - 거래 완료
     @Transactional
     public void OkayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
         );
         Long userId = user.getId();
+        // 거래내역을 조회한다.
         Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("거래내역이 없습니다."));
         // 거래중인 상태가 아니면 예외처리
         if (myBarter.getStatus() != 2){
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
 
-
-        String[] barterIdList = myBarter.getBarter().split(";");
-        String[] buyerItemId = barterIdList[0].split(",");
-        String sellerItemId = barterIdList[1];
-
-
-        for (String eachBuyer : buyerItemId) {
-            Long buyerId = Long.valueOf(eachBuyer);
-            Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
-                    () -> new IllegalArgumentException("buyerItem not found"));
-            buyerItem.statusUpdate(buyerItem.getId(),3);
+        // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
+        if (myBarter.getBuyerId().equals(userId)){
+            myBarter.updateTradBuyer(true);
+            // 유저가 셀러라면 셀러거래완료를 true로 변경한다.
+        } else {
+            myBarter.updateTradSeller(true);
         }
-        //셀러(유저)의 물품을 찾아서 정보를 넣기
-        Long sellerId = Long.parseLong(sellerItemId);
-        Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
-                () -> new IllegalArgumentException("sellerItem not found")
-        );
-        sellerItem.statusUpdate(sellerItem.getId(),3);
-        myBarter.updateBarter(3);
-        System.out.println("내거래 상태 : " + myBarter.getStatus());
-    }
+
+        Boolean buyerTrade = myBarter.getIsBuyerTrad();
+        Boolean sellerTrade = myBarter.getIsSellerTrad();
+
+        // 바이어와 셀러 모두 거래완료이면 (거래내역과 아이템)의 상태를 거래완료(status : 3)으로 변경
+       if (buyerTrade && sellerTrade){
+
+           String[] barterIdList = myBarter.getBarter().split(";");
+           String[] buyerItemId = barterIdList[0].split(",");
+           String sellerItemId = barterIdList[1];
+
+            for (String eachBuyer : buyerItemId) {
+                Long buyerId = Long.valueOf(eachBuyer);
+                Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
+                        () -> new IllegalArgumentException("buyerItem not found"));
+                buyerItem.statusUpdate(buyerItem.getId(),3);
+            }
+            //셀러(유저)의 물품을 찾아서 정보를 넣기
+            Long sellerId = Long.parseLong(sellerItemId);
+            Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
+                    () -> new IllegalArgumentException("sellerItem not found")
+            );
+            sellerItem.statusUpdate(sellerItem.getId(),3);
+            myBarter.updateBarter(3);
+//            System.out.println("내거래 상태 : " + myBarter.getStatus());
+        }
+
+        }
 }
 
 

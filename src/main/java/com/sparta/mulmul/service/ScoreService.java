@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.persistence.Column;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -97,7 +96,7 @@ public class ScoreService {
         // 거래내역을 조회
         Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
         // 바이어Id와 셀러Id에 유저아이디가 없을 경우
-        if (myBarter.getBuyerId() != userId && myBarter.getSellerId() != userId) {
+        if (!myBarter.getBuyerId().equals(userId) && !myBarter.getSellerId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
 
@@ -127,6 +126,10 @@ public class ScoreService {
             );
         }
     }
+
+
+
+
 
 
     // 성훈 - 상대 평점주기
@@ -167,10 +170,10 @@ public class ScoreService {
         if (barter.getStatus() != 3) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
             // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
-        } else if ((opponentUserId != barter.getBuyerId()) && (opponentUserId != barter.getSellerId())) {
+        } else if ((!opponentUserId.equals(barter.getBuyerId())) && (!opponentUserId.equals(barter.getSellerId()))) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
             // 자기 자신에게 점수를 줄 경우
-        } else if (opponentUserId == user.getId()) {
+        } else if (opponentUserId.equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
 
