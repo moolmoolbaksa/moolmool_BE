@@ -43,7 +43,7 @@ public class MyUserService {
         for (Item items : myItemList) {
             ItemUserResponseDto itemResponseDto = new ItemUserResponseDto(
                     items.getId(),
-                    items.getItemImg(),
+                    items.getItemImg().split(",")[0],
                     items.getStatus()
             );
             myItemResponseList.add(itemResponseDto);
@@ -90,14 +90,11 @@ public class MyUserService {
         // 성훈_마이페이지_내 정보수정
         @Transactional
         public UserEditResponseDto editMyPage (String nickname, String address, String
-        storeInfo, List < String > imgUrl, UserDetailsImpl userDetails){
+        storeInfo, String imgUrl, UserDetailsImpl userDetails){
             User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                     () -> new IllegalArgumentException("user not found")
             );
-            String profile = null;
-            for (String imgUrls : imgUrl) {
-                profile = imgUrls;
-            }
+            String profile = imgUrl;
 
             // 유저 정보를 수정
             user.update(
