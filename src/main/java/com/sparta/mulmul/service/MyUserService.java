@@ -43,7 +43,7 @@ public class MyUserService {
         for (Item items : myItemList) {
             ItemUserResponseDto itemResponseDto = new ItemUserResponseDto(
                     items.getId(),
-                    items.getItemImg(),
+                    items.getItemImg().split(",")[0],
                     items.getStatus()
             );
             myItemResponseList.add(itemResponseDto);

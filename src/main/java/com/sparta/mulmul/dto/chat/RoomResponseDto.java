@@ -1,6 +1,8 @@
 package com.sparta.mulmul.dto.chat;
 
-import com.sparta.mulmul.websocket.TempChatRoom;
+import com.sparta.mulmul.model.ChatMessage;
+import com.sparta.mulmul.model.ChatRoom;
+import com.sparta.mulmul.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +11,8 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class RoomResponseDto {
-    private String roomId;
+
+    private Long roomId;
     private Long userId;
     private String nickname;
     private String profile;
@@ -17,18 +20,20 @@ public class RoomResponseDto {
     private LocalDateTime date;
     private Boolean isRead;
 
-    public static RoomResponseDto createFrom(TempChatRoom tempRoom){
+    public static RoomResponseDto createOf(ChatRoom chatRoom, ChatMessage message, User user){
 
         RoomResponseDto responseDto = new RoomResponseDto();
 
-        responseDto.roomId = tempRoom.getTempId();
-        responseDto.userId = tempRoom.getUserId();
-        responseDto.nickname = tempRoom.getNickname();
-        responseDto.profile = tempRoom.getProfile();
-        responseDto.message = tempRoom.getMessage();
-        responseDto.date = tempRoom.getDate();
-        responseDto.isRead = tempRoom.getIsRead();
+        responseDto.roomId = chatRoom.getId();
+        responseDto.userId = user.getId();
+        responseDto.nickname = user.getNickname();
+        responseDto.profile = user.getProfile();
+        // 메시지에 관한 정보도 같이 검색해 와야 한다. 최신 메시지 단 한 건이면 된다.
+        responseDto.message = message.getMessage();
+        responseDto.date = message.getCreatedAt();
+        responseDto.isRead = message.getIsRead();
 
         return responseDto;
     }
+
 }

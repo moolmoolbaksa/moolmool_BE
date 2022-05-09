@@ -6,14 +6,10 @@ import com.sparta.mulmul.dto.chat.MessageResponseDto;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
 import com.sparta.mulmul.service.chat.ChatMessageService;
-import com.sparta.mulmul.service.chat.ChatRoomService;
 import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 
@@ -22,7 +18,6 @@ import org.springframework.stereotype.Controller;
 public class ChatController {
 
     private final ChatMessageService messageService;
-    private final ChatRoomService roomService;
     private final HeaderTokenExtractor extractor;
     private final JwtDecoder jwtDecoder;
 
@@ -42,13 +37,14 @@ public class ChatController {
 
         wsUser = WsUser.fromUserRequestDto(UserRequestDto.createOf(userId, nickname));
 
+        System.out.println("ChatController: 아이디값 '" + requestDto.getRoomId() + "' 전송받았습니다.");
         // 메시지 저장, isRead를 전송받아 메시지 상태별로 읽음/안읽음 구분
         System.out.println("ChatController: 메시지를 전송받았습니다.");
-        MessageResponseDto responseDto = roomService.saveMessage(requestDto, wsUser); //DB에 저장
+        MessageResponseDto responseDto = messageService.saveMessage(requestDto, wsUser); //DB에 저장
         System.out.println("ChatController: 메시지를 DB에 저장하는데 성공했습니다.");
         // 메시지 발신
         System.out.println("ChatController: 메시지 발송을 시작합니다.");
-        roomService.sendMessage(requestDto.getRoomId(), wsUser.getUserId(), responseDto);// 메시지를 sub 주소로 발송해줌
+        messageService.sendMessage(requestDto, wsUser, responseDto);// 메시지를 sub 주소로 발송해줌
         System.out.println("ChatController: 메시지를 발송을 완료했습니다.");
     }
 

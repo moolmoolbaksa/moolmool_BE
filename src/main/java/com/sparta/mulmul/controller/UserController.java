@@ -42,7 +42,7 @@ public class UserController {
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
-    // 주소, 프로필 이미지 설정
+    // 주소 설정
     @PutMapping("/user/info")
     public ResponseEntity<OkDto> setUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                              @RequestBody UserRequestDto requestDto) {
