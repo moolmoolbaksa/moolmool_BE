@@ -9,10 +9,7 @@ import com.sparta.mulmul.service.MyUserService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -34,7 +31,7 @@ public class MyUserController {
     }
 
     /*성훈 - 마이페이지 내 정보 수정*/
-    @PutMapping("/api/mypage")
+    @PostMapping("/api/mypage")
     public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
                                              @RequestParam("profile") MultipartFile multipartFile,
                                              @RequestParam("address") String address,
