@@ -302,10 +302,12 @@ public class ItemService {
         String sellerImages = item.getItemImg().split(",")[0];
         List<TradeInfoImagesDto> tradeInfoImagesDtoArrayList = new ArrayList<>();
         for(Item items : myItemList){
-            String itemImage = items.getItemImg().split(",")[0];
-            Long itemId = items.getId();
-            TradeInfoImagesDto tradeInfoImagesDto = new TradeInfoImagesDto(itemImage, itemId);
-            tradeInfoImagesDtoArrayList.add(tradeInfoImagesDto);
+            if(items.getStatus()==1 || items.getStatus()==0) {
+                String itemImage = items.getItemImg().split(",")[0];
+                Long itemId = items.getId();
+                TradeInfoImagesDto tradeInfoImagesDto = new TradeInfoImagesDto(itemImage, itemId);
+                tradeInfoImagesDtoArrayList.add(tradeInfoImagesDto);
+            }
         }
 
         return new TradeInfoDto(sellerNickName, sellerImages,  tradeInfoImagesDtoArrayList);
