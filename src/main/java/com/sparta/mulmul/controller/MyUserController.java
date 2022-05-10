@@ -37,7 +37,7 @@ public class MyUserController {
                                              @RequestParam(value = "address", required = false) String address,
                                              @RequestParam(value = "storeInfo", required = false) String storeInfo,
                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        List<String> imgUrl = awsS3Service.uploadFile(multipartFile, userDetails);
+        String imgUrl = awsS3Service.mypageUpdate(multipartFile, userDetails);
         return myUserService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);
 
     }

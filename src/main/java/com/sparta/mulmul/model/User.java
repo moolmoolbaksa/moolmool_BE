@@ -84,4 +84,9 @@ public class User {
         this.degree = degree;
     }
 
+    public void updateThirdScore(float totalGrade, String degree) {
+        this.totalGrade = totalGrade;
+        this.degree = degree;
+    }
+
 }

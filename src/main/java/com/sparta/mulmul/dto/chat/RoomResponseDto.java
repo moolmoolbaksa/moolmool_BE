@@ -33,7 +33,7 @@ public class RoomResponseDto {
         responseDto.message = message.getMessage();
         responseDto.date = message.getCreatedAt();
         responseDto.isRead = message.getIsRead();
-        responseDto.readCnt = chatRoom.getReadCnt();
+//        responseDto.readCnt = chatRoom.getReadCnt();
 
         return responseDto;
     }

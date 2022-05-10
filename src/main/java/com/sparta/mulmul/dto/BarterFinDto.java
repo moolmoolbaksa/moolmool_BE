@@ -1,6 +1,5 @@
 package com.sparta.mulmul.dto;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
