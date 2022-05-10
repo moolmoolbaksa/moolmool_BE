@@ -10,7 +10,6 @@ import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.ImageRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
-import jdk.internal.util.xml.impl.Input;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
