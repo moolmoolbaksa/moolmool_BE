@@ -3,6 +3,7 @@ package com.sparta.mulmul.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.KakaoUserInfoDto;
+import com.sparta.mulmul.dto.TokenDto;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
@@ -32,15 +33,15 @@ public class KakaoUserService {
     private ObjectMapper objectMapper = new ObjectMapper();
     private RestTemplate rt = new RestTemplate();
 
-    public String kakaoLogin(String code) throws JsonProcessingException {
+    public TokenDto kakaoLogin(String code) throws JsonProcessingException {
         // 카카오 서버로 요청
         String accessToken = getAccessToken(code);
         // 카카오 서버로 재차 요청 by access token
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
         // 회원가입과 로그인 처리 및 유저 정보 받아오기
         User kakaoUser = registerUserIfNeeded(kakaoUserInfo);
-        // 토큰 만들기
-        return getJwtToken(kakaoUser);
+        // 토큰 Dto 만들기
+        return TokenDto.createOf(getJwtToken(kakaoUser), kakaoUser);
     }
 
     private String getAccessToken(String code) throws JsonProcessingException {

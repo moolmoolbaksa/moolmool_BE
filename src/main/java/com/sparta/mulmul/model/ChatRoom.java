@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter @Entity
 @NoArgsConstructor
@@ -24,14 +23,13 @@ public class ChatRoom extends CreationDate {
     @Column(nullable = false)
     private Long acceptorId;
 
-    // DB에서 검색해온 후, show 처리는 서버에서 하는 것이 나을까요?
     @Column(nullable = false)
-    private Boolean requesterShow = true;
+    private Boolean reqOut = false;
 
     @Column(nullable = false)
-    private Boolean acceptorShow = true;
+    private Boolean accOut = false;
 
-    public static ChatRoom createOfReqAndAcc(UserDetailsImpl userDetails, UserRequestDto requestDto){
+    public static ChatRoom createOf(UserDetailsImpl userDetails, UserRequestDto requestDto){
 
         ChatRoom room = new ChatRoom();
 
