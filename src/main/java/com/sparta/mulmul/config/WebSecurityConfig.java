@@ -58,16 +58,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // 접근 완전 허용 (CSRF, FrameOptions 무시)
         web
                 .ignoring()
-                .antMatchers("/h2-console/**")
-                .antMatchers("/chat/**");
+                .antMatchers("/h2-console/**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // POST 요청에 대한 CSRF를 추가로 무시해 줘야 접근이 가능합니다.
         http
-                .csrf()
-                .disable();
+                .csrf().disable()
+                .headers().frameOptions().sameOrigin();
 
         // cors 필터 등록
         http
@@ -128,11 +127,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         skipPathList.add("GET,/favicon.ico");
 
-        // 웹소켓 허용
-        skipPathList.add("POST,/ws/chat/**");
-        skipPathList.add("GET,/ws/chat/**");
-        skipPathList.add("GET,/ws-stomp/**/**");
-        skipPathList.add("GET,/ws-stomp/**");
         FilterSkipMatcher matcher = new FilterSkipMatcher(
                 skipPathList,
                 "/**"

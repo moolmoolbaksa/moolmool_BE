@@ -46,7 +46,8 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
         String tokenPayload = request.getHeader("Authorization");
         String method = request.getMethod();
 
-        System.out.println(tokenPayload);
+        System.out.println("< 받아온 토큰의 내용 >");
+        System.out.println("JwtAuthFilter: " + tokenPayload);
 
         if ( tokenPayload == null && !method.equals("GET") ) {
 
@@ -59,9 +60,9 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
             return null;
         }
-        else if ( tokenPayload == null ){ jwtToken = new JwtPreProcessingToken("null"); }
+        else if ( tokenPayload == null ) { jwtToken = new JwtPreProcessingToken("null"); }
         else { jwtToken = new JwtPreProcessingToken(
-                    extractor.extract(tokenPayload, request));
+                extractor.extract(tokenPayload, request));
         }
 
         return super

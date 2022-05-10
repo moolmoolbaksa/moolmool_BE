@@ -5,15 +5,12 @@ import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
-import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.transaction.Transactional;
 
@@ -77,11 +74,12 @@ public class UserService {
     @Transactional
     public void setUserInfo(UserDetailsImpl userDetails, UserRequestDto requestDto) {
 
+        System.out.println(requestDto.getAddress());
         User user = userRepository.findById(userDetails
                         .getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User's not found error"));
 
-        user.initProfile(requestDto);
+        user.initProfile(requestDto.getAddress());
     }
 
     // 로그인 체크하기

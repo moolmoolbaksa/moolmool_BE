@@ -20,7 +20,7 @@ public class ChatMessage extends CreationDate {
     private Long roomId;
 
     @Column(nullable = false)
-    private Long userId;
+    private Long senderId;
 
     @Column(nullable = false)
     private String message;
@@ -30,17 +30,36 @@ public class ChatMessage extends CreationDate {
     private MessageTypeEnum type;
 
     @Column(nullable = false)
-    private Boolean isRead = false;
+    private Boolean isRead;
 
-    public static ChatMessage fromMessageRequestDto(MessageRequestDto requestDto) {
+    public static ChatMessage createOf(MessageRequestDto requestDto, Long senderId) {
 
         ChatMessage message = new ChatMessage();
 
         message.roomId = requestDto.getRoomId();
-        message.userId = requestDto.getUserId();
+        message.senderId = senderId;
         message.message = requestDto.getMessage();
+        message.isRead = requestDto.getIsRead();
+        message.type = requestDto.getType();
 
         return message;
+    }
+
+    public static ChatMessage createInitOf(Long roomId, Long senderId){
+
+        ChatMessage message = new ChatMessage();
+
+        message.roomId = roomId;
+        message.senderId = senderId;
+        message.message = "채팅방이 개설되었습니다.";
+        message.isRead = false;
+        message.type = MessageTypeEnum.STATUS;
+
+        return message;
+    }
+
+    public void read() {
+        this.isRead = true;
     }
 
 }

@@ -1,5 +1,7 @@
 package com.sparta.mulmul.service;
 
+
+import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.dto.ItemUserResponseDto;
 import com.sparta.mulmul.dto.MyPageResponseDto;
 import com.sparta.mulmul.dto.UserEditDtailResponseDto;
@@ -41,7 +43,7 @@ public class MyUserService {
         for (Item items : myItemList) {
             ItemUserResponseDto itemResponseDto = new ItemUserResponseDto(
                     items.getId(),
-                    items.getItemImg(),
+                    items.getItemImg().split(",")[0],
                     items.getStatus()
             );
             myItemResponseList.add(itemResponseDto);
@@ -87,14 +89,12 @@ public class MyUserService {
 
     // 성훈_마이페이지_내 정보수정
     @Transactional
-    public UserEditResponseDto editMyPage(String nickname, String address, String storeInfo, List<String> imgUrl, UserDetailsImpl userDetails) {
+    public UserEditResponseDto editMyPage (String nickname, String address, String
+            storeInfo, String imgUrl, UserDetailsImpl userDetails){
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("user not found")
         );
-        String profile = null;
-        for (String imgUrls : imgUrl) {
-            profile = imgUrls;
-        }
+        String profile = imgUrl;
 
         // 유저 정보를 수정
         user.update(
@@ -114,5 +114,27 @@ public class MyUserService {
 
         // 요청값 반환
         return new UserEditResponseDto(true, userEditDtailResponseDto);
+    }
+
+    // 이승재 / 찜한 아이템 보여주기
+    public List<MyScrabItemDto> scrabItem (UserDetailsImpl userDetails){
+        List<Scrab> scrabList = scrabRepository.findAllByUserId(userDetails.getUserId());
+
+        List<MyScrabItemDto> myScrabItemDtoList = new ArrayList<>();
+        for (Scrab scrab : scrabList) {
+            if(scrab.getScrab().equals(true)) {
+                Item item = itemRepository.findById(scrab.getItemId()).orElseThrow(
+                        () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+                );
+                Long itemId = item.getId();
+                String title = item.getTitle();
+                String contents = item.getContents();
+                String image = item.getItemImg().split(",")[0];
+                MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image);
+                myScrabItemDtoList.add(myScrabItemDto);
+            }
+        }
+        return myScrabItemDtoList;
+
     }
 }

@@ -1,16 +1,14 @@
 package com.sparta.mulmul.model;
 
-import com.sparta.mulmul.dto.UserRequestDto;
-import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Getter @Entity
 @NoArgsConstructor
-public class  ChatRoom extends CreationDate {
+public class ChatRoom extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,27 +16,36 @@ public class  ChatRoom extends CreationDate {
     private Long id;
 
     // PK만 넣지 말고 관련 정보들이 같이 넣어 두는 게 어떨까요?
-    @Column(nullable = false)
-    private Long requesterId;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User requester;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User acceptor;
 
     @Column(nullable = false)
-    private Long acceptorId;
-
-    // DB에서 검색해온 후, show 처리는 서버에서 하는 것이 나을까요?
-    @Column(nullable = false)
-    private Boolean requesterShow = true;
+    private Boolean reqOut;
 
     @Column(nullable = false)
-    private Boolean acceptorShow = true;
+    private Boolean accOut;
 
-    public static ChatRoom createOfReqAndAcc(UserDetailsImpl userDetails, UserRequestDto requestDto){
+    @Formula("(SELECT count(1) FROM chat_room c WHERE c.is_read = false)")
+    private int readCnt;
+
+    public static ChatRoom createOf(User requester, User acceptor){
 
         ChatRoom room = new ChatRoom();
 
-        room.requesterId = userDetails.getUserId();
-        room.acceptorId = requestDto.getUserId();
+        room.requester = requester;
+        room.acceptor = acceptor;
+        room.reqOut = false;
+        room.accOut = true;
 
         return room;
     }
+
+    public void reqOut(Boolean bool) { this.reqOut = bool; }
+    public void accOut(Boolean bool) { this.accOut = bool; }
 
 }

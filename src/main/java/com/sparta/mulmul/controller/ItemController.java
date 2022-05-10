@@ -29,10 +29,10 @@ public class ItemController {
             @RequestParam("contents") String contents,
             @RequestParam("images") List<MultipartFile> multipartFiles,
             @RequestParam("type") String type,
-        @AuthenticationPrincipal UserDetailsImpl userDetails
+            @AuthenticationPrincipal UserDetailsImpl userDetails
 
     ){
-         List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
+        List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
         ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
         itemService.createItem(itemRequestDto, userDetails);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
@@ -42,12 +42,12 @@ public class ItemController {
     //이승재 / 아이템 수정 (미리 구현)
     @PutMapping("/api/items/{itemId}")
     public ResponseEntity<OkDto> updateItem(
-            @RequestParam("category") String category,
-            @RequestParam("favored") List<String> favored,
-            @RequestParam("title") String title,
-            @RequestParam("contents") String contents,
-            @RequestParam("images") List<MultipartFile> multipartFiles,
-            @RequestParam("type") String type,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "favored", required = false) List<String> favored,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "contents", required = false) String contents,
+            @RequestParam(value = "images", required = false) List<MultipartFile> multipartFiles,
+            @RequestParam(value = "type", required = false) String type,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long itemId
 
@@ -89,7 +89,7 @@ public class ItemController {
 
     // 이승재 / 유저 스토어 목록 보기
 
-    @GetMapping("/api/{userId}/store")
+    @GetMapping("/api/store/{userId}")
     private UserStoreResponseDto showStore(@PathVariable Long userId){
         return itemService.showStore(userId);
     }

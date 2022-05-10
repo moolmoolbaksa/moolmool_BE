@@ -2,6 +2,7 @@ package com.sparta.mulmul.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.mulmul.dto.OkDto;
+import com.sparta.mulmul.dto.TokenDto;
 import com.sparta.mulmul.service.KakaoUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -22,9 +23,11 @@ public class KakaoUserController {
 
     @GetMapping("/user/kakao")
 //    @GetMapping("/user/kakao/callback")
-    public ResponseEntity<OkDto> kakaoLogin(@RequestParam String code) throws URISyntaxException, JsonProcessingException {
+    public ResponseEntity<TokenDto> kakaoLogin(@RequestParam String code) throws URISyntaxException, JsonProcessingException {
 
-        String token = kakaoUserService.kakaoLogin(code);
+        TokenDto tokenDto = kakaoUserService.kakaoLogin(code);
+        String token = tokenDto.getToken();
+        tokenDto.setToken(null);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTH_HEADER, token);
@@ -34,7 +37,6 @@ public class KakaoUserController {
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .body(OkDto.valueOf("true")
-                );
+                .body(tokenDto);
     }
 }

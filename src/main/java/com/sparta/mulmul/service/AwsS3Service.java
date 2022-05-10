@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -76,49 +77,84 @@ public class AwsS3Service {
 
 
 //     성훈 - user 프로필 수정하기기
-   public List<String> uploadFile(List<MultipartFile> multipartFile, UserDetailsImpl userDetails) {
-        List<String> imageUrlList = new ArrayList<>();
-//        User user = userDetails.getUser;
+//   public List<String> uploadFile(List<MultipartFile> multipartFile, UserDetailsImpl userDetails) {
+//        List<String> imageUrlList = new ArrayList<>();
+////        User user = userDetails.getUser;
+//
+//        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
+//        multipartFile.forEach(file -> {
+//            String fileName = createFileName(file.getOriginalFilename());
+//            ObjectMetadata objectMetadata = new ObjectMetadata();
+//            objectMetadata.setContentLength(file.getSize());
+//            objectMetadata.setContentType(file.getContentType());
+//
+//            // 이미지에 대한 url
+//            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
+//
+//            // 기존 ImageRepository에서 삭제
+//            Long userId = userDetails.getUserId();
+//            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("user not found"));;
+//
+//            String userImgUrl = user.getProfile();
+//
+//           if (!userImgUrl.equals("http://kaihuastudio.com/common/img/default_profile.png")) {
+//                Image nowImage = imageRepository.findByImgUrl(userImgUrl);
+//                String nowFileName = nowImage.getFileName();
+//                Long nowImgeId = nowImage.getId();
+//                amazonS3.deleteObject(new DeleteObjectRequest(bucket, nowFileName));
+//                imageRepository.deleteById(nowImgeId);
+//            }
+//
+//            try(InputStream inputStream = file.getInputStream()) {
+//                amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+//                        .withCannedAcl(CannedAccessControlList.PublicRead));
+//            } catch(IOException e) {
+//                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+//            }
+//
+//            Image image = new Image(fileName, imgUrl);
+//            imageRepository.save(image);
+//            imageUrlList.add(imgUrl);
+//        });
+//
+//
+//        return imageUrlList;
+//    }
 
-        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
-        multipartFile.forEach(file -> {
-            String fileName = createFileName(file.getOriginalFilename());
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
-            objectMetadata.setContentType(file.getContentType());
-
-            // 이미지에 대한 url
-            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
-
-            // 기존 ImageRepository에서 삭제
-            Long userId = userDetails.getUserId();
-            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("user not found"));;
-
-            String userImgUrl = user.getProfile();
-
-           if (!userImgUrl.equals("http://kaihuastudio.com/common/img/default_profile.png")) {
-                Image nowImage = imageRepository.findByImgUrl(userImgUrl);
-                String nowFileName = nowImage.getFileName();
-                Long nowImgeId = nowImage.getId();
-                amazonS3.deleteObject(new DeleteObjectRequest(bucket, nowFileName));
-                imageRepository.deleteById(nowImgeId);
-            }
-
-            try(InputStream inputStream = file.getInputStream()) {
-                amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-            } catch(IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
-            }
-
-            Image image = new Image(fileName, imgUrl);
-            imageRepository.save(image);
-            imageUrlList.add(imgUrl);
-        });
 
 
-        return imageUrlList;
+    public String mypageUpdate(MultipartFile multipartFile, UserDetailsImpl userDetails){
+        String fileName = createFileName(multipartFile.getOriginalFilename());
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
+
+        String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
+
+        Long userId = userDetails.getUserId();
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new IllegalArgumentException("user not found")
+        );
+
+        String userImgUrl = user.getProfile();
+
+        if(!userImgUrl.equals("http://kaihuastudio.com/common/img/default_profile.png")){
+            Image nowImage = imageRepository.findByImgUrl(userImgUrl);
+            String nowFileName = nowImage.getFileName();
+            Long nowImgId = nowImage.getId();
+            amazonS3.deleteObject(new DeleteObjectRequest(bucket, nowFileName));
+            imageRepository.deleteById(nowImgId);
+        }
+
+        try(InputStream inputStream = multipartFile.getInputStream()){
+            amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+        }
+
+        Image image = new Image(fileName, imgUrl);
+        imageRepository.save(image);
+        return  imgUrl;
     }
-
 }
-

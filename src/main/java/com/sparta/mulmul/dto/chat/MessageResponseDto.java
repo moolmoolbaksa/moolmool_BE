@@ -15,7 +15,7 @@ public class MessageResponseDto {
     private Long senderId;
     private String message;
     private LocalDateTime date;
-    private final Boolean isRead = false;
+    private Boolean isRead = false;
     private MessageTypeEnum type;
 
     public static MessageResponseDto createOf(ChatMessage message, WsUser user){
@@ -30,4 +30,20 @@ public class MessageResponseDto {
 
         return responseDto;
     }
+
+    public static MessageResponseDto createFromChatMessage(ChatMessage message){
+
+        MessageResponseDto responseDto = new MessageResponseDto();
+
+        responseDto.senderId = message.getSenderId();
+        responseDto.messageId = message.getId();
+        responseDto.message = message.getMessage();
+        responseDto.date = message.getCreatedAt();
+        responseDto.type = message.getType();
+        responseDto.isRead = message.getIsRead();
+
+        return responseDto;
+
+    }
+
 }
