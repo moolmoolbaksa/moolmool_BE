@@ -29,10 +29,10 @@ public class ItemController {
             @RequestParam("contents") String contents,
             @RequestParam("images") List<MultipartFile> multipartFiles,
             @RequestParam("type") String type,
-        @AuthenticationPrincipal UserDetailsImpl userDetails
+            @AuthenticationPrincipal UserDetailsImpl userDetails
 
     ){
-         List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
+        List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
         ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
         itemService.createItem(itemRequestDto, userDetails);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));

@@ -42,6 +42,9 @@ dependencies {
     //WEB Socket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.3.2.RELEASE'
+
 }
 
 tasks.named('test') {

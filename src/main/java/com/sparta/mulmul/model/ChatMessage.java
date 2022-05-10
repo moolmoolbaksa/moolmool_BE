@@ -32,15 +32,28 @@ public class ChatMessage extends CreationDate {
     @Column(nullable = false)
     private Boolean isRead;
 
-    public static ChatMessage createOf(MessageRequestDto requestDto, Long roomId, Long senderId) {
+    public static ChatMessage createOf(MessageRequestDto requestDto, Long senderId) {
+
+        ChatMessage message = new ChatMessage();
+
+        message.roomId = requestDto.getRoomId();
+        message.senderId = senderId;
+        message.message = requestDto.getMessage();
+        message.isRead = requestDto.getIsRead();
+        message.type = requestDto.getType();
+
+        return message;
+    }
+
+    public static ChatMessage createInitOf(Long roomId, Long senderId){
 
         ChatMessage message = new ChatMessage();
 
         message.roomId = roomId;
         message.senderId = senderId;
-        message.message = requestDto.getMessage();
-        message.isRead = requestDto.getIsRead();
-        message.type = requestDto.getType();
+        message.message = "채팅방이 개설되었습니다.";
+        message.isRead = false;
+        message.type = MessageTypeEnum.STATUS;
 
         return message;
     }

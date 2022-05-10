@@ -1,6 +1,5 @@
 package com.sparta.mulmul.dto.chat;
 
-import com.sparta.mulmul.websocket.TempChatRoom;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,16 +9,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class RoomMsgUpdateDto {
 
-    private String roomId;
+    private Long roomId;
     private String message;
     private LocalDateTime date;
 
-    public static RoomMsgUpdateDto createFrom(TempChatRoom tempRoom){
+    public static RoomMsgUpdateDto createFrom(MessageRequestDto requestDto){
         RoomMsgUpdateDto msgUpdateDto = new RoomMsgUpdateDto();
 
-        msgUpdateDto.roomId = tempRoom.getTempId();
-        msgUpdateDto.message = tempRoom.getMessage();
-        msgUpdateDto.date = tempRoom.getDate();
+        msgUpdateDto.roomId = requestDto.getRoomId();
+        msgUpdateDto.message = requestDto.getMessage();
+        msgUpdateDto.date = LocalDateTime.now();
 
         return msgUpdateDto;
     }
