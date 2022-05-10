@@ -18,4 +18,5 @@ public interface ScrabRepository extends JpaRepository<Scrab, Long> {
 
     List<Scrab> findAllByItemId(Long itemId);
 
+    List<Scrab> findTop3ByUserIdAndScrab(Long userId, boolean scrab);
 }

@@ -315,7 +315,7 @@ public class ItemService {
     // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
     public void requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
-        Item sellerItem = itemRepository.findById(requestTradeDto.getUserId()).orElseThrow(
+        Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
         sellerItem.statusUpdate(sellerItem.getId(), 1);

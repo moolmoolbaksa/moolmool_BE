@@ -6,9 +6,11 @@ import com.sparta.mulmul.dto.ItemUserResponseDto;
 import com.sparta.mulmul.dto.MyPageResponseDto;
 import com.sparta.mulmul.dto.UserEditDtailResponseDto;
 import com.sparta.mulmul.dto.UserEditResponseDto;
+import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.model.User;
+import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.ScrabRepository;
 import com.sparta.mulmul.repository.UserRepository;
@@ -28,6 +30,7 @@ public class MyUserService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final ScrabRepository scrabRepository;
+    private final BagRepository bagRepository;
 
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
@@ -35,9 +38,12 @@ public class MyUserService {
                 () -> new IllegalArgumentException("user not found")
         );
         Long userId = userDetails.getUserId();
+//        Bag bag = bagRepository.findByUserId(userId);
+//        Long bagId = bag.getId();
 
         // 한 유저의 모든 아이템을 보여줌
         List<Item> myItemList = itemRepository.findAllMyItem(userId);
+//        List<Item> myItemList = itemRepository.findAllByBagIdOrBagId(bagId, bagId);
         List<ItemUserResponseDto> myItemResponseList = new ArrayList<>();
         // 내 보유 아이템을 리스트 형식으로 담기
         for (Item items : myItemList) {
@@ -48,10 +54,9 @@ public class MyUserService {
             );
             myItemResponseList.add(itemResponseDto);
         }
-        List<Scrab> myScrabList = scrabRepository.findAllByUserId(userId);
+        List<Scrab> myScrabList = scrabRepository.findTop3ByUserIdAndScrab(userId, true);
         List<ItemUserResponseDto> myScrapItemList = new ArrayList<>();
 
-        int cnt = 0;
         for (Scrab myscrap : myScrabList) {
 
             // 스크랩이 true이면
@@ -65,12 +70,7 @@ public class MyUserService {
                         scrabItem.getItemImg().split(",")[0],
                         scrabItem.getStatus()
                 );
-                cnt++;
                 myScrapItemList.add(scrabitemDto);
-                // 5번 담으면 멈춘다
-                if (cnt == 3) {
-                    break;
-                }
             }
         }
 

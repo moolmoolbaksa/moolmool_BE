@@ -18,8 +18,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     // 성훈 - 내 아이템 찾기 (마이페이지)
     // 물품과 보따리는 bagId, 보따리와 유저는 userId로 이어준다.
-    @Query("SELECT i FROM Item i INNER JOIN Bag bg ON i.bag.id=bg.id INNER JOIN User u ON bg.userId=u.id WHERE u.id=:userId")
+    @Query("SELECT i FROM Item i WHERE i.bag.userId = :userId")
     List<Item> findAllMyItem(@Param("userId") Long userId);
+
+//    List<Item> findAllByBagIdOrBagId(Long bagId, Long bagId1);
 
 //    테스트를 위한 코딩
 //    List<Item> findALLByBuyerIdOrSellerId(Long userId, Long userId1);
