@@ -88,7 +88,7 @@ public class ChatRoomService {
         for (ChatRoom chatRoom : chatRooms ){
 
             // 메시지 목록 가져오기
-            ChatMessage message = messageRepository.findFirstByRoomIdOrderByCreatedAtDesc(chatRoom.getId())
+            ChatMessage message = messageRepository.findFirstByRoomIdOrderByIdDesc(chatRoom.getId())
                     .orElseThrow( () -> new IllegalArgumentException("ChatRoomService: 채팅방 메시지를 설정해 주지 않았습니다. 방 개설과 함께 채팅 메시지를 작성하도록 설정하세요."));
 
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.

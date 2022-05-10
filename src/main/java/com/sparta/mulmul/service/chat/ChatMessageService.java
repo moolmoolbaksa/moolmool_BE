@@ -12,9 +12,6 @@ import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -101,11 +98,10 @@ public class ChatMessageService {
 
     // 메시지 찾기, 페이징 처리
     @Transactional
-    public List<MessageResponseDto> getMessage(Long id, int page, UserDetailsImpl userDetails){
+    public List<MessageResponseDto> getMessage(Long roomId, UserDetailsImpl userDetails){
 
         // 메시지 찾아오기
-        Pageable pageable = PageRequest.of(page - 1, 50, Sort.by("Id").descending());
-        List<ChatMessage> messages = messageRepository.findAllByRoomId(id, pageable);
+        List<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId);
 
         // responseDto 만들기
         List<MessageResponseDto> responseDtos = new ArrayList<>();
@@ -123,19 +119,30 @@ public class ChatMessageService {
     @Transactional
     public MessageResponseDto saveMessage(MessageRequestDto requestDto, WsUser wsUser) {
 
-        ChatRoom chatRoom = roomRepository.findById(requestDto.getRoomId()).orElseThrow(() -> new NullPointerException("ChatController: 해당 채팅방이 존재하지 않습니다."));
+        ChatRoom chatRoom = roomRepository.findById(requestDto.getRoomId())
+                .orElseThrow(() -> new NullPointerException("ChatController: 해당 채팅방이 존재하지 않습니다."));
+
         ChatMessage message = messageRepository.save(ChatMessage.createOf(requestDto, wsUser.getUserId()));
 
         if (chatRoom.getAccOut()){
             // 채팅 알림 저장 및 전달하기 ( 일관성을 위해 수정이 필요합니다. )
-            Notification notification = notificationRepository.save(Notification.createFrom(message, chatRoom.getAcceptor(), NotificationType.TALK));
-            messagingTemplate.convertAndSend("/sub/notification/" + chatRoom.getAcceptor().getId(), NotificationDto.createFrom(notification));
+            // 알림 메시지도 일관성을 갖춰 제작해야 합니다. ex. xx님이 거래를 요청했습니다. / 가입을 환영합니다. / xx님이 채팅방을 개설했습니다. -> 누르면 해당 방으로 연결됩니다.
+            Notification notification = notificationRepository.save(Notification.createOf(
+                    chatRoom.getAcceptor().getNickname() + "님에게 채팅이 왔어요!", chatRoom.getAcceptor(), NotificationType.CHAT)
+            );
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + chatRoom.getAcceptor().getId(), NotificationDto.createFrom(notification)
+            );
             chatRoom.accOut(false);
         }
         if (chatRoom.getReqOut()){
             // 채팅 알림 저장 및 전달하기
-            Notification notification = notificationRepository.save(Notification.createFrom(message, chatRoom.getRequester(), NotificationType.TALK));
-            messagingTemplate.convertAndSend("/sub/notification/" + chatRoom.getRequester().getId(), NotificationDto.createFrom(notification));
+            Notification notification = notificationRepository.save(Notification.createOf(
+                    chatRoom.getAcceptor().getNickname() + "님에게 채팅이 왔어요!", chatRoom.getRequester(), NotificationType.CHAT)
+            );
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + chatRoom.getRequester().getId(), NotificationDto.createFrom(notification)
+            );
             chatRoom.reqOut(false);
         }
 

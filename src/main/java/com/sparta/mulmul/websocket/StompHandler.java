@@ -4,8 +4,6 @@ import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;

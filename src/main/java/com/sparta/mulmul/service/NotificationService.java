@@ -30,6 +30,7 @@ public class NotificationService {
 
     // 알림 삭제
     public void deleteNotification(Long notificationId, UserDetailsImpl userDetails){
+        // 삭제를 시도하는 유저가 해당 회원과 일치하는지 검증작업이 필요합니다.
         notificationRepository.deleteById(notificationId);
     }
 
