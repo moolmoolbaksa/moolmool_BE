@@ -299,7 +299,7 @@ public class ItemService {
         );
 
 
-        String[] sellerImages = item.getItemImg().split(",");
+        String sellerImages = item.getItemImg().split(",")[0];
         List<TradeInfoImagesDto> tradeInfoImagesDtoArrayList = new ArrayList<>();
         for(Item items : myItemList){
             String itemImage = items.getItemImg().split(",")[0];

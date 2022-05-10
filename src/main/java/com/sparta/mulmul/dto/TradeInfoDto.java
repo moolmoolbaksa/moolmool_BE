@@ -8,10 +8,10 @@ import java.util.List;
 @Getter
 public class TradeInfoDto {
     private String sellerNickName;
-    private String[] sellerImages;
+    private String sellerImages;
     private List<TradeInfoImagesDto> myImages;
 
-    public TradeInfoDto(String sellerNickName, String[] sellerImages, List<TradeInfoImagesDto> tradeInfoImagesDtoArrayList){
+    public TradeInfoDto(String sellerNickName, String sellerImages, List<TradeInfoImagesDto> tradeInfoImagesDtoArrayList){
         this.sellerNickName = sellerNickName;
         this.sellerImages = sellerImages;
         this.myImages = tradeInfoImagesDtoArrayList;
