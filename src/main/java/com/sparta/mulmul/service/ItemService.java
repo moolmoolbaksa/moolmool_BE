@@ -323,7 +323,7 @@ public class ItemService {
            Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
                    ()-> new IllegalArgumentException("아이템이 없습니다.")
            );
-           buyerItem.statusUpdate(buyerItemIds, 1);
+           buyerItem.statusUpdate(buyerItemIds, 2);
         }
 
         //Long 형태인 아이디들을 String 형태로 변환
