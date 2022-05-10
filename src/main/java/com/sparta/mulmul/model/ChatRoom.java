@@ -2,6 +2,7 @@ package com.sparta.mulmul.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 
@@ -28,6 +29,9 @@ public class ChatRoom extends Timestamped {
 
     @Column(nullable = false)
     private Boolean accOut;
+
+    @Formula("(SELECT count(1) FROM chat_room c WHERE c.is_read = false)")
+    private int readCnt;
 
     public static ChatRoom createOf(User requester, User acceptor){
 

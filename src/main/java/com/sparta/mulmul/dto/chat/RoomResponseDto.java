@@ -19,6 +19,7 @@ public class RoomResponseDto {
     private String message;
     private LocalDateTime date;
     private Boolean isRead;
+    private int readCnt;
 
     public static RoomResponseDto createOf(ChatRoom chatRoom, ChatMessage message, User user){
 
@@ -32,6 +33,7 @@ public class RoomResponseDto {
         responseDto.message = message.getMessage();
         responseDto.date = message.getCreatedAt();
         responseDto.isRead = message.getIsRead();
+        responseDto.readCnt = chatRoom.getReadCnt();
 
         return responseDto;
     }

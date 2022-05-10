@@ -10,7 +10,6 @@ import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.ImageRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
-import jdk.internal.util.xml.impl.Input;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -160,4 +158,3 @@ public class AwsS3Service {
         return  imgUrl;
     }
 }
-

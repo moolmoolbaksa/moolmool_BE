@@ -32,10 +32,10 @@ public class MyUserController {
 
     /*성훈 - 마이페이지 내 정보 수정*/
     @PostMapping("/api/mypage")
-    public UserEditResponseDto showMyPageage(@RequestParam("nickname") String nickname,
-                                             @RequestParam("profile") MultipartFile multipartFile,
-                                             @RequestParam("address") String address,
-                                             @RequestParam("storeInfo") String storeInfo,
+    public UserEditResponseDto showMyPageage(@RequestParam(value = "nickname", required = false) String nickname,
+                                             @RequestParam(value = "profile", required = false) MultipartFile multipartFile,
+                                             @RequestParam(value = "address", required = false) String address,
+                                             @RequestParam(value = "storeInfo", required = false) String storeInfo,
                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         String imgUrl = awsS3Service.mypageUpdate(multipartFile, userDetails);
         return myUserService.editMyPage(nickname, address, storeInfo, imgUrl, userDetails);

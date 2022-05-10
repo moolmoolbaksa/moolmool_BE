@@ -87,10 +87,16 @@ public class ChatMessageService {
 
         if ( count == 2 ){
             messagingTemplate.convertAndSend("/sub/chat/room/" + roomId,
-                    RoomStatusDto.valueOf(MessageTypeEnum.FULL)); }
+                    RoomStatusDto.valueOf(MessageTypeEnum.FULL));
+            System.out.println("ChatController: 인원 수 " + count + "명으로 집계되었습니다.");
+            System.out.println("ChatController: FULL 메시지를 전달합니다.");
+        }
         else {
             messagingTemplate.convertAndSend("/sub/chat/room/" + roomId,
-                    RoomStatusDto.valueOf(MessageTypeEnum.NORMAL)); }
+                    RoomStatusDto.valueOf(MessageTypeEnum.NORMAL));
+            System.out.println("ChatController: 인원 수 " + count + "명으로 집계되었습니다.");
+            System.out.println("ChatController: NORMAL 메시지를 전달합니다.");
+        }
     }
 
     // 메시지 찾기, 페이징 처리
