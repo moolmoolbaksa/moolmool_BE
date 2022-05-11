@@ -7,6 +7,7 @@ import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,6 +24,8 @@ public class ItemService {
     private final ScrabRepository scrabRepository;
     private final UserRepository userRepository;
     private final BarterRepository barterRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final NotificationRepository notificationRepository;
 
     // 이승재 / 보따리 아이템 등록하기
     public void createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
@@ -299,20 +302,22 @@ public class ItemService {
         );
 
 
-        String[] sellerImages = item.getItemImg().split(",");
+        String sellerImages = item.getItemImg().split(",")[0];
         List<TradeInfoImagesDto> tradeInfoImagesDtoArrayList = new ArrayList<>();
         for(Item items : myItemList){
-            String itemImage = items.getItemImg().split(",")[0];
-            Long itemId = items.getId();
-            TradeInfoImagesDto tradeInfoImagesDto = new TradeInfoImagesDto(itemImage, itemId);
-            tradeInfoImagesDtoArrayList.add(tradeInfoImagesDto);
+            if(items.getStatus()==1 || items.getStatus()==0) {
+                String itemImage = items.getItemImg().split(",")[0];
+                Long itemId = items.getId();
+                TradeInfoImagesDto tradeInfoImagesDto = new TradeInfoImagesDto(itemImage, itemId);
+                tradeInfoImagesDtoArrayList.add(tradeInfoImagesDto);
+            }
         }
 
         return new TradeInfoDto(sellerNickName, sellerImages,  tradeInfoImagesDtoArrayList);
     }
 
-
     // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
+    @Transactional
     public void requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
@@ -323,7 +328,7 @@ public class ItemService {
            Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
                    ()-> new IllegalArgumentException("아이템이 없습니다.")
            );
-           buyerItem.statusUpdate(buyerItemIds, 1);
+           buyerItem.statusUpdate(buyerItemIds, 2);
         }
 
         //Long 형태인 아이디들을 String 형태로 변환
@@ -342,6 +347,10 @@ public class ItemService {
                 .sellerId(requestTradeDto.getUserId())
                 .barter(StringBarter)
                 .status(1)
+                .isBuyerScore(false)
+                .isBuyerTrade(false)
+                .isSellerScore(false)
+                .isSellerTrade(false)
                 .build();
         barterRepository.save(barter);
         }
@@ -414,6 +423,13 @@ public class ItemService {
             );
             item.statusUpdate(id,2);
         }
+        // 알림 내역 저장 후 상대방에게 전송
+        Notification notification = notificationRepository.save(Notification.createFrom(barter));
+
+        messagingTemplate.convertAndSend(
+                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
+        );
+
     }
 
     @Transactional

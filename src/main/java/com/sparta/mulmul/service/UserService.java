@@ -32,7 +32,6 @@ public class UserService {
         // 비밀번호 암호화
         String EncodedPassword = passwordEncoder.encode(requestDto.getPassword());
         // 회원가입 및 반환
-
         bagRepository.save(new Bag(userRepository.save(
                         User.withPassword(requestDto, EncodedPassword)
                 ))

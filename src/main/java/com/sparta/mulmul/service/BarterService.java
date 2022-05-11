@@ -257,6 +257,13 @@ public class BarterService {
             System.out.println("내거래 상태 : " + myBarter.getStatus());
         }
 
+//        // 알림 내역 저장 후 상대방에게 전송
+//        Notification notification = notificationRepository.save(Notification.createFrom(barter));
+//
+//        messagingTemplate.convertAndSend(
+//                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
+//        );
+
     }
 }
 

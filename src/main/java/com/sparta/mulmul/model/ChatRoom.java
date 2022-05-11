@@ -30,8 +30,8 @@ public class ChatRoom extends Timestamped {
     @Column(nullable = false)
     private Boolean accOut;
 
-//    @Formula("(SELECT count(1) FROM chat_message c WHERE c.is_read = false)")
-//    private int readCnt;
+    @Formula("(SELECT count(1) FROM chat_message c WHERE c.room_id = room_id AND c.is_read = false)")
+    private int unreadCnt;
 
     public static ChatRoom createOf(User requester, User acceptor){
 

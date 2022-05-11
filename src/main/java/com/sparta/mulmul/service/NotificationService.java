@@ -7,6 +7,7 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class NotificationService {
     // 알림 전체 목록
     public List<NotificationDto> getNotification(UserDetailsImpl userDetails){
 
-        List<Notification> notifications = notificationRepository.findAllByUserIdOrderByModifiedAtDesc(userDetails.getUserId());
+        List<Notification> notifications = notificationRepository.findAllByUserIdOrderByIdDesc(userDetails.getUserId());
         List<NotificationDto> dtos = new ArrayList<>();
 
         for (Notification notification : notifications){
@@ -28,9 +29,13 @@ public class NotificationService {
         return dtos;
     }
 
-    // 알림 삭제
-    public void deleteNotification(Long notificationId, UserDetailsImpl userDetails){
-        notificationRepository.deleteById(notificationId);
-    }
+    // 읽음 상태 업데이트
+    @Transactional
+    public void setRead(Long notificationId){
+        Notification notification = notificationRepository
+                .findById(notificationId)
+                .orElseThrow( () -> new NullPointerException("NotificationService: " + notificationId + "번 알림이 존재하지 않습니다."));
 
+        notification.setRead();
+    }
 }

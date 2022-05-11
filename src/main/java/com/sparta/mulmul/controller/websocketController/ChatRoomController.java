@@ -38,10 +38,9 @@ public class ChatRoomController {
     // 개별 채팅방 메시지 불러오기
     @GetMapping("/room/{roomId}")
     public List<MessageResponseDto> getMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                               @PathVariable Long roomId,
-                                               @RequestParam(value = "page", defaultValue = "1") int page){
+                                               @PathVariable Long roomId){
 
-        return messageService.getMessage(roomId, page, userDetails);
+        return messageService.getMessage(roomId, userDetails);
     }
 
     // 채팅방 나가기

@@ -4,8 +4,6 @@ import com.sparta.mulmul.dto.UserRequestDto;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -30,28 +28,24 @@ public class StompHandler implements ChannelInterceptor {
 
         assert accessor != null;
 
-        System.out.println("StompHandler: 엑세스 Header의 이름 : " + accessor.getFirstNativeHeader("Authorization"));
-
         if(accessor.getCommand() == StompCommand.CONNECT) {
-
-            try {
-                String token = extractor.extract(accessor.getFirstNativeHeader("Authorization"));
-                System.out.println("StompHandler: 헤더에서 토큰 추출 완료");
-                Long userId = jwtDecoder.decodeTokenByUserId(token);
-                String nickname = jwtDecoder.decodeTokenByNickname(token);
-                System.out.println("StompHandler: 토큰 디코딩 완료");
-                WsUser wsUser = WsUser.fromUserRequestDto(UserRequestDto.createOf(userId, nickname));
-                System.out.println("StompHandler: WsUser 객체 생성");
-
-                accessor.setUser(wsUser);
-                System.out.println("StompHandler: StompHeaderAccessor에 Principal 설정");
-
-            } catch (Exception e) {
-                throw new AccessDeniedException("StompHandler: 유효하지 않은 토큰입니다.");
-            }
+            accessor.setUser(checkVaild(accessor));
         }
-
         return message;
+    }
+
+    private WsUser checkVaild(StompHeaderAccessor accessor){
+
+        WsUser wsUser;
+        try {
+            String token = extractor.extract(accessor.getFirstNativeHeader("Authorization"));
+            Long userId = jwtDecoder.decodeTokenByUserId(token);
+            String nickname = jwtDecoder.decodeTokenByNickname(token);
+            wsUser = WsUser.fromUserRequestDto(UserRequestDto.createOf(userId, nickname));
+        } catch (Exception e) {
+            throw new AccessDeniedException("StompHandler: 유효하지 않은 토큰입니다.");
+        }
+        return wsUser;
     }
 }
 

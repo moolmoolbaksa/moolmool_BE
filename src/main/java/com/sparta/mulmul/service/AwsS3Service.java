@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -123,38 +124,42 @@ public class AwsS3Service {
 
 
 
-    public String mypageUpdate(MultipartFile multipartFile, UserDetailsImpl userDetails){
-        String fileName = createFileName(multipartFile.getOriginalFilename());
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(multipartFile.getSize());
-        objectMetadata.setContentType(multipartFile.getContentType());
+    public String mypageUpdate(MultipartFile multipartFile, UserDetailsImpl userDetails) {
+        if (multipartFile == null) {
+            return "empty";
+        } else {
+            String fileName = createFileName(multipartFile.getOriginalFilename());
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(multipartFile.getSize());
+            objectMetadata.setContentType(multipartFile.getContentType());
 
-        String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
+            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
 
-        Long userId = userDetails.getUserId();
-        User user = userRepository.findById(userId).orElseThrow(
-                ()-> new IllegalArgumentException("user not found")
-        );
+            Long userId = userDetails.getUserId();
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new IllegalArgumentException("user not found")
+            );
 
-        String userImgUrl = user.getProfile();
+            String userImgUrl = user.getProfile();
 
-        if(!userImgUrl.equals("http://kaihuastudio.com/common/img/default_profile.png")){
-            Image nowImage = imageRepository.findByImgUrl(userImgUrl);
-            String nowFileName = nowImage.getFileName();
-            Long nowImgId = nowImage.getId();
-            amazonS3.deleteObject(new DeleteObjectRequest(bucket, nowFileName));
-            imageRepository.deleteById(nowImgId);
+            Optional<Image> nowImage = imageRepository.findByImgUrl(userImgUrl);
+            if (nowImage.isPresent()) {
+                String nowFileName = nowImage.get().getFileName();
+                Long nowImgId = nowImage.get().getId();
+                amazonS3.deleteObject(new DeleteObjectRequest(bucket, nowFileName));
+                imageRepository.deleteById(nowImgId);
+            }
+
+            try (InputStream inputStream = multipartFile.getInputStream()) {
+                amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+            }
+
+            Image image = new Image(fileName, imgUrl);
+            imageRepository.save(image);
+            return imgUrl;
         }
-
-        try(InputStream inputStream = multipartFile.getInputStream()){
-            amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
-        }
-
-        Image image = new Image(fileName, imgUrl);
-        imageRepository.save(image);
-        return  imgUrl;
     }
 }
