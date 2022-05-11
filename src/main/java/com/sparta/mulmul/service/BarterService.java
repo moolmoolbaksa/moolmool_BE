@@ -72,11 +72,7 @@ public class BarterService {
                         () -> new IllegalArgumentException("buyerItem not found")
                 );
 
-                MyBarterDto buyerItemList = new MyBarterDto(
-                        itemId,
-                        buyerItem.getTitle(),
-                        buyerItem.getItemImg()
-                );
+                MyBarterDto buyerItemList = getMyBarterDto(itemId, buyerItem);
 
                 //바이어가 유저라면
                 if (buyerItem.getBag().getUserId().equals(userId)) {
@@ -97,11 +93,7 @@ public class BarterService {
                         () -> new IllegalArgumentException("sellerItem not found")
                 );
 
-                MyBarterDto sellerItemList = new MyBarterDto(
-                        itemId,
-                        sellerItem.getTitle(),
-                        sellerItem.getItemImg()
-                );
+                MyBarterDto sellerItemList = getMyBarterDto(itemId, sellerItem);
                 //셀러가 유저라면
                 if (sellerItem.getBag().getUserId().equals(userId)) {
                     myBarterList.add(sellerItemList);
@@ -164,6 +156,15 @@ public class BarterService {
             }
         }
         return totalList;
+    }
+// 성훈 리팩토링 (거래리스트)
+    private MyBarterDto getMyBarterDto(Long itemId, Item Item) {
+        MyBarterDto buyerItemList = new MyBarterDto(
+                itemId,
+                Item.getTitle(),
+                Item.getItemImg()
+        );
+        return buyerItemList;
     }
 
 
