@@ -60,58 +60,62 @@ public class ItemService {
         if(category.isEmpty()){
             List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
             List<ItemResponseDto> items = new ArrayList<>();
-            for(Item item : itemList){
-                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                int scrabCnt = 0;
-                for(Scrab scrab1 : scrabs){
-                    if(scrab1.getScrab().equals(true)){
-                        scrabCnt++;
+            for(Item item : itemList) {
+                if (item.getStatus() == 1 || item.getStatus() == 0) {
+                    List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+                    int scrabCnt = 0;
+                    for (Scrab scrab1 : scrabs) {
+                        if (scrab1.getScrab().equals(true)) {
+                            scrabCnt++;
+                        }
                     }
+                    ItemResponseDto itemResponseDto = new ItemResponseDto(
+                            item.getId(),
+                            item.getCategory(),
+                            item.getTitle(),
+                            item.getContents(),
+                            item.getItemImg().split(",")[0],
+                            item.getAddress(),
+                            scrabCnt,
+                            item.getViewCnt(),
+                            item.getStatus());
+                    items.add(itemResponseDto);
                 }
-                ItemResponseDto itemResponseDto = new ItemResponseDto(
-                        item.getId(),
-                        item.getCategory(),
-                        item.getTitle(),
-                        item.getContents(),
-                        item.getItemImg().split(",")[0],
-                        item.getAddress(),
-                        scrabCnt,
-                        item.getViewCnt(),
-                        item.getStatus());
-                items.add(itemResponseDto);
-                }
+            }
             return items;
             }
        List<Item> itemList = itemRepository.findAllByCategory(category);
        List<ItemResponseDto> items = new ArrayList<>();
        Long userId = userDetails.getUserId();
        for(Item item : itemList) {
-           boolean isScrab;
-           if(scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()){
-               isScrab  = true;
-           }else{
-               isScrab = false;
-           }
-           List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-           int scrabCnt = 0;
-           for(Scrab scrab1 : scrabs){
-               if(scrab1.getScrab().equals(true)){
-                   scrabCnt++;
+           if (item.getStatus() == 0 || item.getStatus() == 1) {
+               boolean isScrab;
+               if (scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()) {
+                   isScrab = true;
+               } else {
+                   isScrab = false;
                }
-           }
-           ItemResponseDto itemResponseDto = new ItemResponseDto(
-                   item.getId(),
-                   item.getCategory(),
-                   item.getTitle(),
-                   item.getContents(),
-                   item.getItemImg().split(",")[0],
-                   item.getAddress(),
-                   scrabCnt,
-                   item.getViewCnt(),
-                   item.getStatus(),
-                   isScrab);
-           items.add(itemResponseDto);
+               List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+               int scrabCnt = 0;
+               for (Scrab scrab1 : scrabs) {
+                   if (scrab1.getScrab().equals(true)) {
+                       scrabCnt++;
+                   }
+               }
+               ItemResponseDto itemResponseDto = new ItemResponseDto(
+                       item.getId(),
+                       item.getCategory(),
+                       item.getTitle(),
+                       item.getContents(),
+                       item.getItemImg().split(",")[0],
+                       item.getAddress(),
+                       scrabCnt,
+                       item.getViewCnt(),
+                       item.getStatus(),
+                       isScrab);
+               items.add(itemResponseDto);
 
+           }
        }
        return items;
     }
