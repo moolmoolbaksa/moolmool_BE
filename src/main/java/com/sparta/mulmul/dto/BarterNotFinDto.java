@@ -10,9 +10,9 @@ import java.util.List;
 @Builder
 public class BarterNotFinDto {
     private Long barterId;
-    private Long opponentId;
-    private String opponentnickname;
-    private String opponentProfile;
+    private Long userId;
+    private String usernickname;
+    private String profile;
     private int status;
     private String myPosition;
     private Boolean isTrade;
@@ -20,11 +20,11 @@ public class BarterNotFinDto {
     private List<MyBarterDto> barterItem;
 
 
-    public BarterNotFinDto(Long barterId, Long opponentId, String opponentnickname, String opponentProfile, int status, String myPosition, Boolean isTrade,  List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
+    public BarterNotFinDto(Long barterId, Long userId, String usernickname, String profile, int status, String myPosition, Boolean isTrade,  List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
         this.barterId = barterId;
-        this.opponentId = opponentId;
-        this.opponentnickname = opponentnickname;
-        this.opponentProfile = opponentProfile;
+        this.userId = userId;
+        this.usernickname = usernickname;
+        this.profile = profile;
         this.status = status;
         this.myPosition = myPosition;
         this.isTrade = isTrade;
