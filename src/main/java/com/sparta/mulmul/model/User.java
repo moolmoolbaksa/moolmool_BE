@@ -33,7 +33,7 @@ public class User {
     private String storeInfo;
     private String degree = "물물어린이";
     private int raterCount;
-    private float totalGrade;
+    private float totalGrade = 50.0F;
     private float grade;
 
     // 회원 정보 초기화 (초기설정을 어떻게 해줄 것인지, 점수 알고리즘이 나오면 다시 만들어 보도록 합니다.)
@@ -72,16 +72,20 @@ public class User {
 
     }
 
-    public void execptImageUpdate(String nickname, String address, String storeInfo){
-        this.nickname = nickname;
-        this.address = address;
-        this.storeInfo = storeInfo;
-    }
-
-    public void updateScore(float totalGrade, float grade, int raterCount, String degree) {
+    public void updateFirstScore(float totalGrade, float grade, int raterCount, String degree) {
         this.totalGrade = totalGrade;
         this.grade = grade;
         this.raterCount = raterCount;
+        this.degree = degree;
+    }
+
+    public void updateSecondScore(float totalGrade, String degree) {
+        this.totalGrade = totalGrade;
+        this.degree = degree;
+    }
+
+    public void updateThirdScore(float totalGrade, String degree) {
+        this.totalGrade = totalGrade;
         this.degree = degree;
     }
 

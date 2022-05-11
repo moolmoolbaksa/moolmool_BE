@@ -3,8 +3,6 @@ package com.sparta.mulmul.repository.chat;
 import com.sparta.mulmul.model.ChatRoom;
 import com.sparta.mulmul.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,5 +21,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     // 채팅방 생성 중복검사를 해줍니다.
     Optional<ChatRoom> findByRequesterAndAcceptor(User requester, User acceptor);
+
+    ChatRoom findByRequesterIdAndAcceptorId(Long id, Long opponentUserId);
 
 }

@@ -16,14 +16,4 @@ public class BarterResponseDto {
         this.notFinBarter = notFinBarter;
         this.finBarter = finBarter;
     }
-
-    public void addNotFin(BarterNotFinDto notFinBarter) {
-        this.notFinBarter = notFinBarter;
-        this.finBarter = null;
-    }
-
-    public void addFin(BarterFinDto finBarter) {
-        this.notFinBarter = null;
-        this.finBarter = finBarter;
-    }
 }
