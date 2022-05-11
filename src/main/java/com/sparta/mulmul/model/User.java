@@ -72,6 +72,12 @@ public class User {
 
     }
 
+    public void execptImageUpdate(String nickname, String address, String storeInfo){
+        this.nickname = nickname;
+        this.address = address;
+        this.storeInfo = storeInfo;
+    }
+
     public void updateScore(float totalGrade, float grade, int raterCount, String degree) {
         this.totalGrade = totalGrade;
         this.grade = grade;

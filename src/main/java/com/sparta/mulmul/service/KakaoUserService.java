@@ -44,9 +44,6 @@ public class KakaoUserService {
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
         // 회원가입과 로그인 처리 및 유저 정보 받아오기
         User kakaoUser = registerUserIfNeeded(kakaoUserInfo);
-        // 회원가입 알림 메시지 저장
-        notificationRepository.save(
-                Notification.createOf("반가워요! " + kakaoUser.getNickname() + "님 회원 가입을 축하드려요!", kakaoUser, NotificationType.ETC));
         // 토큰 Dto 만들기
         return TokenDto.createOf(getJwtToken(kakaoUser), kakaoUser);
     }
@@ -55,16 +52,12 @@ public class KakaoUserService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "6c57a62de555a589bbaaabdc73a9e011");
-//        body.add("client_id", "6117b8849303b224556a558baf39dcb9");
         body.add("redirect_uri", "http://localhost:3000/auth/kakao/callback");
-//        body.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
         body.add("code", code);
-
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
                 new HttpEntity<>(body, headers);
@@ -74,7 +67,6 @@ public class KakaoUserService {
                 kakaoTokenRequest,
                 String.class
         );
-
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         return objectMapper.readTree(response.getBody()).get("access_token").asText();
     }
@@ -84,7 +76,6 @@ public class KakaoUserService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
 
@@ -94,7 +85,6 @@ public class KakaoUserService {
                 kakaoUserInfoRequest,
                 String.class
         );
-
         return KakaoUserInfoDto
                 .fromJsonNode(objectMapper.readTree(response.getBody()));
     }
@@ -113,11 +103,13 @@ public class KakaoUserService {
             );
 
             bagRepository.save(new Bag(kakaoUser));
+            // 회원가입 알림 메시지 저장
+            notificationRepository.save(
+                    Notification.createFrom(kakaoUser));
         }
 
         return kakaoUser;
     }
-
     // JWT 토큰 추출
     private String getJwtToken(User kakaoUser){
         return TOKEN_TYPE + " " + JwtTokenUtils.generateJwtToken(

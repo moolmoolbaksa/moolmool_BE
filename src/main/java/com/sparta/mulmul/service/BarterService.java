@@ -1,18 +1,18 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.BarterFinDto;
-import com.sparta.mulmul.dto.BarterNotFinDto;
-import com.sparta.mulmul.dto.BarterResponseDto;
-import com.sparta.mulmul.dto.MyBarterDto;
+import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
+import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,6 +28,8 @@ public class BarterService {
     private final BarterRepository barterRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final NotificationRepository notificationRepository;
 
     // 성훈 - 거래내역서 보기
     public List<BarterResponseDto> showMyBarter(UserDetailsImpl userDetails) {
@@ -226,7 +228,14 @@ public class BarterService {
         );
         sellerItem.statusUpdate(sellerItem.getId(),3);
         myBarter.updateBarter(3);
-        System.out.println("내거래 상태 : " + myBarter.getStatus());
+
+//        // 알림 내역 저장 후 상대방에게 전송
+//        Notification notification = notificationRepository.save(Notification.createFrom(barter));
+//
+//        messagingTemplate.convertAndSend(
+//                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
+//        );
+
     }
 }
 

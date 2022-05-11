@@ -35,6 +35,17 @@ public class Barter extends Timestamped{
     @Column(nullable = false)
     private int status;
 
+    @Column(nullable = false)
+    private Boolean isBuyerTrade = false;
+
+    @Column(nullable = false)
+    private Boolean isSellerTrade = false;
+
+    @Column(nullable = false)
+    private Boolean isBuyerScore = false;
+
+    @Column(nullable = false)
+    private Boolean isSellerScore = false;
 
     public void updateBarter(int status) {
         this.status = status;

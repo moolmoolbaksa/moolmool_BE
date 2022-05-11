@@ -96,13 +96,17 @@ public class MyUserService {
         );
         String profile = imgUrl;
 
-        // 유저 정보를 수정
-        user.update(
-                nickname,
-                profile,
-                address,
-                storeInfo
-        );
+        if (imgUrl.equals("empty")){
+            user.execptImageUpdate(nickname, address, storeInfo);
+        }else {
+            // 유저 정보를 수정
+            user.update(
+                    nickname,
+                    profile,
+                    address,
+                    storeInfo
+            );
+        }
 
         // 수정된 정보를 Response하기위해 정보를 넣어 줌
         UserEditDtailResponseDto userEditDtailResponseDto = new UserEditDtailResponseDto(
