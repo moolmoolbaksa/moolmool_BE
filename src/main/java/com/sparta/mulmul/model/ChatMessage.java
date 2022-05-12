@@ -57,9 +57,4 @@ public class ChatMessage extends CreationDate {
 
         return message;
     }
-
-    public void read() {
-        this.isRead = true;
-    }
-
 }

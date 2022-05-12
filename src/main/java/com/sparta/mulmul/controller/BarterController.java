@@ -1,6 +1,7 @@
 package com.sparta.mulmul.controller;
 
-import com.sparta.mulmul.dto.BarterResponseDto;
+import com.sparta.mulmul.dto.barter.BarterDto;
+import com.sparta.mulmul.dto.barter.BarterStatusDto;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.BarterService;
@@ -18,7 +19,7 @@ public class BarterController {
 
     /*성훈 - 거래중인 내역보기*/
     @GetMapping("/api/myhistory")
-    public List<BarterResponseDto> showMyBarter (@AuthenticationPrincipal UserDetailsImpl userDetails){
+    public List<BarterDto> showMyBarter (@AuthenticationPrincipal UserDetailsImpl userDetails){
         return barterService.showMyBarter(userDetails);
     }
 
@@ -31,9 +32,8 @@ public class BarterController {
 
     //엄성훈 - 교환신청
     @PutMapping("/api/myhistory/handshake")
-    public ResponseEntity<OkDto> OkayItem(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        barterService.OkayBarter(barterId, userDetails);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    public BarterStatusDto OkayItem(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return barterService.OkayBarter(barterId, userDetails);
     }
 
 }

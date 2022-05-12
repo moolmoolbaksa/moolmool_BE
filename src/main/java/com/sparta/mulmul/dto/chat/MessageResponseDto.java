@@ -40,7 +40,7 @@ public class MessageResponseDto {
         responseDto.message = message.getMessage();
         responseDto.date = message.getCreatedAt();
         responseDto.type = message.getType();
-        responseDto.isRead = message.getIsRead();
+        responseDto.isRead = true;
 
         return responseDto;
 

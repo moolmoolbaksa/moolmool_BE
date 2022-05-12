@@ -1,8 +1,8 @@
 package com.sparta.mulmul.controller;
 
-import com.sparta.mulmul.dto.MyPageResponseDto;
-import com.sparta.mulmul.dto.MyScrabItemDto;
-import com.sparta.mulmul.dto.UserEditResponseDto;
+import com.sparta.mulmul.dto.user.MyPageResponseDto;
+import com.sparta.mulmul.dto.scrab.MyScrabItemDto;
+import com.sparta.mulmul.dto.user.UserEditResponseDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.AwsS3Service;
 import com.sparta.mulmul.service.MyUserService;

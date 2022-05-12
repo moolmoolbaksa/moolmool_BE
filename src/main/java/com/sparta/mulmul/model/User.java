@@ -1,7 +1,7 @@
 package com.sparta.mulmul.model;
 
-import com.sparta.mulmul.dto.KakaoUserInfoDto;
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.KakaoUserInfoDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -84,10 +84,6 @@ public class User {
         this.degree = degree;
     }
 
-    public void updateThirdScore(float totalGrade, String degree) {
-        this.totalGrade = totalGrade;
-        this.degree = degree;
-    }
 
     public void execptImageUpdate(String nickname, String address, String storeInfo){
         this.nickname = nickname;

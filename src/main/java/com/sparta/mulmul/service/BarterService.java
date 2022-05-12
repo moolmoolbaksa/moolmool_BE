@@ -1,9 +1,8 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.BarterFinDto;
-import com.sparta.mulmul.dto.BarterNotFinDto;
-import com.sparta.mulmul.dto.BarterResponseDto;
-import com.sparta.mulmul.dto.MyBarterDto;
+import com.sparta.mulmul.dto.barter.BarterDto;
+import com.sparta.mulmul.dto.barter.BarterStatusDto;
+import com.sparta.mulmul.dto.barter.MyBarterDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.User;
@@ -29,14 +28,14 @@ public class BarterService {
     private final ItemRepository itemRepository;
 
     // 성훈 - 거래내역서 보기
-    public List<BarterResponseDto> showMyBarter(UserDetailsImpl userDetails) {
+    public List<BarterDto> showMyBarter(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
         );
 
         Long userId = userDetails.getUserId();
         // (거래 물품리스트들과 거래내역의 Id값)이 포함된 거래내역 리스트를 담을 Dto
-        List<BarterResponseDto> totalList = new ArrayList<>();
+        List<BarterDto> totalList = new ArrayList<>();
         // 상대방 아이디
         Long opponentId = null;
         // 나의 포지션
@@ -72,11 +71,7 @@ public class BarterService {
                         () -> new IllegalArgumentException("buyerItem not found")
                 );
 
-                MyBarterDto buyerItemList = new MyBarterDto(
-                        itemId,
-                        buyerItem.getTitle(),
-                        buyerItem.getItemImg()
-                );
+                MyBarterDto buyerItemList = getMyBarterDto(itemId, buyerItem);
 
                 //바이어가 유저라면
                 if (buyerItem.getBag().getUserId().equals(userId)) {
@@ -97,11 +92,7 @@ public class BarterService {
                         () -> new IllegalArgumentException("sellerItem not found")
                 );
 
-                MyBarterDto sellerItemList = new MyBarterDto(
-                        itemId,
-                        sellerItem.getTitle(),
-                        sellerItem.getItemImg()
-                );
+                MyBarterDto sellerItemList = getMyBarterDto(itemId, sellerItem);
                 //셀러가 유저라면
                 if (sellerItem.getBag().getUserId().equals(userId)) {
                     myBarterList.add(sellerItemList);
@@ -129,23 +120,23 @@ public class BarterService {
             }
 
             if (status == 2 || status == 1) {
-                BarterNotFinDto barterNotFin = new BarterNotFinDto(
+                BarterDto barterFin = new BarterDto(
                         barterId,
                         opponentId,
                         opponentUser.getNickname(),
                         opponentUser.getProfile(),
+                        null,
                         status,
                         myPosition,
                         myTradeCheck,
+                        myScoreCheck,
                         myBarterList,
                         barterList
                 );
-
-                BarterResponseDto totalBarter = new BarterResponseDto(barterNotFin, null);
-                totalList.add(totalBarter);
+                totalList.add(barterFin);
                 // 거래완료, 평가완료일 경우
             } else if (status == 3 || status == 4) {
-                BarterFinDto barterFin = new BarterFinDto(
+                BarterDto barterFin = new BarterDto(
                         barterId,
                         opponentId,
                         opponentUser.getNickname(),
@@ -153,17 +144,27 @@ public class BarterService {
                         date,
                         status,
                         myPosition,
+                        myTradeCheck,
                         myScoreCheck,
                         myBarterList,
                         barterList
                 );
-
-                BarterResponseDto totalBarter = new BarterResponseDto(null, barterFin);
-                totalList.add(totalBarter);
+                totalList.add(barterFin);
 
             }
         }
         return totalList;
+    }
+
+
+// 성훈 리팩토링 (거래리스트)
+    private MyBarterDto getMyBarterDto(Long itemId, Item Item) {
+        MyBarterDto buyerItemList = new MyBarterDto(
+                itemId,
+                Item.getTitle(),
+                Item.getItemImg()
+        );
+        return buyerItemList;
     }
 
 
@@ -210,7 +211,7 @@ public class BarterService {
 
     // 성훈 - 거래 완료
     @Transactional
-    public void OkayBarter(Long barterId, UserDetailsImpl userDetails) {
+    public BarterStatusDto OkayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
         );
@@ -222,12 +223,15 @@ public class BarterService {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
 
+        boolean isTrade;
         // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
         if (myBarter.getBuyerId().equals(userId)) {
             myBarter.updateTradBuyer(true);
+            isTrade = true;
             // 유저가 셀러라면 셀러거래완료를 true로 변경한다.
         } else {
             myBarter.updateTradSeller(true);
+            isTrade = true;
         }
 
         Boolean buyerTrade = myBarter.getIsBuyerTrade();
@@ -252,8 +256,9 @@ public class BarterService {
                     () -> new IllegalArgumentException("sellerItem not found")
             );
             sellerItem.statusUpdate(sellerItem.getId(), 3);
-            myBarter.updateBarter(3);
-            System.out.println("내거래 상태 : " + myBarter.getStatus());
+            myBarter.updateTradeBarter(3, LocalDateTime.now());
+
+            return new BarterStatusDto(isTrade,false , myBarter.getStatus());
         }
 
 //        // 알림 내역 저장 후 상대방에게 전송
@@ -262,7 +267,7 @@ public class BarterService {
 //        messagingTemplate.convertAndSend(
 //                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
 //        );
-
+        return new BarterStatusDto(isTrade, false, myBarter.getStatus());
     }
 }
 

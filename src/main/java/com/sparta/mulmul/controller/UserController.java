@@ -1,6 +1,8 @@
 package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.dto.user.UserCheckResponseDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class UserController {
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
+    // 회원 정보 체크
     @GetMapping("/user/check")
     public UserCheckResponseDto userCheck(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userService.userCheck(userDetails);

@@ -1,7 +1,6 @@
 package com.sparta.mulmul.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.TokenDto;
 import com.sparta.mulmul.service.KakaoUserService;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.net.URISyntaxException;
 
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
 
@@ -22,8 +19,7 @@ public class KakaoUserController {
     private final KakaoUserService kakaoUserService;
 
     @GetMapping("/user/kakao")
-//    @GetMapping("/user/kakao/callback")
-    public ResponseEntity<TokenDto> kakaoLogin(@RequestParam String code) throws URISyntaxException, JsonProcessingException {
+    public ResponseEntity<TokenDto> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
 
         TokenDto tokenDto = kakaoUserService.kakaoLogin(code);
         String token = tokenDto.getToken();

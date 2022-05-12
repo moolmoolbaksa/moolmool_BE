@@ -1,6 +1,6 @@
 package com.sparta.mulmul.security.provider;
 
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import org.springframework.security.authentication.AuthenticationProvider;

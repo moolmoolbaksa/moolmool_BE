@@ -1,16 +1,14 @@
 package com.sparta.mulmul.repository.chat;
 
 import com.sparta.mulmul.model.ChatMessage;
-import com.sparta.mulmul.model.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 import java.util.Optional;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
@@ -26,4 +24,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     // 내가 요청받은 채팅방
     Optional<ChatMessage> findFirstBySenderIdAndRoomId(Long userId, Long roomID);
+
+    // 채팅 메시지 읽음 상태 일괄 업데이트
+    @Modifying
+    @Transactional
+    @Query("UPDATE ChatMessage msg SET msg.isRead = true WHERE msg.roomId = :roomId AND msg.senderId <> :userId AND msg.isRead = false")
+    void updateChatMessage(Long roomId, Long userId);
 }

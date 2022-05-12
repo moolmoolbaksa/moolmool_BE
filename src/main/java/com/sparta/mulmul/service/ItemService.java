@@ -2,6 +2,15 @@ package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
+import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
+import com.sparta.mulmul.dto.item.ItemRequestDto;
+import com.sparta.mulmul.dto.item.ItemResponseDto;
+import com.sparta.mulmul.dto.item.ItemUserResponseDto;
+import com.sparta.mulmul.dto.trade.RequestTradeDto;
+import com.sparta.mulmul.dto.trade.TradeDecisionDto;
+import com.sparta.mulmul.dto.trade.TradeInfoDto;
+import com.sparta.mulmul.dto.trade.TradeInfoImagesDto;
+import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -36,7 +45,7 @@ public class ItemService {
 
         // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
-         bag.update(bag.getItemCnt()+1);
+        bag.update(bag.getItemCnt()+1);
 
 
         Item item = Item.builder()
@@ -85,41 +94,41 @@ public class ItemService {
                 }
             }
             return items;
-            }
-       List<Item> itemList = itemRepository.findAllByCategory(category);
-       List<ItemResponseDto> items = new ArrayList<>();
-       Long userId = userDetails.getUserId();
-       for(Item item : itemList) {
-           if (item.getStatus() == 0 || item.getStatus() == 1) {
-               boolean isScrab;
-               if (scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()) {
-                   isScrab = true;
-               } else {
-                   isScrab = false;
-               }
-               List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-               int scrabCnt = 0;
-               for (Scrab scrab1 : scrabs) {
-                   if (scrab1.getScrab().equals(true)) {
-                       scrabCnt++;
-                   }
-               }
-               ItemResponseDto itemResponseDto = new ItemResponseDto(
-                       item.getId(),
-                       item.getCategory(),
-                       item.getTitle(),
-                       item.getContents(),
-                       item.getItemImg().split(",")[0],
-                       item.getAddress(),
-                       scrabCnt,
-                       item.getViewCnt(),
-                       item.getStatus(),
-                       isScrab);
-               items.add(itemResponseDto);
+        }
+        List<Item> itemList = itemRepository.findAllByCategory(category);
+        List<ItemResponseDto> items = new ArrayList<>();
+        Long userId = userDetails.getUserId();
+        for(Item item : itemList) {
+            if (item.getStatus() == 0 || item.getStatus() == 1) {
+                boolean isScrab;
+                if (scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()) {
+                    isScrab = true;
+                } else {
+                    isScrab = false;
+                }
+                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+                int scrabCnt = 0;
+                for (Scrab scrab1 : scrabs) {
+                    if (scrab1.getScrab().equals(true)) {
+                        scrabCnt++;
+                    }
+                }
+                ItemResponseDto itemResponseDto = new ItemResponseDto(
+                        item.getId(),
+                        item.getCategory(),
+                        item.getTitle(),
+                        item.getContents(),
+                        item.getItemImg().split(",")[0],
+                        item.getAddress(),
+                        scrabCnt,
+                        item.getViewCnt(),
+                        item.getStatus(),
+                        isScrab);
+                items.add(itemResponseDto);
 
-           }
-       }
-       return items;
+            }
+        }
+        return items;
     }
 
 
@@ -168,11 +177,11 @@ public class ItemService {
         }
         List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
         int scrabCnt = 0;
-       for(Scrab scrab1 : scrabs){
-           if(scrab1.getScrab().equals(true)){
-               scrabCnt++;
-           }
-       }
+        for(Scrab scrab1 : scrabs){
+            if(scrab1.getScrab().equals(true)){
+                scrabCnt++;
+            }
+        }
 
         item.scrabCntUpdate(itemId, scrabCnt);
         String[] favored = item.getFavored().split(",");
@@ -232,7 +241,7 @@ public class ItemService {
                 scrabRepository.save(newScrab);
             }
         }
-        }
+    }
 
     // 이승재 / 아이템 수정 (미리 구현)
     @Transactional
@@ -290,7 +299,7 @@ public class ItemService {
     }
 
     // 이승재 / 교환신청하기 전 정보
-    public TradeInfoDto showTradeInfo(Long itemid, Long userId,  UserDetailsImpl userDetails) {
+    public TradeInfoDto showTradeInfo(Long itemid, Long userId, UserDetailsImpl userDetails) {
         Long myBadId = bagRepositroy.findByUserId(userDetails.getUserId()).getId();
 
         User user = userRepository.findById(userId).orElseThrow(
@@ -328,10 +337,10 @@ public class ItemService {
         );
         sellerItem.statusUpdate(sellerItem.getId(), 1);
         for(Long buyerItemIds : requestTradeDto.getMyItemIds()) {
-           Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
-                   ()-> new IllegalArgumentException("아이템이 없습니다.")
-           );
-           buyerItem.statusUpdate(buyerItemIds, 2);
+            Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
+                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+            );
+            buyerItem.statusUpdate(buyerItemIds, 2);
         }
 
         //Long 형태인 아이디들을 String 형태로 변환
@@ -356,7 +365,14 @@ public class ItemService {
                 .isSellerTrade(false)
                 .build();
         barterRepository.save(barter);
-        }
+        // 알림 내역 저장 후 상대방에게 전송
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(()->new NullPointerException("해당 회원이 존재하지 않습니다."));
+        Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
+        // 리팩토링 필요
+        messagingTemplate.convertAndSend(
+                "/sub/notification/" + requestTradeDto.getUserId(), NotificationDto.createFrom(notification)
+        );
+    }
 
 
     // 이승재 교환신청 확인 페이지
@@ -432,16 +448,11 @@ public class ItemService {
             );
             item.statusUpdate(id,2);
         }
-        // 알림 내역 저장 후 상대방에게 전송
-        Notification notification = notificationRepository.save(Notification.createFrom(barter));
-
-        messagingTemplate.convertAndSend(
-                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
-        );
         Boolean isTrade = false;
         Boolean isScore = false;
         int status = 2;
         return new BarterStatusDto(isTrade, isScore, status);
+
     }
 
     @Transactional
@@ -468,7 +479,6 @@ public class ItemService {
         }
 
         // 거래내역 삭제
-       barterRepository.deleteById(baterId);
+        barterRepository.deleteById(baterId);
     }
 }
-

@@ -1,7 +1,7 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.UserCheckResponseDto;
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.UserCheckResponseDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
@@ -84,7 +84,7 @@ public class UserService {
     // 로그인 체크하기
     public UserCheckResponseDto userCheck(UserDetailsImpl userDetails){
 
-        if ( userDetails.getUserId() == null ) { throw new NullPointerException("User's not found"); }
+        if ( userDetails.getUserId() == null ) { throw new NullPointerException("UserService: User's not found"); }
         return new UserCheckResponseDto(userRepository
                 .findById(userDetails.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User's not found error"))

@@ -1,6 +1,6 @@
 package com.sparta.mulmul.websocket;
 
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import lombok.NoArgsConstructor;
 
 import java.security.Principal;
