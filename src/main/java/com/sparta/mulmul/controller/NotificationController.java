@@ -1,9 +1,10 @@
-package com.sparta.mulmul.controller.websocketController;
+package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.OppentScoreResponseDto;
 import com.sparta.mulmul.dto.TradeDecisionDto;
+import com.sparta.mulmul.dto.chat.MessageRequestDto;
 import com.sparta.mulmul.dto.chat.MessageResponseDto;
 import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class NotificationController {
 
@@ -29,14 +31,14 @@ public class NotificationController {
     private final NotificationRepository notificationRepository;
 
     // 알림 전체 목록 가져오기
-    @GetMapping("/api/notifications")
+    @GetMapping("/notifications")
     public List<NotificationDto> getNotification(@AuthenticationPrincipal UserDetailsImpl userDetails){
 
         return notificationService.getNotification(userDetails);
     }
 
     // 개별 채팅방 메시지 불러오기
-    @GetMapping("/api/notification/{notificationId}/chat")
+    @GetMapping("/notification/{notificationId}/chat")
     public List<MessageResponseDto> getMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                @PathVariable Long notificationId,
                                                @RequestParam Long roomId){
@@ -47,7 +49,7 @@ public class NotificationController {
     }
 
     // 교환신청페이지 연결
-    @GetMapping("/api/notification/{notificationId}/decision")
+    @GetMapping("/notification/{notificationId}/decision")
     private TradeDecisionDto tradeDecision(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                            @PathVariable Long notificationId,
                                            @RequestParam Long baterId){
@@ -58,7 +60,7 @@ public class NotificationController {
     }
 
     // 평가 페이지 연결
-    @GetMapping("/api/notification/{notificationId}/score")
+    @GetMapping("/notification/{notificationId}/score")
     public OppentScoreResponseDto showOppentScore(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                   @PathVariable Long notificationId,
                                                   @RequestParam Long barterId){
@@ -69,12 +71,10 @@ public class NotificationController {
     }
 
     // 알림 삭제하기
-    @DeleteMapping("/api/notification/{notificationId}")
-    public ResponseEntity<OkDto> deleteNotification(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                    @PathVariable Long notificationId){
+    @DeleteMapping("/notification/{notificationId}")
+    public ResponseEntity<OkDto> deleteNotification(@PathVariable Long notificationId){
 
         notificationRepository.deleteById(notificationId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
-
 }

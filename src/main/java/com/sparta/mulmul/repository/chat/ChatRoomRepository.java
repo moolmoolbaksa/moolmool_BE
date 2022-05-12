@@ -11,9 +11,6 @@ import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-    // fetch-join으로 리펙토링해야 합니다. 채팅메시지와 연관관계를 맺어, modifiedAt을 이용해 최신을 정렬해 주도록 합니다.
-    List<ChatRoom> findAllByAcceptorOrRequesterOrderByModifiedAtDesc(User acceptor, User requester);
-
     @Query("SELECT DISTINCT room FROM ChatRoom room JOIN FETCH room.acceptor JOIN FETCH room.requester" +
             " WHERE room.acceptor = :user OR room.requester = :user ORDER BY room.modifiedAt DESC ")
     List<ChatRoom> findAllBy(@Param("user") User user);

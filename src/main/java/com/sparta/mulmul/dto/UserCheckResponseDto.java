@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 public class UserCheckResponseDto {
     private String nickname;
     private String profile;
+    private Long userId;
 
     public UserCheckResponseDto(User user){
+        this.userId = user.getId();
         this.nickname = user.getNickname();
         this.profile = user.getProfile();
     }

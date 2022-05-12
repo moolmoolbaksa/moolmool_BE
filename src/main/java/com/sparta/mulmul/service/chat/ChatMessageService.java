@@ -1,7 +1,6 @@
 package com.sparta.mulmul.service.chat;
 
 import com.sparta.mulmul.dto.NotificationDto;
-import com.sparta.mulmul.dto.NotificationType;
 import com.sparta.mulmul.dto.chat.*;
 import com.sparta.mulmul.model.ChatMessage;
 import com.sparta.mulmul.model.ChatRoom;
@@ -27,10 +26,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ChatMessageService {
 
-    private final SimpMessageSendingOperations messagingTemplate;
-    private final ChatMessageRepository messageRepository;
     private final ChatRoomRepository roomRepository;
+    private final ChatMessageRepository messageRepository;
     private final NotificationRepository notificationRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
 
     private Map<Long, Integer> roomUsers;
 
@@ -63,7 +62,6 @@ public class ChatMessageService {
             case OUT: num = -1; break;
             default: throw new IllegalArgumentException("ChatMessageService: 검증메시지 IN과 OUT만 허용됩니다.");
         }
-
         // 해시맵에 키가 존재한다면 접속중인 사람의 수를 계산합니다.
         if ( roomUsers.containsKey(roomId) ) {
 
@@ -78,18 +76,16 @@ public class ChatMessageService {
         return roomUsers.get(roomId);
     }
 
-    // 메시지 찾기, 페이징 처리
-    @Transactional
+    // 메시지 찾기, 페이징 처리 (검증이 필요합니다.)
     public List<MessageResponseDto> getMessage(Long roomId, UserDetailsImpl userDetails){
         // 메시지 찾아오기
         List<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId);
         // responseDto 만들기
         List<MessageResponseDto> responseDtos = new ArrayList<>();
+        // 상대가 보낸 메시지라면 모두 읽음으로 처리 -> isRead 상태 모두 true로 업데이트
+        messageRepository.updateChatMessage(roomId, userDetails.getUserId());
 
         for (ChatMessage message : messages) {
-            // 각 메시지에 대한 유효성 검증 필요
-            // isRead 상태 모두 true로 업데이트
-            if (!message.getIsRead()){ message.read(); }
             responseDtos.add(MessageResponseDto.createFromChatMessage(message));
         }
         return responseDtos;
@@ -99,7 +95,7 @@ public class ChatMessageService {
     @Transactional
     public MessageResponseDto saveMessage(MessageRequestDto requestDto, WsUser wsUser) {
 
-        ChatRoom chatRoom = roomRepository.findById(requestDto.getRoomId())
+        ChatRoom chatRoom = roomRepository.findByIdFetch(requestDto.getRoomId())
                 .orElseThrow(() -> new NullPointerException("ChatController: 해당 채팅방이 존재하지 않습니다."));
 
         ChatMessage message = messageRepository.save(ChatMessage.createOf(requestDto, wsUser.getUserId()));
@@ -121,7 +117,6 @@ public class ChatMessageService {
             );
             chatRoom.reqOut(false);
         }
-
         return MessageResponseDto.createOf(message, wsUser);
     }
 
@@ -132,6 +127,7 @@ public class ChatMessageService {
         messagingTemplate.convertAndSend("/sub/chat/room/" + requestDto.getRoomId(), responseDto); // 채팅방 내부로 메시지 전송
     }
 
+    // 채팅방 접근 권한 검증
     public void checkAccess(MessageRequestDto requestDto, WsUser wsUser){
 
         ChatRoom chatRoom = roomRepository
@@ -143,6 +139,7 @@ public class ChatMessageService {
         if ( chatRoom.getAcceptor().getId() != userId || chatRoom.getRequester().getId() != userId ) {
             throw new AccessDeniedException("ChatController: checkAccess) 허가되지 않은 접근입니다.");
         }
+        // 허가되지 않은 회원 접근 시, Disconnect 상태로 전환시키는 추가적인 로직 구현이 필요합니다.
     }
 }
 

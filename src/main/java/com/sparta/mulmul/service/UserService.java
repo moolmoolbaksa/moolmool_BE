@@ -84,7 +84,7 @@ public class UserService {
     // 로그인 체크하기
     public UserCheckResponseDto userCheck(UserDetailsImpl userDetails){
 
-        if ( userDetails.getUserId() == null ) { throw new NullPointerException("User's not found"); }
+        if ( userDetails.getUserId() == null ) { throw new NullPointerException("UserService: User's not found"); }
         return new UserCheckResponseDto(userRepository
                 .findById(userDetails.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User's not found error"))

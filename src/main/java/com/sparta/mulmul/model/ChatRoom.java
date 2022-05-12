@@ -47,5 +47,4 @@ public class ChatRoom extends Timestamped {
 
     public void reqOut(Boolean bool) { this.reqOut = bool; }
     public void accOut(Boolean bool) { this.accOut = bool; }
-
 }

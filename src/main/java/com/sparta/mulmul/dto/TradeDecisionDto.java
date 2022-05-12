@@ -6,15 +6,21 @@ import java.util.List;
 
 @Getter
 public class TradeDecisionDto {
-    private String buyerNickName;
-    private String sellerNickName;
-    private String sellerItemImage;
-    private List<String> buyerItemImages;
+    private Long userId;
+    private String nickname;
+    private String degree;
+    private String title;
+    private String contents;
+    private String image;
+    private List<TradeInfoImagesDto> barterItem;
 
-    public TradeDecisionDto(String buyerNickName, String sellerNickName, String sellerItemImage, List<String> buyerItemImages){
-        this.buyerNickName = buyerNickName;
-        this.sellerNickName = sellerNickName;
-        this.sellerItemImage = sellerItemImage;
-        this.buyerItemImages = buyerItemImages;
+    public TradeDecisionDto(Long userId, String nickname, String degree, String title, String contents, String image, List<TradeInfoImagesDto> barterItem){
+        this.userId = userId;
+        this.nickname = nickname;
+        this.degree = degree;
+        this.title = title;
+        this.contents = contents;
+        this.image = image;
+        this.barterItem = barterItem;
     }
 }

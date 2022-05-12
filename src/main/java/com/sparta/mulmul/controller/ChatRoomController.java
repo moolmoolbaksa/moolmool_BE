@@ -1,4 +1,4 @@
-package com.sparta.mulmul.controller.websocketController;
+package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.UserRequestDto;
