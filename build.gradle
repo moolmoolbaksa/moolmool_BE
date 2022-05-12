@@ -31,22 +31,18 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     // 이미지 업로드
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
     implementation 'commons-codec:commons-codec:1.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
     implementation 'com.auth0:java-jwt:3.13.0'
-
     //WEB Socket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.webjars:sockjs-client:1.1.2'
-    implementation 'org.webjars:stomp-websocket:2.3.3-1'
-
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.3.2.RELEASE'
-
+    // XSS 방어
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
 }
 
 tasks.named('test') {

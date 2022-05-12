@@ -10,6 +10,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequiredArgsConstructor
 public class WebSocketController {
@@ -33,9 +36,12 @@ public class WebSocketController {
         messageService.sendStatus(requestDto); // 동시접속자수 검증
     }
 
+    // 알림 갯수 전달
     @MessageMapping("/notification")
     public void setNotification(WsUser wsUser) {
         int num = notificationRepository.countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId());
-        messagingTemplate.convertAndSend("/sub/notification" + wsUser.getUserId(), num);
+        Map<String, Integer> map = new HashMap<>();
+        map.put("number", num);
+        messagingTemplate.convertAndSend("/sub/notification" + wsUser.getUserId(), map);
     }
 }
