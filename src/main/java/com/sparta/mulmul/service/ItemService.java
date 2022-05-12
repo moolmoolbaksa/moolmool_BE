@@ -1,6 +1,5 @@
 package com.sparta.mulmul.service;
 
-
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
@@ -388,8 +387,7 @@ public class ItemService {
                 ()-> new IllegalArgumentException("유저정보가 없습니다.")
         );
 
-        // 판매자의 아이디 & 닉네임 & degree
-        Long userId = seller.getId();
+        // 판매자의  닉네임 & degree
         String nickname = seller.getNickname();
         String degree = seller.getDegree();
 
@@ -418,13 +416,15 @@ public class ItemService {
             TradeInfoImagesDto tradeInfoImagesDto = new TradeInfoImagesDto(buyerItemImage, itemId);
             barterItem.add(tradeInfoImagesDto);
         }
-        return new TradeDecisionDto(userId, nickname, degree, title, contents, image, barterItem);
+        //구매자 닉네임
+        String opponentNickname = buyer.getNickname();
+        return new TradeDecisionDto(opponentNickname, nickname, degree, title, contents, image, barterItem);
     }
 
 
     // 이승재 교환신청 확인 페이지 수락 버튼
     @Transactional
-    public void acceptTrade(Long baterId) {
+    public BarterStatusDto acceptTrade(Long baterId) {
         Barter barter = barterRepository.findById(baterId).orElseThrow(
                 ()-> new IllegalArgumentException("거래내역이 없습니다.")
         );
@@ -448,6 +448,11 @@ public class ItemService {
             );
             item.statusUpdate(id,2);
         }
+        Boolean isTrade = false;
+        Boolean isScore = false;
+        int status = 2;
+        return new BarterStatusDto(isTrade, isScore, status);
+
     }
 
     @Transactional
