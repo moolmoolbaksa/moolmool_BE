@@ -84,10 +84,6 @@ public class User {
         this.degree = degree;
     }
 
-    public void updateThirdScore(float totalGrade, String degree) {
-        this.totalGrade = totalGrade;
-        this.degree = degree;
-    }
 
     public void execptImageUpdate(String nickname, String address, String storeInfo){
         this.nickname = nickname;
