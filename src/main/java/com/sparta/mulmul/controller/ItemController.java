@@ -117,9 +117,9 @@ public class ItemController {
 
     // 이승재 교환신청 확인 페이지 수락 버튼
     @PutMapping("/api/trade/decision")
-    private ResponseEntity<OkDto> acceptTrade(@RequestParam Long baterId){
-        itemService.acceptTrade(baterId);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    private BarterStatusDto acceptTrade(@RequestParam Long baterId){
+       return itemService.acceptTrade(baterId);
+
     }
 
     //이승재 교환신청 확인 페이지 거절 버튼
