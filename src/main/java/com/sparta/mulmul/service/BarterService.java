@@ -117,11 +117,6 @@ public class BarterService {
                 myScoreCheck = barters.getIsSellerScore();
             }
 
-
-
-
-
-
             if (status == 2 || status == 1) {
                 BarterDto barterFin = new BarterDto(
                         barterId,
@@ -158,12 +153,6 @@ public class BarterService {
         }
         return totalList;
     }
-
-
-
-
-
-
 
 
 // 성훈 리팩토링 (거래리스트)
