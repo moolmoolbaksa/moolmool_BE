@@ -1,5 +1,6 @@
 package com.sparta.mulmul.controller;
 
+import com.sparta.mulmul.dto.BarterStatusDto;
 import com.sparta.mulmul.dto.GradeScoreRequestDto;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.OppentScoreResponseDto;
@@ -25,9 +26,8 @@ public class ScoreController {
 
     // 성훈 - 평가주기
     @PutMapping("/api/score")
-    public ResponseEntity<OkDto> showMyPageage (@RequestBody GradeScoreRequestDto gradeScoreRequestDto,
-                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
-        scoreService.gradeScore(gradeScoreRequestDto, userDetails);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    public BarterStatusDto showMyPageage (@RequestBody GradeScoreRequestDto gradeScoreRequestDto,
+                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return scoreService.gradeScore(gradeScoreRequestDto, userDetails);
     }
 }

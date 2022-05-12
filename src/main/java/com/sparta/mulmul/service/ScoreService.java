@@ -1,5 +1,6 @@
 package com.sparta.mulmul.service;
 
+import com.sparta.mulmul.dto.BarterStatusDto;
 import com.sparta.mulmul.dto.GradeScoreRequestDto;
 import com.sparta.mulmul.dto.MyBarterScorDto;
 import com.sparta.mulmul.dto.OppentScoreResponseDto;
@@ -130,7 +131,7 @@ public class ScoreService {
 
     // 성훈 - 상대 평점주기
     @Transactional
-    public void gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
+    public BarterStatusDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("user not found")
         );
@@ -140,110 +141,44 @@ public class ScoreService {
         float gradeScore = gradeScoreRequestDto.getScore();
         // 상대찾기
         User opponentUser = userRepository.findById(opponentUserId).orElseThrow(() -> new IllegalArgumentException("user not found"));
-        // 상대 등급
+        // 등급
         String userDegree;
         String opponentDegree;
-        // 상대의 총점수
-        //유저의 전체 점수
+        //전체 점수
         float userTotalGrade = user.getTotalGrade();
         float opponentUserTotalGrade = opponentUser.getTotalGrade();
         // 상대 평가점수
         float opponentGrade = opponentUser.getGrade();
         // 상대 평가자 수
         int opponentRaterCnt = opponentUser.getRaterCount();
-        // 점수
 
         // 거래내역 조회
         Long barterId = gradeScoreRequestDto.getBarterId();
         Barter barter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
 
+        String[] barterIdList = barter.getBarter().split(";");
+        String[] buyerItemId = barterIdList[0].split(",");
+        String sellerItemId = barterIdList[1];
+
+        int viewBonusCntB = 0;
+        int viewBonusCntS = 0;
+        int scrabBonusCntB = 0;
+        int scrabBonusCntS = 0;
+        int status = 4;
         // 내 포지션 확인
-        String myPosition = null;
+        String myPosition;
         // 상대가 바이어라면 -> 유저는 셀러이므로 셀러거래완료를 true로 변경한다.
         if (barter.getBuyerId().equals(opponentUserId)) {
+            myPosition = "seller";
             if (barter.getIsSellerScore()) {
                 throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "이미 평가하였습니다");
             }
-            barter.updateScoreSeller(true);
-            myPosition = "seller";
-            // 중복평가 체크
-            // 유저가 셀러라면 -> 유저는 바이어이므로 바이어거래완료를 true로 변경한다.
-        } else {
-            if (barter.getIsBuyerScore()) {
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "이미 평가하였습니다");
-            }
-            barter.updateScoreBuyer(true);
-            myPosition = "buyer";
-            // 중복평가 체크
-        }
-
-        // 이미 평가를 완료한 경우
-        if (barter.getStatus() != 3) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-            // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
-        } else if ((!opponentUserId.equals(barter.getBuyerId())) && (!opponentUserId.equals(barter.getSellerId()))) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-            // 자기 자신에게 점수를 줄 경우
-        } else if (opponentUserId.equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-        }
-
-        // 상대의 전체 점수에 1, 2은 - / 3은 0 / 4, 5은 +
-        if (gradeScore <= 2) {
-            opponentUserTotalGrade = opponentUserTotalGrade - (3.0f - gradeScore);
-        } else if (gradeScore >= 4) {
-            opponentUserTotalGrade = opponentUserTotalGrade + (gradeScore - 3.0f);
-        }
-        // 유저의 평균 평점
-        if (opponentGrade == 0) {
-            opponentGrade = gradeScore;
-        } else {
-            opponentGrade = (opponentGrade + gradeScore) / 2;
-        }
-        // 평가자수 +1
-        opponentRaterCnt = opponentRaterCnt + 1;
-
-        // 칭호 등급
-        if (opponentUserTotalGrade >= 150.0f) {
-            opponentDegree = "물물박사";
-        } else if (opponentUserTotalGrade >= 100.0f) {
-            opponentDegree = "물물석사";
-        } else if (opponentUserTotalGrade >= 70.0f) {
-            opponentDegree = "물물학사";
-        } else if (opponentUserTotalGrade >= 50.0f) {
-            opponentDegree = "물물학생";
-        } else {
-            opponentDegree = "물물어린이";
-        }
-
-        // 각자 평가한 점수를 업데이트를 해준다.
-        opponentUser.updateFirstScore(
-                opponentUserTotalGrade,
-                opponentGrade,
-                opponentRaterCnt,
-                opponentDegree
-        );
-
-        Boolean buyerScore = barter.getIsBuyerScore();
-        Boolean sellerScore = barter.getIsSellerScore();
-        // 바이어와 셀러가 둘다 평가를 true로 하였다면 거래내역과 물품의 상태를 평가완료로 변경 ( status : 3 -> 4)
-        // 보너스 점수와 칭호과 같은 내용을 일괄로 업데이트를 해 준다.
-        if (buyerScore && sellerScore) {
-
-            String[] barterIdList = barter.getBarter().split(";");
-            String[] buyerItemId = barterIdList[0].split(",");
-            String sellerItemId = barterIdList[1];
-
-            int viewBonusCntB = 0;
-            int viewBonusCntS = 0;
-            int scrabBonusCntB = 0;
-            int scrabBonusCntS = 0;
-            int status = 4;
             // 바이어의 아이템 (여러개)
             for (String eachBuyer : buyerItemId) {
                 Long buyerId = Long.valueOf(eachBuyer);
                 Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
                         () -> new IllegalArgumentException("buyerItem not found"));
+
                 // 아이템 업데이트
                 buyerItem.statusUpdate(buyerItem.getId(), status);
 
@@ -262,15 +197,27 @@ public class ScoreService {
                     scrabBonusCntB++;
                 }
             }
+            System.out.println("셀러조회수 : " + viewBonusCntS);
+            System.out.println("바이어조회수 : " + viewBonusCntB);
+            System.out.println("셀러찜 : " + scrabBonusCntS);
+            System.out.println("바이어찜 : " + scrabBonusCntB);
+
+
+            barter.updateScoreSeller(true);
+
+        } else {
+            myPosition = "buyer";
+            if (barter.getIsBuyerScore()) {
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "이미 평가하였습니다");
+            }
             //셀러(유저)의 물품을 찾아서 정보를 넣기
             Long sellerId = Long.parseLong(sellerItemId);
             Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
                     () -> new IllegalArgumentException("sellerItem not found")
             );
+
             sellerItem.statusUpdate(sellerItem.getId(), status);
             // 유저 정보를 업데이트 이후 status를 거래완료(3) -> 평가완료(4)으로 업데이트를 한다.
-            barter.updateBarter(status);
-
 
             // 좋은 물품 보너스 //
             // 상대의 포지션이 셀러일 때, 조회수 100 이상이면 보너스 카운트 up!
@@ -288,6 +235,60 @@ public class ScoreService {
                 scrabBonusCntB++;
             }
 
+            System.out.println("셀러조회수 : " + viewBonusCntS);
+            System.out.println("바이어조회수 : " + viewBonusCntB);
+            System.out.println("셀러찜 : " + scrabBonusCntS);
+            System.out.println("바이어찜 : " + scrabBonusCntB);
+            barter.updateScoreBuyer(true);
+
+        }
+
+//        // 이미 평가를 완료한 경우
+//        if (barter.getStatus() != 3) {
+//            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+//            // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
+//        } else if ((!opponentUserId.equals(barter.getBuyerId())) && (!opponentUserId.equals(barter.getSellerId()))) {
+//            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+//            // 자기 자신에게 점수를 줄 경우
+//        } else if (opponentUserId.equals(user.getId())) {
+//            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+//        }
+
+        // 상대의 전체 점수에 1, 2은 - / 3은 0 / 4, 5은 +
+        if (gradeScore <= 2) {
+            opponentUserTotalGrade = opponentUserTotalGrade - (3.0f - gradeScore);
+        } else if (gradeScore >= 4) {
+            opponentUserTotalGrade = opponentUserTotalGrade + (gradeScore - 3.0f);
+        }
+        // 유저의 평균 평점
+        if (opponentGrade == 0) {
+            opponentGrade = gradeScore;
+        } else {
+            opponentGrade = (opponentGrade + gradeScore) / 2;
+        }
+
+
+        // 평가자수 +1
+        opponentRaterCnt = opponentRaterCnt + 1;
+
+          // 칭호 등급
+        opponentDegree = updateDegree(opponentUserTotalGrade);
+
+        // 각자 평가한 점수를 업데이트를 해준다.
+        opponentUser.updateFirstScore(
+                opponentUserTotalGrade,
+                opponentGrade,
+                opponentRaterCnt,
+                opponentDegree
+        );
+
+        Boolean buyerScore = barter.getIsBuyerScore();
+        Boolean sellerScore = barter.getIsSellerScore();
+        // 바이어와 셀러가 둘다 평가를 true로 하였다면 거래내역과 물품의 상태를 평가완료로 변경 ( status : 3 -> 4)
+        // 보너스 점수와 칭호과 같은 내용을 일괄로 업데이트를 해 준다.
+
+
+        if (buyerScore && sellerScore) {
             // 응답 보너스 //
             // 10분이네 응답 보너스
             ChatRoom chatRoomCheck;
@@ -312,10 +313,7 @@ public class ScoreService {
             LocalDateTime firstOppoentTime = opponentMessage.getCreatedAt();
             long minute = ChronoUnit.MINUTES.between(firstMyTime, firstOppoentTime);
 
-            boolean chatTime = false;
-            if (Math.abs(minute) <= 10) {
-                chatTime = true;
-            }
+            boolean chatTime = Math.abs(minute) <= 10;
 
             // 보너스 정산 //
             if (myPosition.equals("buyer")) {
@@ -350,30 +348,10 @@ public class ScoreService {
 //            opponentUserTotalGrade = opponentUserTotalGrade + 2.0f;
 //        }
 
-            // 칭호 등급
-            if (opponentUserTotalGrade >= 150.0f) {
-                opponentDegree = "물물박사";
-            } else if (opponentUserTotalGrade >= 100.0f) {
-                opponentDegree = "물물석사";
-            } else if (opponentUserTotalGrade >= 70.0f) {
-                opponentDegree = "물물학사";
-            } else if (opponentUserTotalGrade >= 50.0f) {
-                opponentDegree = "물물학생";
-            } else {
-                opponentDegree = "물물어린이";
-            }
-            // 칭호 등급
-            if (userTotalGrade >= 150.0f) {
-                userDegree = "물물박사";
-            } else if (userTotalGrade >= 100.0f) {
-                userDegree = "물물석사";
-            } else if (userTotalGrade >= 70.0f) {
-                userDegree = "물물학사";
-            } else if (userTotalGrade >= 50.0f) {
-                userDegree = "물물학생";
-            } else {
-                userDegree = "물물어린이";
-            }
+            // 칭호 업데이트
+            opponentDegree = updateDegree(opponentUserTotalGrade);
+            userDegree = updateDegree(userTotalGrade);
+
 
             // 상대 보너스 업데이트
             opponentUser.updateSecondScore(
@@ -385,6 +363,35 @@ public class ScoreService {
                     userTotalGrade,
                     userDegree
             );
+
+
+
+            // 유저 정보를 업데이트 이후 status를 거래완료(3) -> 평가완료(4)으로 업데이트를 한다.
+            barter.updateBarter(status);
+
+
+            return new BarterStatusDto(true, true, barter.getStatus());
         }
+        return new BarterStatusDto(true, true , barter.getStatus());
+    }
+
+
+
+    // 등급 단계
+    private String updateDegree(float totalGrade) {
+        String degree;
+        // 칭호 등급
+        if (totalGrade >= 150.0f) {
+            degree = "물물박사";
+        } else if (totalGrade >= 100.0f) {
+            degree = "물물석사";
+        } else if (totalGrade >= 70.0f) {
+            degree = "물물학사";
+        } else if (totalGrade >= 50.0f) {
+            degree = "물물학생";
+        } else {
+            degree = "물물어린이";
+        }
+        return degree;
     }
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 
 // 성훈 - 거래내역
@@ -47,11 +48,17 @@ public class Barter extends Timestamped {
     @Column(nullable = false)
     private Boolean isSellerScore = false;
 
+    private LocalDateTime tradeTime;
+
 
     public void updateBarter(int status) {
         this.status = status;
     }
 
+    public void updateTradeBarter(int status, LocalDateTime tradeTime) {
+        this.status = status;
+        this.tradeTime = tradeTime;
+    }
 
     public void updateTradBuyer(Boolean isBuyerTrade) {
 
