@@ -21,7 +21,7 @@ public class Notification extends CreationDate {
     private Long userId;
 
     @Column(nullable = false)
-    private String message;
+    private String nickname;
 
     @Column(nullable = false)
     private Boolean isRead;
@@ -36,20 +36,20 @@ public class Notification extends CreationDate {
 
         notification.userId = kakaoUser.getId();
         notification.changeId = kakaoUser.getId();
-        notification.message = "반가워요! " + kakaoUser.getNickname() + "님, 회원 가입을 축하드려요!";
+        notification.nickname = kakaoUser.getNickname();
         notification.isRead = false;
         notification.type = NotificationType.ETC;
 
         return  notification;
     }
 
-    public static Notification createFrom(Barter barter){
+    public static Notification createOf(Barter barter, String nickname){
 
         Notification notification = new Notification();
 
         notification.userId = barter.getSellerId();
         notification.changeId = barter.getId();
-        notification.message = "교환 신청이 도착했습니다!";
+        notification.nickname = nickname;
         notification.isRead = false;
         notification.type = NotificationType.BARTER;
 
@@ -62,7 +62,13 @@ public class Notification extends CreationDate {
 
         notification.userId = user.getId();
         notification.changeId = chatRoom.getId();
-        notification.message = user.getNickname() + "님에게 채팅이 왔어요!";
+
+        if (chatRoom.getRequester() == user){
+            notification.nickname = chatRoom.getAcceptor().getNickname();
+        } else if (chatRoom.getAcceptor() == user){
+            notification.nickname = chatRoom.getRequester().getNickname();
+        }
+
         notification.isRead = false;
         notification.type = NotificationType.CHAT;
 
