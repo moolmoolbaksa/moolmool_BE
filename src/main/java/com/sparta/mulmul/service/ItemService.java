@@ -372,16 +372,19 @@ public class ItemService {
                 ()-> new IllegalArgumentException("유저정보가 없습니다.")
         );
 
-        // 판매자 및 구매자 닉네임
-        String buyerNickName = buyer.getNickname();
-        String sellerNickName = seller.getNickname();
+        // 판매자의 아이디 & 닉네임 & degree
+        Long userId = seller.getId();
+        String nickname = seller.getNickname();
+        String degree = seller.getDegree();
 
-        // 판매자 아이템 이미지
+        // 판매자 아이템 이미지 & 제목 & 내용
         Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
         Item item = itemRepository.findById(sellerItemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
-        String sellerItemImage = item.getItemImg().split(",")[0];
+        String image = item.getItemImg().split(",")[0];
+        String title = item.getTitle();
+        String contents = item.getContents();
 
         // 구매자 아이템 이미지들
         String buyerItem = barter.getBarter().split(";")[0];
@@ -389,15 +392,17 @@ public class ItemService {
         for(int i = 0; i<buyerItem.split(",").length; i++){
             buyerItemId.add(Long.valueOf(buyerItem.split(",")[i]));
         }
-        List<String> buyerItemImages = new ArrayList<>();
+        List<TradeInfoImagesDto> barterItem = new ArrayList<>();
         for(Long id : buyerItemId){
             Item item1 = itemRepository.findById(id).orElseThrow(
                     ()-> new IllegalArgumentException("아이템이 없습니다.")
             );
             String buyerItemImage = item1.getItemImg().split(",")[0];
-            buyerItemImages.add(buyerItemImage);
+            Long itemId = item1.getId();
+            TradeInfoImagesDto tradeInfoImagesDto = new TradeInfoImagesDto(buyerItemImage, itemId);
+            barterItem.add(tradeInfoImagesDto);
         }
-        return new TradeDecisionDto(buyerNickName, sellerNickName, sellerItemImage, buyerItemImages);
+        return new TradeDecisionDto(userId, nickname, degree, title, contents, image, barterItem);
     }
 
 
