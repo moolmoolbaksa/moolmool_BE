@@ -72,17 +72,27 @@ public class User {
 
     }
 
-    public void execptImageUpdate(String nickname, String address, String storeInfo){
-        this.nickname = nickname;
-        this.address = address;
-        this.storeInfo = storeInfo;
-    }
-
-    public void updateScore(float totalGrade, float grade, int raterCount, String degree) {
+    public void updateFirstScore(float totalGrade, float grade, int raterCount, String degree) {
         this.totalGrade = totalGrade;
         this.grade = grade;
         this.raterCount = raterCount;
         this.degree = degree;
+    }
+
+    public void updateSecondScore(float totalGrade, String degree) {
+        this.totalGrade = totalGrade;
+        this.degree = degree;
+    }
+
+    public void updateThirdScore(float totalGrade, String degree) {
+        this.totalGrade = totalGrade;
+        this.degree = degree;
+    }
+
+    public void execptImageUpdate(String nickname, String address, String storeInfo){
+        this.nickname = nickname;
+        this.address = address;
+        this.storeInfo = storeInfo;
     }
 
 }

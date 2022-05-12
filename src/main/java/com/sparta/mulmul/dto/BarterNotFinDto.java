@@ -15,17 +15,19 @@ public class BarterNotFinDto {
     private String opponentProfile;
     private int status;
     private String myPosition;
+    private Boolean isTrade;
     private List<MyBarterDto> myItem;
     private List<MyBarterDto> barterItem;
 
 
-    public BarterNotFinDto(Long barterId, Long opponentId, String opponentnickname, String opponentProfile, int status, String myPosition,  List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
+    public BarterNotFinDto(Long barterId, Long opponentId, String opponentnickname, String opponentProfile, int status, String myPosition, Boolean isTrade,  List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
         this.barterId = barterId;
         this.opponentId = opponentId;
         this.opponentnickname = opponentnickname;
         this.opponentProfile = opponentProfile;
         this.status = status;
         this.myPosition = myPosition;
+        this.isTrade = isTrade;
         this.myItem = myItem;
         this.barterItem = barterItem;
     }

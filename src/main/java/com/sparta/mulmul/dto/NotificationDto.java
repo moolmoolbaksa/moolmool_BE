@@ -1,5 +1,6 @@
 package com.sparta.mulmul.dto;
 
+import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Notification;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NotificationDto {
 
-    private Long id;
+    private Long notificationId;
+    private Long changeId;
     private String message;
     private Boolean isRead;
     private NotificationType type;
@@ -16,7 +18,8 @@ public class NotificationDto {
     public static NotificationDto createFrom(Notification notification){
         NotificationDto dto = new NotificationDto();
 
-        dto.id = notification.getId();
+        dto.notificationId = notification.getId();
+        dto.changeId = notification.getChangeId();
         dto.message = notification.getMessage();
         dto.isRead = notification.getIsRead();
         dto.type = notification.getType();
