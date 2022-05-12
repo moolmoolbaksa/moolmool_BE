@@ -20,12 +20,12 @@ public class BarterDto {
     private String myPosition;
     private Boolean isScore;
     private Boolean isTrade;
-    private List<MyBarterDto> myItem;
-    private List<MyBarterDto> barterItem;
+    private List<OpponentBarterDto> myItem;
+    private List<OpponentBarterDto> barterItem;
 
 
 
-    public BarterDto(Long barterId, Long userId, String usernickname, String profile, LocalDateTime date, int status, String myPosition, Boolean isScore, Boolean isTrade, List<MyBarterDto> myItem, List<MyBarterDto> barterItem) {
+    public BarterDto(Long barterId, Long userId, String usernickname, String profile, LocalDateTime date, int status, String myPosition, Boolean isScore, Boolean isTrade, List<OpponentBarterDto> myItem, List<OpponentBarterDto> barterItem) {
         this.barterId = barterId;
         this.userId = userId;
         this.usernickname = usernickname;
