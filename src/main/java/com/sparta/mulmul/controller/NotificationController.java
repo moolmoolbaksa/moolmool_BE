@@ -2,9 +2,8 @@ package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.OkDto;
-import com.sparta.mulmul.dto.OppentScoreResponseDto;
-import com.sparta.mulmul.dto.TradeDecisionDto;
-import com.sparta.mulmul.dto.chat.MessageRequestDto;
+import com.sparta.mulmul.dto.score.OppentScoreResponseDto;
+import com.sparta.mulmul.dto.trade.TradeDecisionDto;
 import com.sparta.mulmul.dto.chat.MessageResponseDto;
 import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;

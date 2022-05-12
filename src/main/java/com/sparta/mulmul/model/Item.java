@@ -1,6 +1,6 @@
 package com.sparta.mulmul.model;
 
-import com.sparta.mulmul.dto.ItemRequestDto;
+import com.sparta.mulmul.dto.item.ItemRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

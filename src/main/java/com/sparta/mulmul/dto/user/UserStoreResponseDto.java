@@ -1,6 +1,7 @@
-package com.sparta.mulmul.dto;
+package com.sparta.mulmul.dto.user;
 
 
+import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import lombok.Getter;
 
 import java.util.List;

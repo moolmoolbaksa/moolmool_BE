@@ -1,20 +1,16 @@
-package com.sparta.mulmul.dto;
-
+package com.sparta.mulmul.dto.item;
 
 import lombok.Builder;
 import lombok.Getter;
 
-
 @Getter
 @Builder
-public class MyBarterScorDto {
+public class ItemScoreDto {
     private Long itemId;
     private String itemImg;
 
-    //성훈 - 거래내역
-    public MyBarterScorDto(Long itemId, String itemImg) {
+    public ItemScoreDto(Long itemId, String itemImg) {
         this.itemId = itemId;
         this.itemImg = itemImg;
     }
-
 }

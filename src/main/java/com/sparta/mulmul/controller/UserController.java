@@ -1,6 +1,8 @@
 package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.dto.user.UserCheckResponseDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.UserService;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.sparta.mulmul.dto;
+package com.sparta.mulmul.dto.score;
 
 import lombok.Builder;
 import lombok.Getter;

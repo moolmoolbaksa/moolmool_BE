@@ -1,7 +1,7 @@
 package com.sparta.mulmul.controller;
 
-import com.sparta.mulmul.dto.BarterDto;
-import com.sparta.mulmul.dto.BarterStatusDto;
+import com.sparta.mulmul.dto.barter.BarterDto;
+import com.sparta.mulmul.dto.barter.BarterStatusDto;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.BarterService;

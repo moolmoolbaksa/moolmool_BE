@@ -1,7 +1,11 @@
 package com.sparta.mulmul.service;
 
 
-import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.dto.item.ItemUserResponseDto;
+import com.sparta.mulmul.dto.scrab.MyScrabItemDto;
+import com.sparta.mulmul.dto.user.MyPageResponseDto;
+import com.sparta.mulmul.dto.user.UserEditDtailResponseDto;
+import com.sparta.mulmul.dto.user.UserEditResponseDto;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.model.User;

@@ -1,6 +1,6 @@
 package com.sparta.mulmul.websocket;
 
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
 import lombok.RequiredArgsConstructor;

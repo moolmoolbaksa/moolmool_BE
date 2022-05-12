@@ -1,4 +1,4 @@
-package com.sparta.mulmul.dto;
+package com.sparta.mulmul.dto.item;
 
 
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;

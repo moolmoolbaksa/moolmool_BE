@@ -2,7 +2,7 @@ package com.sparta.mulmul.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.mulmul.dto.KakaoUserInfoDto;
+import com.sparta.mulmul.dto.user.KakaoUserInfoDto;
 import com.sparta.mulmul.dto.TokenDto;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Notification;

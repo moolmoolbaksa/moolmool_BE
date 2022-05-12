@@ -1,7 +1,7 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.UserCheckResponseDto;
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.UserCheckResponseDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;

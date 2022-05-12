@@ -1,7 +1,7 @@
 package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.OkDto;
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.dto.chat.MessageResponseDto;
 import com.sparta.mulmul.dto.chat.RoomResponseDto;
 import com.sparta.mulmul.security.UserDetailsImpl;

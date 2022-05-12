@@ -1,5 +1,6 @@
-package com.sparta.mulmul.dto;
+package com.sparta.mulmul.dto.barter;
 
+import com.sparta.mulmul.dto.barter.MyBarterDto;
 import lombok.Builder;
 import lombok.Getter;
 

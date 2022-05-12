@@ -1,7 +1,7 @@
 package com.sparta.mulmul.model;
 
-import com.sparta.mulmul.dto.KakaoUserInfoDto;
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.KakaoUserInfoDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

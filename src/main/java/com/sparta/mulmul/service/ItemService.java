@@ -3,6 +3,15 @@ package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
+import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
+import com.sparta.mulmul.dto.item.ItemRequestDto;
+import com.sparta.mulmul.dto.item.ItemResponseDto;
+import com.sparta.mulmul.dto.item.ItemUserResponseDto;
+import com.sparta.mulmul.dto.trade.RequestTradeDto;
+import com.sparta.mulmul.dto.trade.TradeDecisionDto;
+import com.sparta.mulmul.dto.trade.TradeInfoDto;
+import com.sparta.mulmul.dto.trade.TradeInfoImagesDto;
+import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -291,7 +300,7 @@ public class ItemService {
     }
 
     // 이승재 / 교환신청하기 전 정보
-    public TradeInfoDto showTradeInfo(Long itemid, Long userId,  UserDetailsImpl userDetails) {
+    public TradeInfoDto showTradeInfo(Long itemid, Long userId, UserDetailsImpl userDetails) {
         Long myBadId = bagRepositroy.findByUserId(userDetails.getUserId()).getId();
 
         User user = userRepository.findById(userId).orElseThrow(

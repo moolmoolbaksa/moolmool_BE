@@ -1,5 +1,6 @@
-package com.sparta.mulmul.dto;
+package com.sparta.mulmul.dto.score;
 
+import com.sparta.mulmul.dto.barter.MyBarterScorDto;
 import lombok.Builder;
 import lombok.Getter;
 

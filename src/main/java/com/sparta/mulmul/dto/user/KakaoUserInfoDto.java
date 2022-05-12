@@ -1,4 +1,4 @@
-package com.sparta.mulmul.dto;
+package com.sparta.mulmul.dto.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.sparta.mulmul.security;
 
-import com.sparta.mulmul.dto.UserRequestDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.model.User;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

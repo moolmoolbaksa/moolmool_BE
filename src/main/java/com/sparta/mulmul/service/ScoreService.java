@@ -1,9 +1,9 @@
 package com.sparta.mulmul.service;
 
-import com.sparta.mulmul.dto.BarterStatusDto;
-import com.sparta.mulmul.dto.GradeScoreRequestDto;
-import com.sparta.mulmul.dto.MyBarterScorDto;
-import com.sparta.mulmul.dto.OppentScoreResponseDto;
+import com.sparta.mulmul.dto.barter.BarterStatusDto;
+import com.sparta.mulmul.dto.score.GradeScoreRequestDto;
+import com.sparta.mulmul.dto.barter.MyBarterScorDto;
+import com.sparta.mulmul.dto.score.OppentScoreResponseDto;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
@@ -66,10 +66,7 @@ public class ScoreService {
                 () -> new IllegalArgumentException("buyerItem not found")
         );
 
-        MyBarterScorDto buyerItemList = new MyBarterScorDto(
-                itemIdB,
-                buyerItem.getItemImg()
-        );
+        MyBarterScorDto buyerItemList = getMyBarterScorDto(itemIdB, buyerItem);
 
         if (buyerItem.getBag().getUserId().equals(userId)) {
             myBarterList.add(buyerItemList);
@@ -83,9 +80,7 @@ public class ScoreService {
                 () -> new IllegalArgumentException("sellerItem not found")
         );
 
-        MyBarterScorDto sellerItemList = new MyBarterScorDto(
-                itemIdS,
-                sellerItem.getItemImg());
+        MyBarterScorDto sellerItemList = getMyBarterScorDto(itemIdS, sellerItem);
 
         if (sellerItem.getBag().getUserId().equals(userId)) {
             myBarterList.add(sellerItemList);
@@ -104,28 +99,36 @@ public class ScoreService {
         // 만약 바이어Id와 로그인 유저가 동일하면, 상대방의 아이디를 셀러Id로 식별
         if (myBarter.getBuyerId().equals(userId)) {
             Long oppenetId = myBarter.getSellerId();
-            User OppentUser = userRepository.findById(oppenetId).orElseThrow(() -> new IllegalArgumentException("user not found"));
+            User oppentUser = userRepository.findById(oppenetId).orElseThrow(() -> new IllegalArgumentException("user not found"));
 
             // 상대방의 정보를 조회
             return new OppentScoreResponseDto(
                     oppenetId,
-                    OppentUser.getNickname(),
+                    oppentUser.getNickname(),
                     myBarterList,
                     barterList
             );
         } else {
             // 만약 바이어Id와 로그인 유저Id가 다르다면, 상대방의 아이디를 바이어Id로 식별
             Long oppenetId = myBarter.getBuyerId();
-            User OppentUser = userRepository.findById(oppenetId).orElseThrow(() -> new IllegalArgumentException("user not found"));
+            User oppentUser = userRepository.findById(oppenetId).orElseThrow(() -> new IllegalArgumentException("user not found"));
 
             // 상대방의 정보를 조회
             return new OppentScoreResponseDto(
                     oppenetId,
-                    OppentUser.getNickname(),
+                    oppentUser.getNickname(),
                     myBarterList,
                     barterList
             );
         }
+    }
+
+    private MyBarterScorDto getMyBarterScorDto(Long itemId, Item Item) {
+        MyBarterScorDto buyerItemList = new MyBarterScorDto(
+                itemId,
+                Item.getItemImg()
+        );
+        return buyerItemList;
     }
 
 
