@@ -41,24 +41,19 @@ public class ScoreService {
         );
 
         Long userId = userDetails.getUserId();
-
         // 내가 거래한 거래리스트를 대입한다.
         // barterId, buyerId, SellerId를 분리한다.
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(
                 () -> new IllegalArgumentException("barter not found")
         );
-
         // 거래 물품리스트를 담을 Dto
         List<MyBarterScorDto> myBarterList = new ArrayList<>();
         List<MyBarterScorDto> barterList = new ArrayList<>();
-
         String barter = mybarter.getBarter();
         //barter 거래내역 id split하기 -> 파싱하여 거래항 물품의 Id값을 찾기
         String[] barterIds = barter.split(";");
         String buyerItemIdList = barterIds[0].split(",")[0];
         String sellerItemIdList = barterIds[1];
-
-
         // 바이어(유저)의 물품을 찾아서 정보를 넣기
         Long itemIdB = Long.parseLong(buyerItemIdList);
         System.out.println("바이어 아이디 " + itemIdB);
@@ -67,35 +62,32 @@ public class ScoreService {
         );
 
         MyBarterScorDto buyerItemList = getMyBarterScorDto(itemIdB, buyerItem);
-
-        if (buyerItem.getBag().getUserId().equals(userId)) {
-            myBarterList.add(buyerItemList);
-        } else {
-            barterList.add(buyerItemList);
-        }
-
+        splitAddList(
+                buyerItem,
+                userId,
+                myBarterList,
+                buyerItemList,
+                barterList
+        );
         //셀러(유저)의 물품을 찾아서 정보를 넣기
         Long itemIdS = Long.parseLong(sellerItemIdList);
         Item sellerItem = itemRepository.findById(itemIdS).orElseThrow(
                 () -> new IllegalArgumentException("sellerItem not found")
         );
-
         MyBarterScorDto sellerItemList = getMyBarterScorDto(itemIdS, sellerItem);
-
-        if (sellerItem.getBag().getUserId().equals(userId)) {
-            myBarterList.add(sellerItemList);
-        } else {
-            barterList.add(sellerItemList);
-        }
-
-
+        splitAddList(
+                sellerItem,
+                userId,
+                myBarterList,
+                sellerItemList,
+                barterList
+        );
         // 거래내역을 조회
         Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
         // 바이어Id와 셀러Id에 유저아이디가 없을 경우
         if (!myBarter.getBuyerId().equals(userId) && !myBarter.getSellerId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
-
         // 만약 바이어Id와 로그인 유저가 동일하면, 상대방의 아이디를 셀러Id로 식별
         if (myBarter.getBuyerId().equals(userId)) {
             Long oppenetId = myBarter.getSellerId();
@@ -122,7 +114,19 @@ public class ScoreService {
             );
         }
     }
-
+    // 리스트에 넣기
+    private void splitAddList(Item buyerItem,
+                              Long userId,
+                              List<MyBarterScorDto> myBarterList,
+                              MyBarterScorDto ItemList,
+                              List<MyBarterScorDto> barterList) {
+        if (buyerItem.getBag().getUserId().equals(userId)) {
+            myBarterList.add(ItemList);
+        } else {
+            barterList.add(ItemList);
+        }
+    }
+    // 아이디와 이미지를 넣어준다.
     private MyBarterScorDto getMyBarterScorDto(Long itemId, Item Item) {
         MyBarterScorDto buyerItemList = new MyBarterScorDto(
                 itemId,
@@ -321,7 +325,6 @@ public class ScoreService {
             opponentGrade = (opponentGrade + gradeScore) / 2;
         }
 
-
         // 평가자수 +1
         opponentRaterCnt = opponentRaterCnt + 1;
 
@@ -354,7 +357,6 @@ public class ScoreService {
         }
         return new BarterStatusDto(true, true, barter.getStatus());
     }
-
 
     // 등급 단계
     private String updateDegree(float totalGrade) {

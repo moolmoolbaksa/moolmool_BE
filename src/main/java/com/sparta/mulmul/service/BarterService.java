@@ -151,13 +151,10 @@ public class BarterService {
                         barterList
                 );
                 totalList.add(barterFin);
-
             }
         }
         return totalList;
     }
-
-
 // 성훈 리팩토링 (거래리스트)
     private OpponentBarterDto getMyBarterDto(Long itemId, Item Item) {
         OpponentBarterDto itemList = new OpponentBarterDto(

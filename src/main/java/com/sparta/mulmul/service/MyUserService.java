@@ -94,7 +94,11 @@ public class MyUserService {
         String profile = imgUrl;
 
         if (imgUrl.equals("empty")){
-            user.execptImageUpdate(nickname, address, storeInfo);
+            user.execptImageUpdate(
+                    nickname,
+                    address,
+                    storeInfo
+            );
         }else {
             // 유저 정보를 수정
             user.update(
