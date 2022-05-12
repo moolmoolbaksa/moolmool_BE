@@ -63,58 +63,62 @@ public class ItemService {
         if(category.isEmpty()){
             List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
             List<ItemResponseDto> items = new ArrayList<>();
-            for(Item item : itemList){
-                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                int scrabCnt = 0;
-                for(Scrab scrab1 : scrabs){
-                    if(scrab1.getScrab().equals(true)){
-                        scrabCnt++;
+            for(Item item : itemList) {
+                if (item.getStatus() == 1 || item.getStatus() == 0) {
+                    List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+                    int scrabCnt = 0;
+                    for (Scrab scrab1 : scrabs) {
+                        if (scrab1.getScrab().equals(true)) {
+                            scrabCnt++;
+                        }
                     }
+                    ItemResponseDto itemResponseDto = new ItemResponseDto(
+                            item.getId(),
+                            item.getCategory(),
+                            item.getTitle(),
+                            item.getContents(),
+                            item.getItemImg().split(",")[0],
+                            item.getAddress(),
+                            scrabCnt,
+                            item.getViewCnt(),
+                            item.getStatus());
+                    items.add(itemResponseDto);
                 }
-                ItemResponseDto itemResponseDto = new ItemResponseDto(
-                        item.getId(),
-                        item.getCategory(),
-                        item.getTitle(),
-                        item.getContents(),
-                        item.getItemImg().split(",")[0],
-                        item.getAddress(),
-                        scrabCnt,
-                        item.getViewCnt(),
-                        item.getStatus());
-                items.add(itemResponseDto);
-                }
+            }
             return items;
             }
        List<Item> itemList = itemRepository.findAllByCategory(category);
        List<ItemResponseDto> items = new ArrayList<>();
        Long userId = userDetails.getUserId();
        for(Item item : itemList) {
-           boolean isScrab;
-           if(scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()){
-               isScrab  = true;
-           }else{
-               isScrab = false;
-           }
-           List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-           int scrabCnt = 0;
-           for(Scrab scrab1 : scrabs){
-               if(scrab1.getScrab().equals(true)){
-                   scrabCnt++;
+           if (item.getStatus() == 0 || item.getStatus() == 1) {
+               boolean isScrab;
+               if (scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()) {
+                   isScrab = true;
+               } else {
+                   isScrab = false;
                }
-           }
-           ItemResponseDto itemResponseDto = new ItemResponseDto(
-                   item.getId(),
-                   item.getCategory(),
-                   item.getTitle(),
-                   item.getContents(),
-                   item.getItemImg().split(",")[0],
-                   item.getAddress(),
-                   scrabCnt,
-                   item.getViewCnt(),
-                   item.getStatus(),
-                   isScrab);
-           items.add(itemResponseDto);
+               List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+               int scrabCnt = 0;
+               for (Scrab scrab1 : scrabs) {
+                   if (scrab1.getScrab().equals(true)) {
+                       scrabCnt++;
+                   }
+               }
+               ItemResponseDto itemResponseDto = new ItemResponseDto(
+                       item.getId(),
+                       item.getCategory(),
+                       item.getTitle(),
+                       item.getContents(),
+                       item.getItemImg().split(",")[0],
+                       item.getAddress(),
+                       scrabCnt,
+                       item.getViewCnt(),
+                       item.getStatus(),
+                       isScrab);
+               items.add(itemResponseDto);
 
+           }
        }
        return items;
     }
@@ -376,16 +380,19 @@ public class ItemService {
                 ()-> new IllegalArgumentException("유저정보가 없습니다.")
         );
 
-        // 판매자 및 구매자 닉네임
-        String buyerNickName = buyer.getNickname();
-        String sellerNickName = seller.getNickname();
+        // 판매자의 아이디 & 닉네임 & degree
+        Long userId = seller.getId();
+        String nickname = seller.getNickname();
+        String degree = seller.getDegree();
 
-        // 판매자 아이템 이미지
+        // 판매자 아이템 이미지 & 제목 & 내용
         Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
         Item item = itemRepository.findById(sellerItemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
-        String sellerItemImage = item.getItemImg().split(",")[0];
+        String image = item.getItemImg().split(",")[0];
+        String title = item.getTitle();
+        String contents = item.getContents();
 
         // 구매자 아이템 이미지들
         String buyerItem = barter.getBarter().split(";")[0];
@@ -393,15 +400,17 @@ public class ItemService {
         for(int i = 0; i<buyerItem.split(",").length; i++){
             buyerItemId.add(Long.valueOf(buyerItem.split(",")[i]));
         }
-        List<String> buyerItemImages = new ArrayList<>();
+        List<TradeInfoImagesDto> barterItem = new ArrayList<>();
         for(Long id : buyerItemId){
             Item item1 = itemRepository.findById(id).orElseThrow(
                     ()-> new IllegalArgumentException("아이템이 없습니다.")
             );
             String buyerItemImage = item1.getItemImg().split(",")[0];
-            buyerItemImages.add(buyerItemImage);
+            Long itemId = item1.getId();
+            TradeInfoImagesDto tradeInfoImagesDto = new TradeInfoImagesDto(buyerItemImage, itemId);
+            barterItem.add(tradeInfoImagesDto);
         }
-        return new TradeDecisionDto(buyerNickName, sellerNickName, sellerItemImage, buyerItemImages);
+        return new TradeDecisionDto(userId, nickname, degree, title, contents, image, barterItem);
     }
 
 
