@@ -30,7 +30,7 @@ public class BarterController {
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
-    //엄성훈 - 교환신청
+    //엄성훈 - 교환완료
     @PutMapping("/api/myhistory/handshake")
     public BarterStatusDto OkayItem(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return barterService.OkayBarter(barterId, userDetails);

@@ -3,6 +3,7 @@ package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.barter.BarterDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
 import com.sparta.mulmul.dto.barter.MyBarterDto;
+import com.sparta.mulmul.dto.barter.OpponentBarterDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.User;
@@ -54,8 +55,8 @@ public class BarterService {
             Long barterId = barters.getId();
             LocalDateTime date = barters.getModifiedAt();
             // 거래 물품리스트를 담을 Dto -> 내것과 상대것을 담는다
-            List<MyBarterDto> myBarterList = new ArrayList<>();
-            List<MyBarterDto> barterList = new ArrayList<>();
+            List<OpponentBarterDto> myBarterList = new ArrayList<>();
+            List<OpponentBarterDto> barterList = new ArrayList<>();
 
             String barter = barters.getBarter();
             //barter 거래내역 id split하기 -> 파싱하여 거래항 물품의 Id값을 찾기
@@ -71,7 +72,7 @@ public class BarterService {
                         () -> new IllegalArgumentException("buyerItem not found")
                 );
 
-                MyBarterDto buyerItemList = getMyBarterDto(itemId, buyerItem);
+                OpponentBarterDto buyerItemList = getMyBarterDto(itemId, buyerItem);
 
                 //바이어가 유저라면
                 if (buyerItem.getBag().getUserId().equals(userId)) {
@@ -92,7 +93,7 @@ public class BarterService {
                         () -> new IllegalArgumentException("sellerItem not found")
                 );
 
-                MyBarterDto sellerItemList = getMyBarterDto(itemId, sellerItem);
+                OpponentBarterDto sellerItemList = getMyBarterDto(itemId, sellerItem);
                 //셀러가 유저라면
                 if (sellerItem.getBag().getUserId().equals(userId)) {
                     myBarterList.add(sellerItemList);
@@ -150,21 +151,19 @@ public class BarterService {
                         barterList
                 );
                 totalList.add(barterFin);
-
             }
         }
         return totalList;
     }
-
-
 // 성훈 리팩토링 (거래리스트)
-    private MyBarterDto getMyBarterDto(Long itemId, Item Item) {
-        MyBarterDto buyerItemList = new MyBarterDto(
+    private OpponentBarterDto getMyBarterDto(Long itemId, Item Item) {
+        OpponentBarterDto itemList = new OpponentBarterDto(
                 itemId,
                 Item.getTitle(),
-                Item.getItemImg()
+                Item.getItemImg(),
+                Item.getContents()
         );
-        return buyerItemList;
+        return itemList;
     }
 
 
@@ -178,7 +177,7 @@ public class BarterService {
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(
                 () -> new IllegalArgumentException("거래내역이 없습니다."));
         // 거래중인 상태가 아니면 예외처리
-        if (mybarter.getStatus() != 2) {
+        if (mybarter.getStatus() != 1 || mybarter.getStatus() != 2) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
         // 거래외 사람이 취소를 할 경우

@@ -6,6 +6,7 @@ import com.sparta.mulmul.dto.scrab.MyScrabItemDto;
 import com.sparta.mulmul.dto.user.MyPageResponseDto;
 import com.sparta.mulmul.dto.user.UserEditDtailResponseDto;
 import com.sparta.mulmul.dto.user.UserEditResponseDto;
+import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.model.User;
@@ -46,11 +47,7 @@ public class MyUserService {
         List<ItemUserResponseDto> myItemResponseList = new ArrayList<>();
         // 내 보유 아이템을 리스트 형식으로 담기
         for (Item items : myItemList) {
-            ItemUserResponseDto itemResponseDto = new ItemUserResponseDto(
-                    items.getId(),
-                    items.getItemImg().split(",")[0],
-                    items.getStatus()
-            );
+            ItemUserResponseDto itemResponseDto = getItemUserDto(items);
             myItemResponseList.add(itemResponseDto);
         }
         List<Scrab> myScrabList = scrabRepository.findTop3ByUserIdAndScrab(userId, true);
@@ -61,11 +58,7 @@ public class MyUserService {
             Long myScrapItemId = myscrap.getItemId();
             Item scrabItem = itemRepository.findById(myScrapItemId).orElseThrow(
                     () -> new IllegalArgumentException("Item not found"));
-            ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
-                    scrabItem.getId(),
-                    scrabItem.getItemImg().split(",")[0],
-                    scrabItem.getStatus()
-            );
+            ItemUserResponseDto scrabitemDto = getItemUserDto(scrabItem);
             myScrapItemList.add(scrabitemDto);
 
         }
@@ -83,6 +76,15 @@ public class MyUserService {
         );
     }
 
+    private ItemUserResponseDto getItemUserDto(Item scrabItem) {
+        ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
+                scrabItem.getId(),
+                scrabItem.getItemImg().split(",")[0],
+                scrabItem.getStatus()
+        );
+        return scrabitemDto;
+    }
+
     // 성훈_마이페이지_내 정보수정
     @Transactional
     public UserEditResponseDto editMyPage(String nickname, String address, String
@@ -93,7 +95,11 @@ public class MyUserService {
         String profile = imgUrl;
 
         if (imgUrl.equals("empty")){
-            user.execptImageUpdate(nickname, address, storeInfo);
+            user.execptImageUpdate(
+                    nickname,
+                    address,
+                    storeInfo
+            );
         }else {
             // 유저 정보를 수정
             user.update(
@@ -135,6 +141,34 @@ public class MyUserService {
             }
         }
         return myScrabItemDtoList;
+
+    }
+
+    // 이승재 / 유저 스토어 목록 보기
+    public UserStoreResponseDto showStore(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
+        String nickname = user.getNickname();
+        String profile = user.getProfile();
+        float grade = user.getGrade();
+        String degree = user.getDegree();
+        String address = user.getAddress();
+        String storeInfo = user.getStoreInfo();
+
+        Long userBadId = bagRepository.findByUserId(userId).getId();
+        List<Item> myItemList = itemRepository.findAllByBagId(userBadId);
+        List<ItemUserResponseDto> itemUserResponseDtos = new ArrayList<>();
+
+        for(Item item : myItemList){
+            Long itemId = item.getId();
+            String itemImg = item.getItemImg().split(",")[0];
+            int status = item.getStatus();
+            ItemUserResponseDto itemUserResponseDto = new ItemUserResponseDto(itemId, itemImg, status);
+            itemUserResponseDtos.add(itemUserResponseDto);
+        }
+
+        return new UserStoreResponseDto(nickname, profile, degree, grade, address, storeInfo, itemUserResponseDtos);
 
     }
 }
