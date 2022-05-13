@@ -127,7 +127,7 @@ public class ItemController {
     }
 
     // 이승재 교환신청 확인 페이지 수락 버튼
-    @PutMapping("/api/trade/decision")
+    @PostMapping("/api/trade/decision")
     private BarterStatusDto acceptTrade(@RequestParam Long baterId){
        return tradeService.acceptTrade(baterId);
     }
