@@ -41,6 +41,7 @@ public class StompHandler implements ChannelInterceptor { // 이론상 웹소켓
     private WsUser checkVaild(StompHeaderAccessor accessor){
 
         WsUser wsUser;
+
         try {
             String token = extractor.extract(accessor.getFirstNativeHeader("Authorization"));
             Long userId = jwtDecoder.decodeTokenByUserId(token);
@@ -49,13 +50,15 @@ public class StompHandler implements ChannelInterceptor { // 이론상 웹소켓
                     .builder()
                     .userId(userId)
                     .nickname(nickname)
-                    .sessionId(accessor.getSessionId())
                     .name(UUID.randomUUID().toString())
+                    .sessionId(accessor.getSessionId())
                     .build()
             );
+
         } catch (Exception e) {
             throw new AccessDeniedException("StompHandler: 유효하지 않은 토큰입니다.");
         }
+
         return wsUser;
     }
 }

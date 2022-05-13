@@ -25,6 +25,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     // 내가 요청받은 채팅방
     Optional<ChatMessage> findFirstBySenderIdAndRoomId(Long userId, Long roomID);
 
+    // 메시지 안읽은 갯수 카운트 쿼리
+    @Query("SELECT count(msg) FROM ChatMessage msg WHERE msg.senderId =:userId AND msg.roomId =:roomId AND msg.isRead = false")
+    int countMsg(Long userId, Long roomId);
+
     // 채팅 메시지 읽음 상태 일괄 업데이트
     @Modifying
     @Transactional
