@@ -9,7 +9,6 @@ import com.sparta.mulmul.dto.user.UserEditResponseDto;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.model.User;
-import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import com.sparta.mulmul.repository.ScrabRepository;
 import com.sparta.mulmul.repository.UserRepository;
@@ -29,7 +28,6 @@ public class MyUserService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final ScrabRepository scrabRepository;
-    private final BagRepository bagRepository;
 
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {

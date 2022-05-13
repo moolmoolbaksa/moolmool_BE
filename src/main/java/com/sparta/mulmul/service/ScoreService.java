@@ -167,10 +167,10 @@ public class ScoreService {
         String[] buyerItemId = barterIdList[0].split(",");
         String sellerItemId = barterIdList[1];
 
-        int viewBonusCntB = 0;
-        int viewBonusCntS = 0;
-        int scrabBonusCntB = 0;
-        int scrabBonusCntS = 0;
+//        int viewBonusCntB = 0;
+//        int viewBonusCntS = 0;
+//        int scrabBonusCntB = 0;
+//        int scrabBonusCntS = 0;
         int status = 4;
         // 내 포지션 확인
         String myPosition;
@@ -190,19 +190,19 @@ public class ScoreService {
                 buyerItem.statusUpdate(buyerItem.getId(), status);
 
                 // 상대의 포지션이 바이어일 때, 조회수 100 이상이면 보너스 카운트 up!
-                if (buyerItem.getViewCnt() >= 100 && !myPosition.equals("buyer")) {
-                    viewBonusCntB++;
-                }
-                if (buyerItem.getViewCnt() >= 100 && !myPosition.equals("seller")) {
-                    viewBonusCntS++;
-                }
-                // 상대의 포지션이 바이어일 때, 찜하기가 10 이상이면 보너스 카운트 up!
-                if (buyerItem.getScrabCnt() >= 10 && !myPosition.equals("buyer")) {
-                    scrabBonusCntB++;
-                }
-                if (buyerItem.getScrabCnt() >= 10 && !myPosition.equals("seller")) {
-                    scrabBonusCntS++;
-                }
+//                if (buyerItem.getViewCnt() >= 100 && !myPosition.equals("buyer")) {
+//                    viewBonusCntB++;
+//                }
+//                if (buyerItem.getViewCnt() >= 100 && !myPosition.equals("seller")) {
+//                    viewBonusCntS++;
+//                }
+//                // 상대의 포지션이 바이어일 때, 찜하기가 10 이상이면 보너스 카운트 up!
+//                if (buyerItem.getScrabCnt() >= 10 && !myPosition.equals("buyer")) {
+//                    scrabBonusCntB++;
+//                }
+//                if (buyerItem.getScrabCnt() >= 10 && !myPosition.equals("seller")) {
+//                    scrabBonusCntS++;
+//                }
             }
 
             barter.updateScoreSeller(true);
@@ -226,19 +226,19 @@ public class ScoreService {
 
             // 좋은 물품 보너스 //
             // 상대의 포지션이 셀러일 때, 조회수 100 이상이면 보너스 카운트 up!
-            if (sellerItem.getViewCnt() >= 100 && !myPosition.equals("seller")) {
-                viewBonusCntS++;
-            }
-            if (sellerItem.getViewCnt() >= 100 && !myPosition.equals("buyer")) {
-                viewBonusCntB++;
-            }
-            // 상대의 포지션이 셀러일 때, 찜하기가 10 이상이면 보너스 카운트 up!
-            if (sellerItem.getScrabCnt() >= 10 && !myPosition.equals("seller")) {
-                scrabBonusCntS++;
-            }
-            if (sellerItem.getScrabCnt() >= 100 && !myPosition.equals("buyer")) {
-                scrabBonusCntB++;
-            }
+//            if (sellerItem.getViewCnt() >= 100 && !myPosition.equals("seller")) {
+//                viewBonusCntS++;
+//            }
+//            if (sellerItem.getViewCnt() >= 100 && !myPosition.equals("buyer")) {
+//                viewBonusCntB++;
+//            }
+//            // 상대의 포지션이 셀러일 때, 찜하기가 10 이상이면 보너스 카운트 up!
+//            if (sellerItem.getScrabCnt() >= 10 && !myPosition.equals("seller")) {
+//                scrabBonusCntS++;
+//            }
+//            if (sellerItem.getScrabCnt() >= 100 && !myPosition.equals("buyer")) {
+//                scrabBonusCntB++;
+//            }
             barter.updateScoreBuyer(true);
         }
 
@@ -253,64 +253,64 @@ public class ScoreService {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
 
-        // 응답 보너스 //
-        // 10분이네 응답 보너스
-        ChatRoom chatRoomCheck;
-        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
-        if (myPosition.equals("buyer")) {
-            chatRoomCheck = chatRoomRepository.findByRequesterAndAcceptor(user, opponentUser).orElseThrow(
-                    () -> new IllegalArgumentException("chatRoom not found"));
-        } else {
-            chatRoomCheck = chatRoomRepository.findByRequesterAndAcceptor(opponentUser, user).orElseThrow(
-                    () -> new IllegalArgumentException("chatRoom not found"));
-        }
-        Long chatRoomId = chatRoomCheck.getId();
-        Long myUserId = user.getId();
-
-        ChatMessage myMessage = chatMessageRepository.findFirstBySenderIdAndRoomId(myUserId, chatRoomId).orElseThrow(
-                () -> new IllegalArgumentException("chatRoom not found"));
-        ChatMessage opponentMessage = chatMessageRepository.findFirstBySenderIdAndRoomId(opponentUserId, chatRoomId).orElseThrow(
-                () -> new IllegalArgumentException("chatRoom not found"));
-
-        // 각자의 최초 메시지의 시간을 조회한다
-        LocalDateTime firstMyTime = myMessage.getCreatedAt();
-        LocalDateTime firstOppoentTime = opponentMessage.getCreatedAt();
-        long minute = ChronoUnit.MINUTES.between(firstMyTime, firstOppoentTime);
-        boolean chatTime = Math.abs(minute) <= 10;
+//        // 응답 보너스 //
+//        // 10분이네 응답 보너스
+//        ChatRoom chatRoomCheck;
+//        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
+//        if (myPosition.equals("buyer")) {
+//            chatRoomCheck = chatRoomRepository.findByRequesterAndAcceptor(user, opponentUser).orElseThrow(
+//                    () -> new IllegalArgumentException("chatRoom not found"));
+//        } else {
+//            chatRoomCheck = chatRoomRepository.findByRequesterAndAcceptor(opponentUser, user).orElseThrow(
+//                    () -> new IllegalArgumentException("chatRoom not found"));
+//        }
+//        Long chatRoomId = chatRoomCheck.getId();
+//        Long myUserId = user.getId();
+//
+//        ChatMessage myMessage = chatMessageRepository.findFirstBySenderIdAndRoomId(myUserId, chatRoomId).orElseThrow(
+//                () -> new IllegalArgumentException("chatRoom not found"));
+//        ChatMessage opponentMessage = chatMessageRepository.findFirstBySenderIdAndRoomId(opponentUserId, chatRoomId).orElseThrow(
+//                () -> new IllegalArgumentException("chatRoom not found"));
+//
+//        // 각자의 최초 메시지의 시간을 조회한다
+//        LocalDateTime firstMyTime = myMessage.getCreatedAt();
+//        LocalDateTime firstOppoentTime = opponentMessage.getCreatedAt();
+//        long minute = ChronoUnit.MINUTES.between(firstMyTime, firstOppoentTime);
+//        boolean chatTime = Math.abs(minute) <= 10;
 
         // 보너스 정산 //
-        if (myPosition.equals("buyer")) {
+//        if (myPosition.equals("buyer")) {
             // 좋은 물품 보너스 //
             // 완료된 거래내역의 조회수나 찜하기가 많으면 보너스
-            if (viewBonusCntB >= 1 || scrabBonusCntB >= 1) {
-                userTotalGrade = userTotalGrade + 1.0f * (viewBonusCntB + scrabBonusCntB);
-            }
-            if (viewBonusCntS >= 1 || scrabBonusCntS >= 1) {
-                opponentUserTotalGrade = opponentUserTotalGrade + 1.0f * (viewBonusCntS + scrabBonusCntS);
-            }
+//            if (viewBonusCntB >= 1 || scrabBonusCntB >= 1) {
+//                userTotalGrade = userTotalGrade + 1.0f * (viewBonusCntB + scrabBonusCntB);
+//            }
+//            if (viewBonusCntS >= 1 || scrabBonusCntS >= 1) {
+//                opponentUserTotalGrade = opponentUserTotalGrade + 1.0f * (viewBonusCntS + scrabBonusCntS);
+//            }
             // 10분 이내 응답했을 때의 보너스 -> 상데가 셀러이므로
-            if (!barter.getIsSellerScore()) {
-                if (chatTime) {
-                    opponentUserTotalGrade = opponentUserTotalGrade + 1.0f;
-                }
-            }
+//            if (!barter.getIsSellerScore()) {
+//                if (chatTime) {
+//                    opponentUserTotalGrade = opponentUserTotalGrade + 1.0f;
+//                }
+//            }
 
             //내 포지션에 셀러일 경우 / 상대는 바이어
-        } else {
-            if (viewBonusCntB >= 1 || scrabBonusCntB >= 1) {
-                opponentUserTotalGrade = opponentUserTotalGrade + 1.0f * (viewBonusCntB + scrabBonusCntB);
-            }
-            if (viewBonusCntS >= 1 || scrabBonusCntS >= 1) {
-                userTotalGrade = userTotalGrade + 1.0f * (viewBonusCntS + scrabBonusCntS);
-            }
+//        } else {
+//            if (viewBonusCntB >= 1 || scrabBonusCntB >= 1) {
+//                opponentUserTotalGrade = opponentUserTotalGrade + 1.0f * (viewBonusCntB + scrabBonusCntB);
+//            }
+//            if (viewBonusCntS >= 1 || scrabBonusCntS >= 1) {
+//                userTotalGrade = userTotalGrade + 1.0f * (viewBonusCntS + scrabBonusCntS);
+//            }
             // 10분 이내 응답했을 때의 보너스 / 셀러에게 보너스
-            if (chatTime) {
-                // 상대가 응답을 안했을 경우 -> 응답 보너스의 중목을 막기위함
-                if (!barter.getIsBuyerScore()) {
-                    userTotalGrade = userTotalGrade + 1.0f;
-                }
-            }
-        }
+//            if (chatTime) {
+//                // 상대가 응답을 안했을 경우 -> 응답 보너스의 중목을 막기위함
+//                if (!barter.getIsBuyerScore()) {
+//                    userTotalGrade = userTotalGrade + 1.0f;
+//                }
+//            }
+//        }
 
         // 상대의 전체 점수에 1, 2은 - / 3은 0 / 4, 5은 +
         if (gradeScore <= 2) {
