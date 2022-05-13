@@ -1,6 +1,5 @@
 package com.sparta.mulmul.controller;
 
-import com.sparta.mulmul.dto.NotificationCountDto;
 import com.sparta.mulmul.dto.chat.MessageRequestDto;
 import com.sparta.mulmul.dto.chat.MessageResponseDto;
 import com.sparta.mulmul.repository.NotificationRepository;
@@ -10,8 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Controller
 @RequiredArgsConstructor
@@ -41,27 +46,35 @@ public class WebSocketController {
     @MessageMapping("/notification")
     public void setNotification(WsUser wsUser) {
 
-//        messagingTemplate.convertAndSendToUser(wsUser.getSessionId(),
-//                "/sub/notification",
-//                NotificationCountDto.valueOf(
-//                        notificationRepository.countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
-//        ));
-        messagingTemplate.convertAndSend("/sub/notification/" + wsUser.getUserId(),
-                NotificationCountDto.valueOf(
-                        notificationRepository.
-                                countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
-                )
-        );
+        Map<String, Integer> map = new HashMap<>();
+        map.put("NotificationCnt", notificationRepository.
+                        countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId()));
+
+        messagingTemplate.convertAndSend("/sub/notification/" + wsUser.getUserId(), map);
+    }
+
+    // 교환 요청
+    @MessageMapping("/barter")
+    public void barter(){
+
+
     }
     // 알림 갯수 전달(테스트)
 //    @SubscribeMapping("/notification")
-//    public void setTest(WsUser wsUser) {
+//    public void setTest(WsUser wsUser, Principal principal) {
 //
-//        messagingTemplate.convertAndSend("/sub/notification/",
-//                NotificationCountDto.valueOf(
-//                        notificationRepository.
-//                                countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
-//                )
-//        );
+//        System.out.println("WebsocketController: @SubscribeMapping에 접근하였습니다.");
+//
+//        System.out.println("프린시펄 추출: " + principal.getName());
+//
+//        Map<String, Integer> map = new HashMap<>();
+//        map.put("NotificationCnt", notificationRepository.
+//                countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId()));
+//
+//        messagingTemplate.convertAndSend("/sub/notification", map);
+//        System.out.println("WebsocketController: 해쉬맵 제작");
+//        messagingTemplate.convertAndSendToUser(principal.getName(), "/sub/notification", map);
+//
+//        System.out.println("WebsocketController: /sub/notification 으로 전송 완료");
 //    }
 }
