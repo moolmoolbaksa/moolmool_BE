@@ -102,7 +102,7 @@ public class ChatMessageService {
         ChatMessage message = messageRepository.save(ChatMessage.createOf(requestDto, wsUser.getUserId()));
 
         if (chatRoom.getAccOut()){
-            // 채팅 알림 저장 및 전달하기 ( 일관성을 위해 수정이 필요합니다. )
+            // 채팅 알림 저장 및 전달하기
             Notification notification = notificationRepository.save(Notification.createOf(chatRoom, chatRoom.getAcceptor()));
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + chatRoom.getAcceptor().getId(), NotificationDto.createFrom(notification)

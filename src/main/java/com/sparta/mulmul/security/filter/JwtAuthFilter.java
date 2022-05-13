@@ -51,6 +51,7 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
         if ( tokenPayload == null && !method.equals("GET") ) {
 
+            System.out.println("JwtAuthFilter: 토큰값이 없어 NullPointException 발생했습니다.");
             response.setContentType("application/json;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_OK);
 

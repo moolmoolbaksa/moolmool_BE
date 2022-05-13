@@ -30,7 +30,9 @@ public class StompHandler implements ChannelInterceptor { // 이론상 웹소켓
 
         assert accessor != null;
 
-        if(accessor.getCommand() == StompCommand.CONNECT) {
+        if(accessor.getCommand() == StompCommand.CONNECT
+                || accessor.getCommand() == StompCommand.SUBSCRIBE
+                || accessor.getCommand() == StompCommand.SEND) {
             accessor.setUser(checkVaild(accessor));
         }
         return message;

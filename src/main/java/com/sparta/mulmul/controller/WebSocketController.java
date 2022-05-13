@@ -9,6 +9,7 @@ import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.stereotype.Controller;
 
@@ -31,6 +32,7 @@ public class WebSocketController {
     // 커넥트와 디스커넥트 시에는 이 주소로 IN과 OUT의 type으로 요청을 보냅니다.
     @MessageMapping("/chat/connect-status")
     public void connectStatus(MessageRequestDto requestDto, WsUser wsUser, StompSession session) {
+
         messageService.checkAccess(requestDto, wsUser, session); // 엑세스 권한 검증 -> stomp
         messageService.sendStatus(requestDto); // 동시접속자수 검증
     }
@@ -39,16 +41,27 @@ public class WebSocketController {
     @MessageMapping("/notification")
     public void setNotification(WsUser wsUser) {
 
-        messagingTemplate.convertAndSendToUser(wsUser.getSessionId(),
-                "/sub/notification",
+//        messagingTemplate.convertAndSendToUser(wsUser.getSessionId(),
+//                "/sub/notification",
+//                NotificationCountDto.valueOf(
+//                        notificationRepository.countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
+//        ));
+        messagingTemplate.convertAndSend("/sub/notification/" + wsUser.getUserId(),
                 NotificationCountDto.valueOf(
-                        notificationRepository.countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
-        ));
-//        messagingTemplate.convertAndSend("/sub/notification/" + wsUser.getUserId(),
+                        notificationRepository.
+                                countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
+                )
+        );
+    }
+    // 알림 갯수 전달(테스트)
+//    @SubscribeMapping("/notification")
+//    public void setTest(WsUser wsUser) {
+//
+//        messagingTemplate.convertAndSend("/sub/notification/",
 //                NotificationCountDto.valueOf(
 //                        notificationRepository.
 //                                countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
 //                )
 //        );
-    }
+//    }
 }
