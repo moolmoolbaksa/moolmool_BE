@@ -1,5 +1,6 @@
 package com.sparta.mulmul.controller;
 
+import com.sparta.mulmul.dto.NotificationCountDto;
 import com.sparta.mulmul.dto.chat.MessageRequestDto;
 import com.sparta.mulmul.dto.chat.MessageResponseDto;
 import com.sparta.mulmul.repository.NotificationRepository;
@@ -8,10 +9,8 @@ import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.stereotype.Controller;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,17 +30,25 @@ public class WebSocketController {
 
     // 커넥트와 디스커넥트 시에는 이 주소로 IN과 OUT의 type으로 요청을 보냅니다.
     @MessageMapping("/chat/connect-status")
-    public void connectStatus(MessageRequestDto requestDto, WsUser wsUser) {
-        messageService.checkAccess(requestDto, wsUser); // 엑세스 권한 검증 -> stomp
+    public void connectStatus(MessageRequestDto requestDto, WsUser wsUser, StompSession session) {
+        messageService.checkAccess(requestDto, wsUser, session); // 엑세스 권한 검증 -> stomp
         messageService.sendStatus(requestDto); // 동시접속자수 검증
     }
 
     // 알림 갯수 전달
     @MessageMapping("/notification")
     public void setNotification(WsUser wsUser) {
-        int num = notificationRepository.countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId());
-        Map<String, Integer> map = new HashMap<>();
-        map.put("number", num);
-        messagingTemplate.convertAndSend("/sub/notification" + wsUser.getUserId(), map);
+
+        messagingTemplate.convertAndSendToUser(wsUser.getSessionId(),
+                "/sub/notification",
+                NotificationCountDto.valueOf(
+                        notificationRepository.countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
+        ));
+//        messagingTemplate.convertAndSend("/sub/notification/" + wsUser.getUserId(),
+//                NotificationCountDto.valueOf(
+//                        notificationRepository.
+//                                countNotificationByUserIdAndIsReadIsFalse(wsUser.getUserId())
+//                )
+//        );
     }
 }
