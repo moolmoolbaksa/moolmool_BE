@@ -151,7 +151,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("https://main.d38cmg5gt99sfb.amplifyapp.com");
         configuration.addAllowedOrigin("https://kapi.kakao.com/v2/user/me");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
