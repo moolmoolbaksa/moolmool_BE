@@ -10,6 +10,7 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.ItemService;
 import com.sparta.mulmul.service.NotificationService;
 import com.sparta.mulmul.service.ScoreService;
+import com.sparta.mulmul.service.TradeService;
 import com.sparta.mulmul.service.chat.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class NotificationController {
     private final ChatMessageService messageService;
     private final NotificationService notificationService;
     private final NotificationRepository notificationRepository;
+    private final TradeService tradeService;
 
     // 알림 전체 목록 가져오기
     @GetMapping("/notifications")
@@ -53,7 +55,7 @@ public class NotificationController {
                                            @PathVariable Long notificationId,
                                            @RequestParam Long baterId){
 
-        TradeDecisionDto decisionDto = itemService.tradeDecision(baterId, userDetails);
+        TradeDecisionDto decisionDto = tradeService.tradeDecision(baterId, userDetails);
         notificationService.setRead(notificationId);
         return  decisionDto;
     }

@@ -50,7 +50,7 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
         System.out.println("JwtAuthFilter: " + tokenPayload);
 
         if ( tokenPayload == null && !method.equals("GET") ) {
-
+            System.out.println("JWTAuthFilter : null을 받아서 오류가 발생하였습니다.");
             response.setContentType("application/json;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_OK);
 
