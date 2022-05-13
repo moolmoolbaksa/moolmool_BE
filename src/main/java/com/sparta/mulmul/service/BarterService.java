@@ -177,34 +177,34 @@ public class BarterService {
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(
                 () -> new IllegalArgumentException("거래내역이 없습니다."));
         // 거래중인 상태가 아니면 예외처리
-        if (mybarter.getStatus() != 1 || mybarter.getStatus() != 2) {
+        if (mybarter.getStatus() == 1 || mybarter.getStatus() == 2) {
+            // 거래외 사람이 취소를 할 경우
+            if (!mybarter.getBuyerId().equals(userId) && !mybarter.getSellerId().equals(userId)) {
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            }
+
+            String[] barterIdList = mybarter.getBarter().split(";");
+            String[] buyerItemId = barterIdList[0].split(",");
+            String sellerItemId = barterIdList[1];
+
+            int setStatus = 0;
+            for (String eachBuyer : buyerItemId) {
+                Long buyerId = Long.valueOf(eachBuyer);
+                Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
+                        () -> new IllegalArgumentException("buyerItem not found"));
+                buyerItem.statusUpdate(buyerItem.getId(), setStatus);
+            }
+            //셀러(유저)의 물품을 찾아서 정보를 넣기
+            Long sellerId = Long.parseLong(sellerItemId);
+            Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
+                    () -> new IllegalArgumentException("sellerItem not found")
+            );
+            sellerItem.statusUpdate(sellerItem.getId(), setStatus);
+            // 거래내역 삭제
+            barterRepository.deleteById(barterId);
+        } else {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
-        // 거래외 사람이 취소를 할 경우
-        if (!mybarter.getBuyerId().equals(userId) && !mybarter.getSellerId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-        }
-
-
-        String[] barterIdList = mybarter.getBarter().split(";");
-        String[] buyerItemId = barterIdList[0].split(",");
-        String sellerItemId = barterIdList[1];
-
-        int setStatus = 0;
-        for (String eachBuyer : buyerItemId) {
-            Long buyerId = Long.valueOf(eachBuyer);
-            Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
-                    () -> new IllegalArgumentException("buyerItem not found"));
-            buyerItem.statusUpdate(buyerItem.getId(), setStatus);
-        }
-        //셀러(유저)의 물품을 찾아서 정보를 넣기
-        Long sellerId = Long.parseLong(sellerItemId);
-        Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
-                () -> new IllegalArgumentException("sellerItem not found")
-        );
-        sellerItem.statusUpdate(sellerItem.getId(), setStatus);
-        // 거래내역 삭제
-        barterRepository.deleteById(barterId);
     }
 
 
