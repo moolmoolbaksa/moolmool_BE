@@ -177,7 +177,7 @@ public class BarterService {
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(
                 () -> new IllegalArgumentException("거래내역이 없습니다."));
         // 거래중인 상태가 아니면 예외처리
-        if (mybarter.getStatus() != 2) {
+        if (mybarter.getStatus() != 1 || mybarter.getStatus() != 2) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
         // 거래외 사람이 취소를 할 경우
