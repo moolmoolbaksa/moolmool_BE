@@ -1,16 +1,8 @@
 package com.sparta.mulmul.service;
-
-import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
 import com.sparta.mulmul.dto.item.ItemRequestDto;
 import com.sparta.mulmul.dto.item.ItemResponseDto;
-import com.sparta.mulmul.dto.item.ItemUserResponseDto;
-import com.sparta.mulmul.dto.trade.RequestTradeDto;
-import com.sparta.mulmul.dto.trade.TradeDecisionDto;
-import com.sparta.mulmul.dto.trade.TradeInfoDto;
-import com.sparta.mulmul.dto.trade.TradeInfoImagesDto;
-import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
