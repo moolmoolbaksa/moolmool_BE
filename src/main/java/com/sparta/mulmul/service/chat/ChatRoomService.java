@@ -39,7 +39,7 @@ public class ChatRoomService {
                 .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다."));
         User requester = userRepository.findById(userDetails.getUserId())
                 .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다."));
-        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
+        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장 -> 로직에 오류가 있기 때문에, 수정해야 합니다.
         ChatRoom chatRoom = roomRepository.findByRequesterAndAcceptor(requester, acceptor)
                 .orElse(roomRepository.findByRequesterAndAcceptor(acceptor, requester)
                         .orElse(roomRepository.save(ChatRoom.createOf(requester, acceptor))));
@@ -81,10 +81,12 @@ public class ChatRoomService {
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( chatRoom.getAcceptor().getId() == userId ) {
                 if (!chatRoom.getAccOut()) { // 만약 Acc가 나가지 않았다면
-                    responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester())); }
+                    int unreadCnt = messageRepository.countMsg(chatRoom.getRequester().getId(), chatRoom.getId());
+                    responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt)); }
             } else if ( chatRoom.getRequester().getId() == userId ){
                 if (!chatRoom.getReqOut()) { // 만약 Req가 나가지 않았다면
-                    responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor())); }
+                    int unreadCnt = messageRepository.countMsg(chatRoom.getAcceptor().getId(), chatRoom.getId());
+                    responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt)); }
             }
         }
         return responseDtos;

@@ -12,6 +12,7 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -101,7 +102,7 @@ public class ChatMessageService {
         ChatMessage message = messageRepository.save(ChatMessage.createOf(requestDto, wsUser.getUserId()));
 
         if (chatRoom.getAccOut()){
-            // 채팅 알림 저장 및 전달하기 ( 일관성을 위해 수정이 필요합니다. )
+            // 채팅 알림 저장 및 전달하기
             Notification notification = notificationRepository.save(Notification.createOf(chatRoom, chatRoom.getAcceptor()));
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + chatRoom.getAcceptor().getId(), NotificationDto.createFrom(notification)
@@ -128,7 +129,7 @@ public class ChatMessageService {
     }
 
     // 채팅방 접근 권한 검증
-    public void checkAccess(MessageRequestDto requestDto, WsUser wsUser){
+    public void checkAccess(MessageRequestDto requestDto, WsUser wsUser, StompSession session){
 
         ChatRoom chatRoom = roomRepository
                 .findByIdFetch(requestDto.getRoomId())
@@ -137,6 +138,9 @@ public class ChatMessageService {
         Long userId = wsUser.getUserId();
 
         if ( chatRoom.getAcceptor().getId() != userId || chatRoom.getRequester().getId() != userId ) {
+            System.out.println("Disconnect 전) 세션 커넥트 검증: " + session.isConnected());
+            session.disconnect();
+            System.out.println("Disconnect 후) 세션 커넥트 검증: " + session.isConnected());
             throw new AccessDeniedException("ChatController: checkAccess) 허가되지 않은 접근입니다.");
         }
         // 허가되지 않은 회원 접근 시, Disconnect 상태로 전환시키는 추가적인 로직 구현이 필요합니다.

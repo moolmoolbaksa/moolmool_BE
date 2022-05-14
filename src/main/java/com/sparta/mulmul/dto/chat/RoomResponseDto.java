@@ -21,7 +21,7 @@ public class RoomResponseDto {
     private Boolean isRead;
     private int unreadCnt;
 
-    public static RoomResponseDto createOf(ChatRoom chatRoom, ChatMessage message, User user){
+    public static RoomResponseDto createOf(ChatRoom chatRoom, ChatMessage message, User user, int unreadCnt){
 
         RoomResponseDto responseDto = new RoomResponseDto();
 
@@ -33,7 +33,7 @@ public class RoomResponseDto {
         responseDto.message = message.getMessage();
         responseDto.date = message.getCreatedAt();
         responseDto.isRead = message.getIsRead();
-        responseDto.unreadCnt = chatRoom.getUnreadCnt();
+        responseDto.unreadCnt = unreadCnt;
 
         return responseDto;
     }

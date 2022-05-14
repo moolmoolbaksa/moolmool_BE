@@ -26,6 +26,7 @@ public class BarterDto {
 
 
     public BarterDto(Long barterId, Long userId, String usernickname, String profile, LocalDateTime date, int status, String myPosition , Boolean isTrade, Boolean isScore, List<OpponentBarterDto> myItem, List<OpponentBarterDto> barterItem) {
+
         this.barterId = barterId;
         this.userId = userId;
         this.usernickname = usernickname;

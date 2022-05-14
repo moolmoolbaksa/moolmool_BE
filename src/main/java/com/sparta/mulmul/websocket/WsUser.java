@@ -1,6 +1,6 @@
 package com.sparta.mulmul.websocket;
 
-import com.sparta.mulmul.dto.user.UserRequestDto;
+import com.sparta.mulmul.dto.WsUserDto;
 import lombok.NoArgsConstructor;
 
 import java.security.Principal;
@@ -8,19 +8,21 @@ import java.security.Principal;
 @NoArgsConstructor
 public class WsUser implements Principal {
 
-    private UserRequestDto requestDto;
+    private String name;
+    private WsUserDto userDto;
 
-    public static WsUser fromUserRequestDto(UserRequestDto requestDto){
+    public static WsUser createFrom(WsUserDto userDto){
         WsUser user = new WsUser();
-        user.requestDto = requestDto;
+        user.userDto = userDto;
+        user.name = user.getName();
         return user;
     }
 
     @Override
-    public String getName() { return requestDto.getNickname(); }
+    public String getName() { return this.name; }
 
-    public Long getUserId() { return requestDto.getUserId();}
+    public Long getUserId() { return userDto.getUserId();}
 
-    public String getNickname() { return requestDto.getNickname(); }
+    public String getNickname() { return userDto.getNickname(); }
 
 }

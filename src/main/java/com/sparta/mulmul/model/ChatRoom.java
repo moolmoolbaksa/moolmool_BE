@@ -30,7 +30,7 @@ public class ChatRoom extends Timestamped {
     @Column(nullable = false)
     private Boolean accOut;
 
-    @Formula("(SELECT count(1) FROM chat_message c WHERE c.room_id = room_id AND c.is_read = false)")
+    @Formula("(SELECT count(1) FROM chat_message c WHERE c.room_id = room_id AND c.is_read = false)") // 작동 오류. 다시 작성해야함.
     private int unreadCnt;
 
     public static ChatRoom createOf(User requester, User acceptor){
