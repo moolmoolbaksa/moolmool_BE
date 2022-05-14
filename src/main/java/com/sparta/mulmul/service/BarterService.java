@@ -160,7 +160,7 @@ public class BarterService {
         OpponentBarterDto itemList = new OpponentBarterDto(
                 itemId,
                 Item.getTitle(),
-                Item.getItemImg(),
+                Item.getItemImg().split(",")[0],
                 Item.getContents()
         );
         return itemList;
