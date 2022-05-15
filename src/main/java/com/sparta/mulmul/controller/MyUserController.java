@@ -53,7 +53,7 @@ public class MyUserController {
     }
 
     // 이승재 / 유저 신고 기능
-    @PutMapping("/api/report/user")
+    @PutMapping("/api/user/report")
     public ResponseEntity<OkDto> reportUser(@RequestParam Long userId){
         myUserService.reportUser(userId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
