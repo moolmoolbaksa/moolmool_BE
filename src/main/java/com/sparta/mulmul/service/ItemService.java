@@ -263,6 +263,7 @@ public class ItemService {
     }
 
     // 이승재 / 아이템 신고하기
+    @Transactional
     public void reportItem(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템 정보가 없습니다.")

@@ -174,6 +174,7 @@ public class MyUserService {
 
 
     // 이승재 / 유저 신고하기 기능
+    @Transactional
     public void reportUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new IllegalArgumentException("유저 정보가 없습니다.")
