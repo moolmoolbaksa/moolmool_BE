@@ -32,8 +32,9 @@ public class User {
     private String profile = "http://kaihuastudio.com/common/img/default_profile.png";
     private String storeInfo;
     private String degree = "물물어린이";
-    private int raterCount;
+    private int raterCount= 0;
     private float totalGrade;
+    private int reportCnt;
     private float grade;
     private double latitude;
     private double longitude;
@@ -93,4 +94,8 @@ public class User {
         this.storeInfo = storeInfo;
     }
 
+    public void reportCntUpdate(Long userId , int reportCnt){
+        this.id = userId;
+        this.reportCnt = reportCnt;
+    }
 }

@@ -171,4 +171,19 @@ public class MyUserService {
         return new UserStoreResponseDto(nickname, profile, degree, grade, address, storeInfo, itemUserResponseDtos);
 
     }
+
+
+    // 이승재 / 유저 신고하기 기능
+    public void reportUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
+        int reportCnt = user.getReportCnt();
+
+        user.reportCntUpdate(userId, reportCnt+1);
+
+        if(user.getReportCnt()==5){
+            userRepository.deleteById(userId);
+        }
+    }
 }

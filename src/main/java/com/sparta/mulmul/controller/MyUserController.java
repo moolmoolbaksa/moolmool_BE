@@ -1,5 +1,6 @@
 package com.sparta.mulmul.controller;
 
+import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.user.MyPageResponseDto;
 import com.sparta.mulmul.dto.scrab.MyScrabItemDto;
 import com.sparta.mulmul.dto.user.UserEditResponseDto;
@@ -8,6 +9,7 @@ import com.sparta.mulmul.service.AwsS3Service;
 import com.sparta.mulmul.service.MyUserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,5 +50,12 @@ public class MyUserController {
     @GetMapping("/api/mypage/scrab")
     public List<MyScrabItemDto> scrabItem(@AuthenticationPrincipal UserDetailsImpl userDetails){
         return myUserService.scrabItem(userDetails);
+    }
+
+    // 이승재 / 유저 신고 기능
+    @PutMapping("/api/report/user")
+    public ResponseEntity<OkDto> reportUser(@RequestParam Long userId){
+        myUserService.reportUser(userId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 }
