@@ -11,9 +11,9 @@ import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -78,9 +78,9 @@ public class ChatMessageService {
     }
 
     // 메시지 찾기, 페이징 처리 (검증이 필요합니다.)
-    public List<MessageResponseDto> getMessage(Long roomId, UserDetailsImpl userDetails){
+    public List<MessageResponseDto> getMessage(Long roomId, UserDetailsImpl userDetails, Pageable pageable){
         // 메시지 찾아오기
-        List<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId);
+        Slice<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId, pageable);
         // responseDto 만들기
         List<MessageResponseDto> responseDtos = new ArrayList<>();
         // 상대가 보낸 메시지라면 모두 읽음으로 처리 -> isRead 상태 모두 true로 업데이트
@@ -129,21 +129,18 @@ public class ChatMessageService {
     }
 
     // 채팅방 접근 권한 검증
-    public void checkAccess(MessageRequestDto requestDto, WsUser wsUser, StompSession session){
-
-        ChatRoom chatRoom = roomRepository
-                .findByIdFetch(requestDto.getRoomId())
-                .orElseThrow(() -> new NullPointerException("ChatController: checkAccess) " + requestDto.getRoomId() + "번 채팅방이 존재하지 않습니다."));
-
-        Long userId = wsUser.getUserId();
-
-        if ( chatRoom.getAcceptor().getId() != userId || chatRoom.getRequester().getId() != userId ) {
-            System.out.println("Disconnect 전) 세션 커넥트 검증: " + session.isConnected());
-            session.disconnect();
-            System.out.println("Disconnect 후) 세션 커넥트 검증: " + session.isConnected());
-            throw new AccessDeniedException("ChatController: checkAccess) 허가되지 않은 접근입니다.");
-        }
-        // 허가되지 않은 회원 접근 시, Disconnect 상태로 전환시키는 추가적인 로직 구현이 필요합니다.
-    }
+//    public void checkAccess(MessageRequestDto requestDto, WsUser wsUser){
+//
+//        ChatRoom chatRoom = roomRepository
+//                .findByIdFetch(requestDto.getRoomId())
+//                .orElseThrow(() -> new NullPointerException("ChatController: checkAccess) " + requestDto.getRoomId() + "번 채팅방이 존재하지 않습니다."));
+//
+//        Long userId = wsUser.getUserId();
+//
+//        if ( chatRoom.getAcceptor().getId() != userId || chatRoom.getRequester().getId() != userId ) {
+//            throw new AccessDeniedException("ChatController: checkAccess) 허가되지 않은 접근입니다.");
+//        }
+//        // 허가되지 않은 회원 접근 시, Disconnect 상태로 전환시키는 추가적인 로직 구현이 필요합니다.
+//    }
 }
 

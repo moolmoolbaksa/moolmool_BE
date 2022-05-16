@@ -6,13 +6,13 @@ import com.sparta.mulmul.security.jwt.JwtDecoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -30,11 +30,12 @@ public class StompHandler implements ChannelInterceptor { // 이론상 웹소켓
 
         assert accessor != null;
 
-        if(accessor.getCommand() == StompCommand.CONNECT
-                || accessor.getCommand() == StompCommand.SUBSCRIBE
-                || accessor.getCommand() == StompCommand.SEND) {
-            accessor.setUser(checkVaild(accessor));
+        switch (Objects.requireNonNull(accessor.getCommand())){
+            case CONNECT: accessor.setUser(checkVaild(accessor)); break; // User는 커넥트에서 한 번만 설정해 줍니다.
+            case SEND: checkVaild(accessor); break; // 메시지 전송에서도 사용자를 검증합니다.
+            default: break;
         }
+
         return message;
     }
 
@@ -51,7 +52,6 @@ public class StompHandler implements ChannelInterceptor { // 이론상 웹소켓
                     .userId(userId)
                     .nickname(nickname)
                     .name(UUID.randomUUID().toString())
-                    .sessionId(accessor.getSessionId())
                     .build()
             );
 

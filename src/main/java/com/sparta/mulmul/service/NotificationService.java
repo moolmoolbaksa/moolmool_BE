@@ -5,6 +5,7 @@ import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -16,6 +17,7 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
 
     // 알림 전체 목록
     public List<NotificationDto> getNotification(UserDetailsImpl userDetails){

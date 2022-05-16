@@ -8,6 +8,8 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.chat.ChatMessageService;
 import com.sparta.mulmul.service.chat.ChatRoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +40,10 @@ public class ChatRoomController {
     // 개별 채팅방 메시지 불러오기
     @GetMapping("/room/{roomId}")
     public List<MessageResponseDto> getMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                               @PathVariable Long roomId){
+                                               @PathVariable Long roomId,
+                                               @PageableDefault(page = 1, size = 20) Pageable pageable){
 
-        return messageService.getMessage(roomId, userDetails);
+        return messageService.getMessage(roomId, userDetails, pageable);
     }
 
     // 채팅방 나가기
