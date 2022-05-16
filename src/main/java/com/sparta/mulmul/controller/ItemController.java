@@ -127,7 +127,7 @@ public class ItemController {
     }
 
     // 이승재 교환신청 확인 페이지 수락 버튼
-    @PostMapping("/api/trade/decision")
+    @PutMapping("/api/trade/decision")
     private BarterStatusDto acceptTrade(@RequestParam Long baterId){
        return tradeService.acceptTrade(baterId);
     }
@@ -136,6 +136,13 @@ public class ItemController {
     @DeleteMapping("/api/trade/decision")
     private ResponseEntity<OkDto> deleteTrade(@RequestParam Long baterId){
         tradeService.deleteTrade(baterId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
+    // 이승재 아이템 신고하기
+    @PutMapping("/api/report/item")
+    private ResponseEntity<OkDto> reportItem(@RequestParam Long itemId){
+        itemService.reportItem(itemId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 }

@@ -12,18 +12,20 @@ import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 
+import marvin.image.MarvinImage;
+import org.marvinproject.image.transform.scale.Scale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +44,10 @@ public class AwsS3Service {
         // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
         multipartFiles.forEach(file -> {
             String fileName = createFileName(file.getOriginalFilename());
+//            String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("."));
+            
+//            MultipartFile resizeFile = resizeImage(fileName, fileFormatName, file, 768);
+
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());
@@ -59,6 +65,35 @@ public class AwsS3Service {
         });
         return imageUrlList;
     }
+
+//     MultipartFile resizeImage(String fileName, String fileFormatName, MultipartFile originalImage, int targetWidth) {
+//        try{
+//            BufferedImage image = ImageIO.read(originalImage.getInputStream());
+//            int originWidth = image.getWidth();
+//            int originHeight = image.getHeight();
+//
+//            if(originWidth<targetWidth)
+//                return originalImage;
+//
+//            MarvinImage imageMarvin = new MarvinImage(image);
+//
+//            Scale scale = new Scale();
+//            scale.load();
+//            scale.setAttribute("newWidth", targetWidth);
+//            scale.setAttribute("new Height", targetWidth * originHeight / originWidth);
+//            scale.process(imageMarvin.clone(), imageMarvin, null, null, false);
+//
+//            BufferedImage imageNoAlpha = imageMarvin.getBufferedImageNoAlpha();
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            ImageIO.write(imageNoAlpha, fileFormatName, baos);
+//            baos.flush();
+//
+//            MultipartFile multipartFile = new M
+//            return new MockMultipartFile(fileName, baos.toByteArray());
+//        }catch (IOException e){
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 리사이즈에 실패하였습니다.");
+//        }
+//    }
 
     public void deleteFile(String fileName) {
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));

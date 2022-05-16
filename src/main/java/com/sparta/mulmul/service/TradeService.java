@@ -14,7 +14,6 @@ import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.core.AbstractDestinationResolvingMessagingTemplate;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 

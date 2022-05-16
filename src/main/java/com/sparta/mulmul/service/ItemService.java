@@ -1,16 +1,8 @@
 package com.sparta.mulmul.service;
-
-import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
 import com.sparta.mulmul.dto.item.ItemRequestDto;
 import com.sparta.mulmul.dto.item.ItemResponseDto;
-import com.sparta.mulmul.dto.item.ItemUserResponseDto;
-import com.sparta.mulmul.dto.trade.RequestTradeDto;
-import com.sparta.mulmul.dto.trade.TradeDecisionDto;
-import com.sparta.mulmul.dto.trade.TradeInfoDto;
-import com.sparta.mulmul.dto.trade.TradeInfoImagesDto;
-import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -56,6 +48,7 @@ public class ItemService {
                 .scrabCnt(0)
                 .commentCnt(0) // 사용할지 안할지 확정안됨
                 .viewCnt(0)
+                .reportCnt(0)
                 .status(0)
                 .itemImg(imgUrl)
                 .type(itemRequestDto.getType())
@@ -266,6 +259,19 @@ public class ItemService {
         );
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
             itemRepository.deleteById(itemId);
+        }
+    }
+
+    // 이승재 / 아이템 신고하기
+    @Transactional
+    public void reportItem(Long itemId) {
+        Item item = itemRepository.findById(itemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템 정보가 없습니다.")
+        );
+        int reportCnt = item.getReportCnt();
+        item.reportCntUpdate(itemId, reportCnt+1);
+        if(item.getReportCnt()==5){
+            item.statusUpdate(itemId, 5);
         }
     }
 }
