@@ -164,6 +164,17 @@ public class ScoreService {
         Long barterId = gradeScoreRequestDto.getBarterId();
         Barter barter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
 
+        // 이미 평가를 완료한 경우
+        if (barter.getStatus() != 3) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
+        } else if ((!opponentUserId.equals(barter.getBuyerId())) && (!opponentUserId.equals(barter.getSellerId()))) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            // 자기 자신에게 점수를 줄 경우
+        } else if (opponentUserId.equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+        }
+
         String[] barterIdList = barter.getBarter().split(";");
         String[] buyerItemId = barterIdList[0].split(",");
         String sellerItemId = barterIdList[1];
@@ -207,9 +218,6 @@ public class ScoreService {
             }
 
             barter.updateScoreSeller(true);
-            if (barter.getIsBuyerScore()) {
-
-            }
 
         } else {
             myPosition = "buyer";
@@ -243,16 +251,7 @@ public class ScoreService {
             barter.updateScoreBuyer(true);
         }
 
-        // 이미 평가를 완료한 경우
-        if (barter.getStatus() != 3) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-            // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
-        } else if ((!opponentUserId.equals(barter.getBuyerId())) && (!opponentUserId.equals(barter.getSellerId()))) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-            // 자기 자신에게 점수를 줄 경우
-        } else if (opponentUserId.equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-        }
+
 
 //        // 응답 보너스 //
 //        // 10분이네 응답 보너스
