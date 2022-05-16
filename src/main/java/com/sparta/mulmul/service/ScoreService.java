@@ -1,24 +1,26 @@
 package com.sparta.mulmul.service;
 
+import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
-import com.sparta.mulmul.dto.score.GradeScoreRequestDto;
 import com.sparta.mulmul.dto.barter.MyBarterScorDto;
+import com.sparta.mulmul.dto.score.GradeScoreRequestDto;
 import com.sparta.mulmul.dto.score.OppentScoreResponseDto;
-import com.sparta.mulmul.model.*;
+import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.Notification;
+import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
+import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
-import com.sparta.mulmul.repository.chat.ChatMessageRepository;
-import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +32,8 @@ public class ScoreService {
     private final UserRepository userRepository;
     private final BarterRepository barterRepository;
     private final ItemRepository itemRepository;
-    private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final NotificationRepository notificationRepository;
 
 
     // 성훈 - 평가 페이지 보여주기
@@ -355,6 +357,23 @@ public class ScoreService {
             barter.updateBarter(status);
             return new BarterStatusDto(true, true, barter.getStatus());
         }
+
+        if (myPosition.equals("buyer")){
+            // 알림 내역 저장 후 상대방에게 전송
+            Notification notification = notificationRepository.save(Notification.createOf3(barter, user.getNickname()));
+
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
+            );
+        } else {
+            // 알림 내역 저장 후 상대방에게 전송
+            Notification notification = notificationRepository.save(Notification.createOf4(barter, user.getNickname()));
+
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + barter.getBuyerId(), NotificationDto.createFrom(notification)
+            );
+        }
+
         return new BarterStatusDto(true, true, barter.getStatus());
     }
 

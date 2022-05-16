@@ -47,11 +47,50 @@ public class Notification extends CreationDate {
 
         Notification notification = new Notification();
 
+        notification.userId = barter.getBuyerId();
+        notification.changeId = barter.getId();
+        notification.nickname = nickname;
+        notification.isRead = false;
+        notification.type = NotificationType.BARTER;
+
+        return  notification;
+    }
+
+    public static Notification createOf2(Barter barter, String nickname){
+
+        Notification notification = new Notification();
+
         notification.userId = barter.getSellerId();
         notification.changeId = barter.getId();
         notification.nickname = nickname;
         notification.isRead = false;
         notification.type = NotificationType.BARTER;
+
+        return  notification;
+    }
+
+    public static Notification createOf3(Barter barter, String nickname){
+
+        Notification notification = new Notification();
+
+        notification.userId = barter.getBuyerId();
+        notification.changeId = barter.getId();
+        notification.nickname = nickname;
+        notification.isRead = false;
+        notification.type = NotificationType.SCORE;
+
+        return  notification;
+    }
+
+    public static Notification createOf4(Barter barter, String nickname){
+
+        Notification notification = new Notification();
+
+        notification.userId = barter.getSellerId();
+        notification.changeId = barter.getId();
+        notification.nickname = nickname;
+        notification.isRead = false;
+        notification.type = NotificationType.SCORE;
 
         return  notification;
     }
