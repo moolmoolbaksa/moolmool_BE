@@ -1,11 +1,13 @@
 package com.sparta.mulmul.service;
 
+import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.barter.BarterDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
 import com.sparta.mulmul.dto.barter.MyBarterDto;
 import com.sparta.mulmul.dto.barter.OpponentBarterDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
@@ -260,7 +262,7 @@ public class BarterService {
             return new BarterStatusDto(isTrade,false , myBarter.getStatus());
         }
 
-//        // 알림 내역 저장 후 상대방에게 전송
+        // 알림 내역 저장 후 상대방에게 전송
 //        Notification notification = notificationRepository.save(Notification.createFrom(barter));
 //
 //        messagingTemplate.convertAndSend(
