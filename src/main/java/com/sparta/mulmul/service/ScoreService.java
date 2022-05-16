@@ -58,7 +58,6 @@ public class ScoreService {
         String sellerItemIdList = barterIds[1];
         // 바이어(유저)의 물품을 찾아서 정보를 넣기
         Long itemIdB = Long.parseLong(buyerItemIdList);
-        System.out.println("바이어 아이디 " + itemIdB);
         Item buyerItem = itemRepository.findById(itemIdB).orElseThrow(
                 () -> new IllegalArgumentException("buyerItem not found")
         );

@@ -233,11 +233,17 @@ public class BarterService {
         String myPosition;
         // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
         if (myBarter.getBuyerId().equals(userId)) {
+            if (myBarter.getIsBuyerTrade()) {
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "완료된 거래입니다");
+            }
             myBarter.updateTradBuyer(true);
             isTrade = true;
             myPosition = "buyer";
             // 유저가 셀러라면 셀러거래완료를 true로 변경한다.
         } else {
+            if (myBarter.getIsSellerTrade()) {
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "완료된 거래입니다");
+            }
             myBarter.updateTradSeller(true);
             isTrade = true;
             myPosition = "seller";
