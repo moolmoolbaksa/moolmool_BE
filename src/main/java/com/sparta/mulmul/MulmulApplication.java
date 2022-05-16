@@ -2,8 +2,13 @@ package com.sparta.mulmul;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.support.SimpleCacheManager;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.web.config.PageableHandlerMethodArgumentResolverCustomizer;
 
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
@@ -21,6 +26,11 @@ public class MulmulApplication {
         new SpringApplicationBuilder(MulmulApplication.class)
                 .properties(APPLICATION_LOCATIONS)
                 .run(args);
+    }
+
+    @Bean
+    public PageableHandlerMethodArgumentResolverCustomizer customize() {
+        return p -> p.setOneIndexedParameters(true);
     }
 
     @PostConstruct

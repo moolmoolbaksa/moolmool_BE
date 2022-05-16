@@ -11,6 +11,5 @@ public class WsUserDto {
     private String name;
     private String nickname;
     private Long userId;
-    private String sessionId;
 
 }

@@ -23,4 +23,10 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     ChatRoom findByRequesterIdAndAcceptorId(Long id, Long opponentUserId);
 
+    // 채팅방 찾아오기
+    @Query("SELECT room FROM ChatRoom room " +
+            "WHERE (room.requester = :requester AND room.acceptor = :acceptor) OR " +
+            "(room.requester = :acceptor AND room.acceptor = :acceptor)")
+    Optional<ChatRoom> findByUser(@Param("requester") User requester, @Param("acceptor") User acceptor);
+
 }
