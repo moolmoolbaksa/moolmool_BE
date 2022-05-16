@@ -78,9 +78,10 @@ public class ChatMessageService {
     }
 
     // 메시지 찾기, 페이징 처리 (검증이 필요합니다.)
-    public List<MessageResponseDto> getMessage(Long roomId, UserDetailsImpl userDetails, Pageable pageable){
+    public List<MessageResponseDto> getMessage(Long roomId, UserDetailsImpl userDetails){
         // 메시지 찾아오기
-        Slice<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId, pageable);
+//        Slice<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId, pageable);
+        List<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId);
         // responseDto 만들기
         List<MessageResponseDto> responseDtos = new ArrayList<>();
         // 상대가 보낸 메시지라면 모두 읽음으로 처리 -> isRead 상태 모두 true로 업데이트

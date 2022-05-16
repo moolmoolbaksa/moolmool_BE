@@ -1,14 +1,17 @@
 package com.sparta.mulmul.service;
 
+import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.barter.BarterDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
 import com.sparta.mulmul.dto.barter.MyBarterDto;
 import com.sparta.mulmul.dto.barter.OpponentBarterDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
+import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class BarterService {
     private final BarterRepository barterRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final NotificationRepository notificationRepository;
 
     // 성훈 - 거래내역서 보기
     public List<BarterDto> showMyBarter(UserDetailsImpl userDetails) {
@@ -266,8 +270,8 @@ public class BarterService {
 //        messagingTemplate.convertAndSend(
 //                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
 //        );
-        return new BarterStatusDto(isTrade, false, myBarter.getStatus());
-    }
-}
+    return new BarterStatusDto(isTrade, false, myBarter.getStatus());
 
+   }
+}
 
