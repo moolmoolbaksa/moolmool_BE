@@ -9,12 +9,12 @@ public class ItemStarDto {
     private Long itemId;
     private String image;
     private String title;
-    private String contensts;
+    private String contents;
 
-    public ItemStarDto(Long itemId, String image, String title, String contensts) {
+    public ItemStarDto(Long itemId, String image, String title, String contents) {
         this.itemId = itemId;
         this.image = image;
         this.title = title;
-        this.contensts = contensts;
+        this.contents = contents;
     }
 }
