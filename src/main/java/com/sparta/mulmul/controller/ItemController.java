@@ -95,7 +95,7 @@ public class ItemController {
         itemService.scrabItem(itemId, userDetails);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
-    
+
 
     // 이승재 아이템 신고하기
     @PutMapping("/api/report/item")
