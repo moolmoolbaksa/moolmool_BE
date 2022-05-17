@@ -41,9 +41,13 @@ public class ChatRoomService {
                 .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다."));
         // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
-                        .orElseGet( () -> roomRepository.save(ChatRoom.createOf(requester, acceptor)));
-        // 채팅방 개설 메시지 생성
-        messageRepository.save(ChatMessage.createInitOf(chatRoom.getId()));
+                        .orElseGet( () ->
+                        {
+                            ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
+                            // 채팅방 개설 메시지 생성
+                            messageRepository.save(ChatMessage.createInitOf(c.getId()));
+                            return c;
+                        });
 
         return chatRoom.getId();
     }
