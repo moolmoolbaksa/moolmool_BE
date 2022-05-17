@@ -1,24 +1,26 @@
 package com.sparta.mulmul.service;
 
+import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
-import com.sparta.mulmul.dto.score.GradeScoreRequestDto;
 import com.sparta.mulmul.dto.barter.MyBarterScorDto;
+import com.sparta.mulmul.dto.score.GradeScoreRequestDto;
 import com.sparta.mulmul.dto.score.OppentScoreResponseDto;
-import com.sparta.mulmul.model.*;
+import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.Notification;
+import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
+import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
-import com.sparta.mulmul.repository.chat.ChatMessageRepository;
-import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +32,8 @@ public class ScoreService {
     private final UserRepository userRepository;
     private final BarterRepository barterRepository;
     private final ItemRepository itemRepository;
-    private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private final NotificationRepository notificationRepository;
 
 
     // 성훈 - 평가 페이지 보여주기
@@ -56,7 +58,6 @@ public class ScoreService {
         String sellerItemIdList = barterIds[1];
         // 바이어(유저)의 물품을 찾아서 정보를 넣기
         Long itemIdB = Long.parseLong(buyerItemIdList);
-        System.out.println("바이어 아이디 " + itemIdB);
         Item buyerItem = itemRepository.findById(itemIdB).orElseThrow(
                 () -> new IllegalArgumentException("buyerItem not found")
         );
@@ -163,6 +164,17 @@ public class ScoreService {
         Long barterId = gradeScoreRequestDto.getBarterId();
         Barter barter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
 
+        // 이미 평가를 완료한 경우
+        if (barter.getStatus() != 3) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
+        } else if ((!opponentUserId.equals(barter.getBuyerId())) && (!opponentUserId.equals(barter.getSellerId()))) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            // 자기 자신에게 점수를 줄 경우
+        } else if (opponentUserId.equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+        }
+
         String[] barterIdList = barter.getBarter().split(";");
         String[] buyerItemId = barterIdList[0].split(",");
         String sellerItemId = barterIdList[1];
@@ -206,9 +218,6 @@ public class ScoreService {
             }
 
             barter.updateScoreSeller(true);
-            if (barter.getIsBuyerScore()) {
-
-            }
 
         } else {
             myPosition = "buyer";
@@ -242,16 +251,7 @@ public class ScoreService {
             barter.updateScoreBuyer(true);
         }
 
-        // 이미 평가를 완료한 경우
-        if (barter.getStatus() != 3) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-            // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
-        } else if ((!opponentUserId.equals(barter.getBuyerId())) && (!opponentUserId.equals(barter.getSellerId()))) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-            // 자기 자신에게 점수를 줄 경우
-        } else if (opponentUserId.equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-        }
+
 
 //        // 응답 보너스 //
 //        // 10분이네 응답 보너스
@@ -355,6 +355,23 @@ public class ScoreService {
             barter.updateBarter(status);
             return new BarterStatusDto(true, true, barter.getStatus());
         }
+
+        if (myPosition.equals("buyer")){
+            // 알림 내역 저장 후 상대방에게 전송
+            Notification notification = notificationRepository.save(Notification.createOf3(barter, user.getNickname()));
+
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
+            );
+        } else {
+            // 알림 내역 저장 후 상대방에게 전송
+            Notification notification = notificationRepository.save(Notification.createOf4(barter, user.getNickname()));
+
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + barter.getBuyerId(), NotificationDto.createFrom(notification)
+            );
+        }
+
         return new BarterStatusDto(true, true, barter.getStatus());
     }
 

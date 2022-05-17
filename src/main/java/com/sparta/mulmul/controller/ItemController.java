@@ -4,15 +4,13 @@ import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
 import com.sparta.mulmul.dto.item.ItemRequestDto;
 import com.sparta.mulmul.dto.item.ItemResponseDto;
+import com.sparta.mulmul.dto.item.ItemStarDto;
 import com.sparta.mulmul.dto.trade.RequestTradeDto;
 import com.sparta.mulmul.dto.trade.TradeDecisionDto;
 import com.sparta.mulmul.dto.trade.TradeInfoDto;
 import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
-import com.sparta.mulmul.service.AwsS3Service;
-import com.sparta.mulmul.service.ItemService;
-import com.sparta.mulmul.service.MyUserService;
-import com.sparta.mulmul.service.TradeService;
+import com.sparta.mulmul.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,6 +25,7 @@ public class ItemController {
 
     private final AwsS3Service awsS3Service;
     private final ItemService itemService;
+    private final ItemStarService itemStarService;
     private final MyUserService myUserService;
 
 
@@ -108,5 +107,11 @@ public class ItemController {
     @GetMapping("/api/item/search")
     private List<ItemResponseDto> searchItem(@RequestParam String keyword, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return itemService.searchItem(keyword, userDetails);
+    }
+
+    // 이승재 교환신청 확인 페이지
+    @GetMapping("/api/items/star")
+    private List<ItemStarDto> hotItem(){
+        return  itemStarService.hotItem();
     }
 }

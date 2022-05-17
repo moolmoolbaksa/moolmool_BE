@@ -3,7 +3,6 @@ package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.barter.BarterDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
-import com.sparta.mulmul.dto.barter.MyBarterDto;
 import com.sparta.mulmul.dto.barter.OpponentBarterDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
@@ -16,6 +15,7 @@ import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,7 +30,10 @@ public class BarterService {
     private final BarterRepository barterRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final SimpMessageSendingOperations messagingTemplate;
     private final NotificationRepository notificationRepository;
+
+
 
     // 성훈 - 거래내역서 보기
     public List<BarterDto> showMyBarter(UserDetailsImpl userDetails) {
@@ -227,14 +230,23 @@ public class BarterService {
         }
 
         boolean isTrade;
+        String myPosition;
         // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
         if (myBarter.getBuyerId().equals(userId)) {
+            if (myBarter.getIsBuyerTrade()) {
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "완료된 거래입니다");
+            }
             myBarter.updateTradBuyer(true);
             isTrade = true;
+            myPosition = "buyer";
             // 유저가 셀러라면 셀러거래완료를 true로 변경한다.
         } else {
+            if (myBarter.getIsSellerTrade()) {
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "완료된 거래입니다");
+            }
             myBarter.updateTradSeller(true);
             isTrade = true;
+            myPosition = "seller";
         }
 
         Boolean buyerTrade = myBarter.getIsBuyerTrade();
@@ -264,14 +276,25 @@ public class BarterService {
             return new BarterStatusDto(isTrade,false , myBarter.getStatus());
         }
 
-        // 알림 내역 저장 후 상대방에게 전송
-//        Notification notification = notificationRepository.save(Notification.createFrom(barter));
-//
-//        messagingTemplate.convertAndSend(
-//                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
-//        );
-    return new BarterStatusDto(isTrade, false, myBarter.getStatus());
 
-   }
+        if (myPosition.equals("buyer")){
+            // 알림 내역 저장 후 상대방에게 전송
+            Notification notification = notificationRepository.save(Notification.createOf(myBarter, user.getNickname()));
+
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + myBarter.getSellerId(), NotificationDto.createFrom(notification)
+            );
+        } else {
+            // 알림 내역 저장 후 상대방에게 전송
+            Notification notification = notificationRepository.save(Notification.createOf2(myBarter, user.getNickname()));
+
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + myBarter.getBuyerId(), NotificationDto.createFrom(notification)
+            );
+        }
+
+        return new BarterStatusDto(isTrade, false, myBarter.getStatus());
+    }
 }
+
 
