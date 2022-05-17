@@ -274,4 +274,42 @@ public class ItemService {
             item.statusUpdate(itemId, 5);
         }
     }
+
+
+    // 이승재 / 아이템 검색
+    public List<ItemResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
+        List<Item> itemList = itemRepository.searchByKeyword(keyword);
+        List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
+        Long userId = userDetails.getUserId();
+        for(Item item : itemList){
+            if(item.getStatus() ==1 || item.getStatus() == 0){
+                Boolean isScrab;
+                if(scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()){
+                    isScrab = true;
+                }else {
+                    isScrab = false;
+                }
+                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+                int scrabCnt = 0;
+                for(Scrab scrab : scrabs){
+                    if(scrab.getScrab().equals(true)){
+                        scrabCnt++;
+                    }
+                }
+                ItemResponseDto itemResponseDto = new ItemResponseDto(
+                        item.getId(),
+                        item.getCategory(),
+                        item.getTitle(),
+                        item.getContents(),
+                        item.getItemImg().split(",")[0],
+                        item.getAddress(),
+                        scrabCnt,
+                        item.getViewCnt(),
+                        item.getStatus(),
+                        isScrab);
+                itemResponseDtos.add(itemResponseDto);
+            }
+        }
+        return itemResponseDtos;
+    }
 }

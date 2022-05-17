@@ -21,6 +21,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT i FROM Item i WHERE i.bag.userId = :userId")
     List<Item> findAllMyItem(@Param("userId") Long userId);
 
+    @Query(value = "select * from item p where p.title like %:keyword% order by p.modified_at desc", nativeQuery = true)
+    List<Item> searchByKeyword(@Param("keyword")String keyword);
+
 //    List<Item> findAllByBagIdOrBagId(Long bagId, Long bagId1);
 
 //    테스트를 위한 코딩

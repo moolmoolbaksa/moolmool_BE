@@ -4,6 +4,7 @@ import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.user.MyPageResponseDto;
 import com.sparta.mulmul.dto.scrab.MyScrabItemDto;
 import com.sparta.mulmul.dto.user.UserEditResponseDto;
+import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.AwsS3Service;
 import com.sparta.mulmul.service.MyUserService;
@@ -52,10 +53,19 @@ public class MyUserController {
         return myUserService.scrabItem(userDetails);
     }
 
+    // 이승재 / 유저 스토어 목록 보기
+    @GetMapping("/api/store/{userId}")
+    private UserStoreResponseDto showStore(@PathVariable Long userId){
+        return myUserService.showStore(userId);
+    }
+
+
     // 이승재 / 유저 신고 기능
     @PutMapping("/api/user/report")
     public ResponseEntity<OkDto> reportUser(@RequestParam Long userId){
         myUserService.reportUser(userId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
+
+
 }
