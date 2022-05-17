@@ -41,9 +41,9 @@ public class ChatRoomService {
                 .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다."));
         // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
-                        .orElse(roomRepository.save(ChatRoom.createOf(requester, acceptor)));
+                        .orElseGet( () -> roomRepository.save(ChatRoom.createOf(requester, acceptor)));
         // 채팅방 개설 메시지 생성
-        messageRepository.save(ChatMessage.createInitOf(chatRoom.getId(), chatRoom.getId()));
+        messageRepository.save(ChatMessage.createInitOf(chatRoom.getId()));
 
         return chatRoom.getId();
     }
@@ -79,12 +79,12 @@ public class ChatRoomService {
                     .orElseThrow( () -> new IllegalArgumentException("ChatRoomService: 채팅방 메시지를 설정해 주지 않았습니다. 방 개설과 함께 채팅 메시지를 작성하도록 설정하세요."));
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( chatRoom.getAcceptor().getId() == userId ) {
-                if (!chatRoom.getAccOut()) { // 만약 Acc가 나가지 않았다면
-                    int unreadCnt = messageRepository.countMsg(chatRoom.getRequester().getId(), chatRoom.getId());
+                if (!chatRoom.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
+                    int unreadCnt = messageRepository.countMsg(chatRoom.getRequester().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
                     responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt)); }
             } else if ( chatRoom.getRequester().getId() == userId ){
-                if (!chatRoom.getReqOut()) { // 만약 Req가 나가지 않았다면
-                    int unreadCnt = messageRepository.countMsg(chatRoom.getAcceptor().getId(), chatRoom.getId());
+                if (!chatRoom.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
+                    int unreadCnt = messageRepository.countMsg(chatRoom.getAcceptor().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
                     responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt)); }
             }
         }

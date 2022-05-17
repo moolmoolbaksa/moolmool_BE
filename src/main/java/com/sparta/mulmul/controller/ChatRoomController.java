@@ -40,9 +40,8 @@ public class ChatRoomController {
     // 개별 채팅방 메시지 불러오기
     @GetMapping("/room/{roomId}")
     public List<MessageResponseDto> getMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                               @PathVariable Long roomId)
-//                                               @PageableDefault(page = 1, size = 20) Pageable pageable)
-    {
+                                               @PathVariable Long roomId) {
+//                                               @PageableDefault(page = 1, size = 20) Pageable pageable) {
 
         return messageService.getMessage(roomId, userDetails);
     }
