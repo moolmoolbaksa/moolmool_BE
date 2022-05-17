@@ -233,16 +233,16 @@ public class ItemService {
             User user = userRepository.findById(userId).orElseThrow(
                     () -> new IllegalArgumentException("유저 정보가 없습니다.")
             );
-            if (user.getAddress().equals(address)) {
+            Location userLocation = locationRepository.findByArea(user.getAddress().split(" ")[1]);
+            Location itemLocation = locationRepository.findByArea(address.split(" ")[1]);
+            double userLat = userLocation.getLatitude();
+            double userLon = userLocation.getLongitude();
+            double itemLat = itemLocation.getLatitude();
+            double itemLon = itemLocation.getLongitude();
+
+            if (userLat== itemLat && userLon== itemLon) {
                 return "인근";
             } else {
-                Location userLocation = locationRepository.findByArea(user.getAddress().split(" ")[1]);
-                Location itemLocation = locationRepository.findByArea(address.split(" ")[1]);
-                double userLat = userLocation.getLatitude();
-                double userLon = userLocation.getLongitude();
-                double itemLat = itemLocation.getLatitude();
-                double itemLon = itemLocation.getLongitude();
-
                 double theta = userLon - itemLon;
                 double dist = Math.sin(deg2rad(userLat)) * Math.sin(deg2rad(itemLat)) + Math.cos(deg2rad(userLat)) * Math.cos(deg2rad(itemLat)) * Math.cos(deg2rad(theta));
 
