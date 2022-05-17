@@ -2,6 +2,7 @@ package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.BarterStatusDto;
 import com.sparta.mulmul.dto.NotificationDto;
+import com.sparta.mulmul.dto.NotificationType;
 import com.sparta.mulmul.dto.trade.RequestTradeDto;
 import com.sparta.mulmul.dto.trade.TradeDecisionDto;
 import com.sparta.mulmul.dto.trade.TradeInfoDto;
@@ -215,5 +216,7 @@ public class TradeService {
 
         // 거래내역 삭제
         barterRepository.deleteById(baterId);
+        // 알림에서 제거
+        notificationRepository.deleteByChangeIdAndType(baterId, NotificationType.BARTER);
     }
 }

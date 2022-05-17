@@ -44,9 +44,8 @@ public class NotificationController {
     @GetMapping("/notification/{notificationId}/chat")
     public List<MessageResponseDto> getMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                @PathVariable Long notificationId,
-                                               @RequestParam Long roomId)
-//                                               @PageableDefault(size = 20) Pageable pageable)
-    {
+                                               @RequestParam Long roomId) {
+//                                               @PageableDefault(size = 20) Pageable pageable) {
 
         List<MessageResponseDto> responseDtos = messageService.getMessage(roomId, userDetails);
         notificationService.setRead(notificationId);

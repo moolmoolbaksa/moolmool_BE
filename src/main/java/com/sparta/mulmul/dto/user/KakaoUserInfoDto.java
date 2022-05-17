@@ -21,9 +21,11 @@ public class KakaoUserInfoDto {
         kakaoUserInfoDto.nickname = jsonNode.get("properties").get("nickname").asText();
         try{
             kakaoUserInfoDto.profile = jsonNode.get("properties").get("profile_image").asText();
-        }catch (NullPointerException e){
-            kakaoUserInfoDto.profile =  "http://kaihuastudio.com/common/img/default_profile.png";
         }
+        catch (Exception e){
+            kakaoUserInfoDto.profile = "http://kaihuastudio.com/common/img/default_profile.png";
+        }
+
         kakaoUserInfoDto.email = jsonNode.get("kakao_account").get("email").asText();
 
         return kakaoUserInfoDto;

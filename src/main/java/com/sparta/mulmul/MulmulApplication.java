@@ -18,13 +18,8 @@ import java.util.TimeZone;
 @SpringBootApplication
 public class MulmulApplication {
 
-    public static final String APPLICATION_LOCATIONS = "spring.config.location="
-            + "classpath:application.properties,"
-            + "classpath:application.yml";
-
     public static void main(String[] args) {
         new SpringApplicationBuilder(MulmulApplication.class)
-                .properties(APPLICATION_LOCATIONS)
                 .run(args);
     }
 

@@ -19,7 +19,6 @@ public class ChatMessage extends CreationDate {
     @Column(nullable = false)
     private Long roomId;
 
-    @Column(nullable = false)
     private Long senderId;
 
     @Column(nullable = false)
@@ -45,12 +44,12 @@ public class ChatMessage extends CreationDate {
         return message;
     }
 
-    public static ChatMessage createInitOf(Long roomId, Long senderId){
+    public static ChatMessage createInitOf(Long roomId){
 
         ChatMessage message = new ChatMessage();
 
         message.roomId = roomId;
-        message.senderId = senderId;
+        message.senderId = roomId;
         message.message = "채팅방이 개설되었습니다.";
         message.isRead = false;
         message.type = MessageTypeEnum.STATUS;

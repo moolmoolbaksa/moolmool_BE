@@ -264,7 +264,7 @@ public class BarterService {
             return new BarterStatusDto(isTrade,false , myBarter.getStatus());
         }
 
-//        // 알림 내역 저장 후 상대방에게 전송
+        // 알림 내역 저장 후 상대방에게 전송
 //        Notification notification = notificationRepository.save(Notification.createFrom(barter));
 //
 //        messagingTemplate.convertAndSend(
