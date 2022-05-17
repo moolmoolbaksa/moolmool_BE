@@ -23,9 +23,7 @@ public class ItemService {
     private final BagRepository bagRepositroy;
     private final ScrabRepository scrabRepository;
     private final UserRepository userRepository;
-    private final BarterRepository barterRepository;
-    private final SimpMessageSendingOperations messagingTemplate;
-    private final NotificationRepository notificationRepository;
+    private final LocationRepository locationRepository;
 
     // 이승재 / 보따리 아이템 등록하기
     public void createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
@@ -34,6 +32,9 @@ public class ItemService {
         String imgUrl = String.join(",", imgUrlList);
         String favored = String.join(",", favoredList);
 
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
 
         // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
@@ -43,7 +44,7 @@ public class ItemService {
         Item item = Item.builder()
                 .title(itemRequestDto.getTitle())
                 .contents(itemRequestDto.getContents())
-                .address("서울")  //유저 정보에서 가져오기
+                .address(user.getAddress())  //유저 정보에서 가져오기
                 .category(itemRequestDto.getCategory())
                 .scrabCnt(0)
                 .commentCnt(0) // 사용할지 안할지 확정안됨
@@ -73,13 +74,20 @@ public class ItemService {
                             scrabCnt++;
                         }
                     }
+                    String distance;
+                    if(userDetails.equals(null)){
+                        distance = "null";
+                    }else {
+                        Long userId = userDetails.getUserId();
+                        distance = getDistance(userId, item.getAddress());
+                    }
                     ItemResponseDto itemResponseDto = new ItemResponseDto(
                             item.getId(),
                             item.getCategory(),
                             item.getTitle(),
                             item.getContents(),
                             item.getItemImg().split(",")[0],
-                            item.getAddress(),
+                            distance,
                             scrabCnt,
                             item.getViewCnt(),
                             item.getStatus());
@@ -106,13 +114,19 @@ public class ItemService {
                         scrabCnt++;
                     }
                 }
+                String distance;
+                if(userDetails.equals(null)){
+                    distance = "null";
+                }else {
+                    distance = getDistance(userId, item.getAddress());
+                }
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
                         item.getId(),
                         item.getCategory(),
                         item.getTitle(),
                         item.getContents(),
                         item.getItemImg().split(",")[0],
-                        item.getAddress(),
+                        distance,
                         scrabCnt,
                         item.getViewCnt(),
                         item.getStatus(),
@@ -178,6 +192,16 @@ public class ItemService {
 
         item.scrabCntUpdate(itemId, scrabCnt);
         String[] favored = item.getFavored().split(",");
+
+
+        // 거리 계산
+        String distance;
+        if(userDetails.equals(null)){
+            distance = "null";
+        }else {
+            Long userId = userDetails.getUserId();
+            distance = getDistance(userId, item.getAddress());
+        }
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 user.getId(),
                 itemId,
@@ -190,6 +214,7 @@ public class ItemService {
                 bagInfos,
                 item.getTitle(),
                 item.getContents(),
+                distance,
                 item.getCreatedAt(),
                 item.getViewCnt(),
                 scrabCnt,
@@ -198,6 +223,45 @@ public class ItemService {
                 isSrab
         );
         return itemDetailResponseDto;
+    }
+
+    // 이승재 / 위도 경도 거리계산하기
+    private String getDistance(Long userId, String address) {
+        if(userId == null){
+            return "null";
+        }else {
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new IllegalArgumentException("유저 정보가 없습니다.")
+            );
+            if (user.getAddress().equals(address)) {
+                return "인근";
+            } else {
+                Location userLocation = locationRepository.findByArea(user.getAddress().split(" ")[1]);
+                Location itemLocation = locationRepository.findByArea(address.split(" ")[1]);
+                double userLat = userLocation.getLatitude();
+                double userLon = userLocation.getLongitude();
+                double itemLat = itemLocation.getLatitude();
+                double itemLon = itemLocation.getLongitude();
+
+                double theta = userLon - itemLon;
+                double dist = Math.sin(deg2rad(userLat)) * Math.sin(deg2rad(itemLat)) + Math.cos(deg2rad(userLat)) * Math.cos(deg2rad(itemLat)) * Math.cos(deg2rad(theta));
+
+                dist = Math.acos(dist);
+                dist = rad2deg(dist);
+                dist = dist * 60 * 1.1515;
+                dist = dist * 1.609344;
+                double dist1 = Math.round(dist*10)/10.0;
+                String distance = Double.toString(dist1);
+                return distance + "km";
+            }
+        }
+    }
+
+    private double deg2rad(double deg){
+        return (deg * Math.PI / 180.0);
+    }
+    private double rad2deg(double rad){
+        return (rad * 180 / Math.PI);
     }
 
     // 이승재 / 아이템 구독하기
