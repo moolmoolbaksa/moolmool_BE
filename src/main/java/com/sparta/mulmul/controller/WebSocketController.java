@@ -19,7 +19,6 @@ import java.util.Map;
 public class WebSocketController {
 
     private final ChatMessageService messageService;
-    private final NotificationService notificationService;
     private final NotificationRepository notificationRepository;
     private final SimpMessageSendingOperations messagingTemplate;
 

@@ -51,7 +51,20 @@ public class ChatMessage extends CreationDate {
         message.roomId = roomId;
         message.senderId = roomId;
         message.message = "채팅방이 개설되었습니다.";
-        message.isRead = false;
+        message.isRead = true;
+        message.type = MessageTypeEnum.STATUS;
+
+        return message;
+    }
+
+    public static ChatMessage createOut(Long roomId, User user){
+
+        ChatMessage message = new ChatMessage();
+
+        message.roomId = roomId;
+        message.senderId = roomId;
+        message.message = user.getNickname() + "님이 채팅방을 나갔습니다.";
+        message.isRead = true;
         message.type = MessageTypeEnum.STATUS;
 
         return message;

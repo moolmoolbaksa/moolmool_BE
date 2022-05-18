@@ -47,7 +47,7 @@ public class Notification extends CreationDate {
 
         Notification notification = new Notification();
 
-        notification.userId = barter.getBuyerId();
+        notification.userId = barter.getSellerId();
         notification.changeId = barter.getId();
         notification.nickname = nickname;
         notification.isRead = false;

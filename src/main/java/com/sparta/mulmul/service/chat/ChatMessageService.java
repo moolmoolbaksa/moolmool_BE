@@ -9,10 +9,9 @@ import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.chat.ChatMessageRepository;
 import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
+import com.sparta.mulmul.utils.LanguageFilter;
 import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ChatMessageService {
 
+    private final LanguageFilter filter;
     private final ChatRoomRepository roomRepository;
     private final ChatMessageRepository messageRepository;
     private final NotificationRepository notificationRepository;
@@ -99,6 +99,9 @@ public class ChatMessageService {
         ChatRoom chatRoom = roomRepository.findByIdFetch(requestDto.getRoomId())
                 .orElseThrow(() -> new NullPointerException("ChatController: 해당 채팅방이 존재하지 않습니다."));
 
+        // 비속어 필터링
+        requestDto = filter.filtering(requestDto);
+
         ChatMessage message = messageRepository.save(ChatMessage.createOf(requestDto, wsUser.getUserId()));
 
         if (chatRoom.getAccOut()){
@@ -127,20 +130,4 @@ public class ChatMessageService {
         messagingTemplate.convertAndSend("/sub/chat/rooms/" + user.getUserId(), msgUpdateDto); // 개별 채팅 목록 보기 업데이트
         messagingTemplate.convertAndSend("/sub/chat/room/" + requestDto.getRoomId(), responseDto); // 채팅방 내부로 메시지 전송
     }
-
-    // 채팅방 접근 권한 검증
-//    public void checkAccess(MessageRequestDto requestDto, WsUser wsUser){
-//
-//        ChatRoom chatRoom = roomRepository
-//                .findByIdFetch(requestDto.getRoomId())
-//                .orElseThrow(() -> new NullPointerException("ChatController: checkAccess) " + requestDto.getRoomId() + "번 채팅방이 존재하지 않습니다."));
-//
-//        Long userId = wsUser.getUserId();
-//
-//        if ( chatRoom.getAcceptor().getId() != userId || chatRoom.getRequester().getId() != userId ) {
-//            throw new AccessDeniedException("ChatController: checkAccess) 허가되지 않은 접근입니다.");
-//        }
-//        // 허가되지 않은 회원 접근 시, Disconnect 상태로 전환시키는 추가적인 로직 구현이 필요합니다.
-//    }
 }
-

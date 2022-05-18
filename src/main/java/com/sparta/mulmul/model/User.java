@@ -35,9 +35,11 @@ public class User {
     private int raterCount= 0;
     private float totalGrade;
     private int reportCnt;
+    private Boolean isBan;
     private float grade;
     private double latitude;
     private double longitude;
+
 
     // 회원 정보 초기화 (초기설정을 어떻게 해줄 것인지, 점수 알고리즘이 나오면 다시 만들어 보도록 합니다.)
     public void initProfile(String address){
@@ -95,8 +97,15 @@ public class User {
         this.storeInfo = storeInfo;
     }
 
+    // 이승재 / 유저 신고하기 기능
     public void reportCntUpdate(Long userId , int reportCnt){
         this.id = userId;
         this.reportCnt = reportCnt;
+    }
+
+    // 이승재 / 누적5회신고시 계정 정지
+    public void banUser(Long userId, Boolean isBan){
+        this.id = userId;
+        this.isBan = isBan;
     }
 }

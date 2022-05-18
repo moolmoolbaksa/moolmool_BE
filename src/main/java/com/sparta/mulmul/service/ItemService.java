@@ -7,7 +7,6 @@ import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,17 +22,19 @@ public class ItemService {
     private final BagRepository bagRepositroy;
     private final ScrabRepository scrabRepository;
     private final UserRepository userRepository;
-    private final BarterRepository barterRepository;
-    private final SimpMessageSendingOperations messagingTemplate;
-    private final NotificationRepository notificationRepository;
+    private final LocationRepository locationRepository;
+    private final ReportRepository reportRepository;
 
     // 이승재 / 보따리 아이템 등록하기
-    public void createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
+    public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
         List<String> imgUrlList = itemRequestDto.getImgUrl();
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
         String favored = String.join(",", favoredList);
 
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
 
         // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
@@ -43,7 +44,7 @@ public class ItemService {
         Item item = Item.builder()
                 .title(itemRequestDto.getTitle())
                 .contents(itemRequestDto.getContents())
-                .address("서울")  //유저 정보에서 가져오기
+                .address(user.getAddress())  //유저 정보에서 가져오기
                 .category(itemRequestDto.getCategory())
                 .scrabCnt(0)
                 .commentCnt(0) // 사용할지 안할지 확정안됨
@@ -56,8 +57,9 @@ public class ItemService {
                 .bag(bag)
                 .build();
 
-        itemRepository.save(item);
-
+         item = itemRepository.save(item);
+         Long itemId = item.getId();
+        return itemId;
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
@@ -73,13 +75,20 @@ public class ItemService {
                             scrabCnt++;
                         }
                     }
+                    String distance;
+                    if(userDetails.equals(null)){
+                        distance = "null";
+                    }else {
+                        Long userId = userDetails.getUserId();
+                        distance = getDistance(userId, item.getAddress());
+                    }
                     ItemResponseDto itemResponseDto = new ItemResponseDto(
                             item.getId(),
                             item.getCategory(),
                             item.getTitle(),
                             item.getContents(),
                             item.getItemImg().split(",")[0],
-                            item.getAddress(),
+                            distance,
                             scrabCnt,
                             item.getViewCnt(),
                             item.getStatus());
@@ -106,13 +115,19 @@ public class ItemService {
                         scrabCnt++;
                     }
                 }
+                String distance;
+                if(userDetails.equals(null)){
+                    distance = "null";
+                }else {
+                    distance = getDistance(userId, item.getAddress());
+                }
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
                         item.getId(),
                         item.getCategory(),
                         item.getTitle(),
                         item.getContents(),
                         item.getItemImg().split(",")[0],
-                        item.getAddress(),
+                        distance,
                         scrabCnt,
                         item.getViewCnt(),
                         item.getStatus(),
@@ -178,6 +193,16 @@ public class ItemService {
 
         item.scrabCntUpdate(itemId, scrabCnt);
         String[] favored = item.getFavored().split(",");
+
+
+        // 거리 계산
+        String distance;
+        if(userDetails.equals(null)){
+            distance = "null";
+        }else {
+            Long userId = userDetails.getUserId();
+            distance = getDistance(userId, item.getAddress());
+        }
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 user.getId(),
                 itemId,
@@ -190,6 +215,7 @@ public class ItemService {
                 bagInfos,
                 item.getTitle(),
                 item.getContents(),
+                distance,
                 item.getCreatedAt(),
                 item.getViewCnt(),
                 scrabCnt,
@@ -198,6 +224,45 @@ public class ItemService {
                 isSrab
         );
         return itemDetailResponseDto;
+    }
+
+    // 이승재 / 위도 경도 거리계산하기
+    private String getDistance(Long userId, String address) {
+        if(userId == null){
+            return "null";
+        }else {
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new IllegalArgumentException("유저 정보가 없습니다.")
+            );
+            Location userLocation = locationRepository.findByArea(user.getAddress().split(" ")[1]);
+            Location itemLocation = locationRepository.findByArea(address.split(" ")[1]);
+            double userLat = userLocation.getLatitude();
+            double userLon = userLocation.getLongitude();
+            double itemLat = itemLocation.getLatitude();
+            double itemLon = itemLocation.getLongitude();
+
+            if (userLat== itemLat && userLon== itemLon) {
+                return "인근";
+            } else {
+                double theta = userLon - itemLon;
+                double dist = Math.sin(deg2rad(userLat)) * Math.sin(deg2rad(itemLat)) + Math.cos(deg2rad(userLat)) * Math.cos(deg2rad(itemLat)) * Math.cos(deg2rad(theta));
+
+                dist = Math.acos(dist);
+                dist = rad2deg(dist);
+                dist = dist * 60 * 1.1515;
+                dist = dist * 1.609344;
+                double dist1 = Math.round(dist*10)/10.0;
+                String distance = Double.toString(dist1);
+                return distance + "km";
+            }
+        }
+    }
+
+    private double deg2rad(double deg){
+        return (deg * Math.PI / 180.0);
+    }
+    private double rad2deg(double rad){
+        return (rad * 180 / Math.PI);
     }
 
     // 이승재 / 아이템 구독하기
@@ -264,14 +329,65 @@ public class ItemService {
 
     // 이승재 / 아이템 신고하기
     @Transactional
-    public void reportItem(Long itemId) {
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템 정보가 없습니다.")
-        );
-        int reportCnt = item.getReportCnt();
-        item.reportCntUpdate(itemId, reportCnt+1);
-        if(item.getReportCnt()==5){
-            item.statusUpdate(itemId, 5);
+    public String reportItem(Long itemId, UserDetailsImpl userDetails) {
+        Optional<Report> findReport = reportRepository.findByReporterIdAndReportedItemId(userDetails.getUserId(), itemId);
+        if (findReport.isPresent()){
+            return "false";
+        }else {
+
+            Item item = itemRepository.findById(itemId).orElseThrow(
+                    () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+            );
+            int reportCnt = item.getReportCnt();
+            item.reportCntUpdate(itemId, reportCnt + 1);
+
+            Report report = Report.builder()
+                    .reportedItemId(itemId)
+                    .reporterId(userDetails.getUserId())
+                    .build();
+            reportRepository.save(report);
+            if (item.getReportCnt() == 5) {
+                item.statusUpdate(itemId, 5);
+            }
+            return "true";
         }
+    }
+
+
+    // 이승재 / 아이템 검색
+    public List<ItemResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
+        List<Item> itemList = itemRepository.searchByKeyword(keyword);
+        List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
+        Long userId = userDetails.getUserId();
+        for(Item item : itemList){
+            if(item.getStatus() ==1 || item.getStatus() == 0){
+                Boolean isScrab;
+                if(scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()){
+                    isScrab = true;
+                }else {
+                    isScrab = false;
+                }
+                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+                int scrabCnt = 0;
+                for(Scrab scrab : scrabs){
+                    if(scrab.getScrab().equals(true)){
+                        scrabCnt++;
+                    }
+                }
+                ItemResponseDto itemResponseDto = new ItemResponseDto(
+                        item.getId(),
+                        item.getCategory(),
+                        item.getTitle(),
+                        item.getContents(),
+                        item.getItemImg().split(",")[0],
+                        item.getAddress(),
+                        scrabCnt,
+                        item.getViewCnt(),
+                        item.getStatus(),
+                        isScrab);
+                itemResponseDtos.add(itemResponseDto);
+            }
+        }
+        return itemResponseDtos;
     }
 }

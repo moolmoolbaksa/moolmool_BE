@@ -27,12 +27,11 @@ public class ItemController {
     private final ItemService itemService;
     private final ItemStarService itemStarService;
     private final MyUserService myUserService;
-    private final TradeService tradeService;
 
 
     // 이승재 / 보따리 아이템 등록하기
     @PostMapping("/api/items")
-    public ResponseEntity<OkDto> createItem(
+    public Long createItem(
             @RequestParam("category") String category,
             @RequestParam("favored") List<String> favored,
             @RequestParam("title") String title,
@@ -44,8 +43,8 @@ public class ItemController {
     ){
         List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
         ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
-        itemService.createItem(itemRequestDto, userDetails);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+        return itemService.createItem(itemRequestDto, userDetails);
+
     }
 
 
@@ -97,45 +96,21 @@ public class ItemController {
     }
 
 
-    // 이승재 / 유저 스토어 목록 보기
-
-    @GetMapping("/api/store/{userId}")
-    private UserStoreResponseDto showStore(@PathVariable Long userId){
-        return myUserService.showStore(userId);
+    // 이승재 아이템 신고하기
+    @PutMapping("/api/report/item")
+    private ResponseEntity<OkDto> reportItem(@RequestParam Long itemId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        String answer = itemService.reportItem(itemId, userDetails);
+        if(answer.equals("true")) {
+            return ResponseEntity.ok().body(OkDto.valueOf("true"));
+        }else{
+            return ResponseEntity.ok().body(OkDto.valueOf("false"));
+        }
     }
 
-
-    // 이승재 / 교환신청하기 전 정보
-    @GetMapping("/api/trade")
-    private TradeInfoDto showTradeInfo(@RequestParam Long itemId, @RequestParam Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return tradeService.showTradeInfo(itemId, userId, userDetails);
-    }
-
-    // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
-    @PostMapping("/api/trade")
-    private ResponseEntity<OkDto> requestTrade(@RequestBody RequestTradeDto requestTradeDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        tradeService.requestTrade(requestTradeDto, userDetails);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
-    }
-
-
-    // 이승재 교환신청 확인 페이지
-    @GetMapping("/api/trade/decision")
-    private TradeDecisionDto tradeDecision(@RequestParam Long baterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return  tradeService.tradeDecision(baterId, userDetails);
-    }
-
-    // 이승재 교환신청 확인 페이지 수락 버튼
-    @PutMapping("/api/trade/decision")
-    private BarterStatusDto acceptTrade(@RequestParam Long baterId){
-       return tradeService.acceptTrade(baterId);
-    }
-
-    //이승재 교환신청 확인 페이지 거절 버튼
-    @DeleteMapping("/api/trade/decision")
-    private ResponseEntity<OkDto> deleteTrade(@RequestParam Long baterId){
-        tradeService.deleteTrade(baterId);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    // 이승재 아이템 검색하기
+    @GetMapping("/api/item/search")
+    private List<ItemResponseDto> searchItem(@RequestParam String keyword, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return itemService.searchItem(keyword, userDetails);
     }
 
     // 이승재 교환신청 확인 페이지
