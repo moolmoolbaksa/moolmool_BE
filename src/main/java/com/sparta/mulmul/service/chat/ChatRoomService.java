@@ -63,7 +63,8 @@ public class ChatRoomService {
         else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
         else { throw new AccessDeniedException("ChatRoomService: '나가기'는 채팅방에 존재하는 회원만 접근 가능한 서비스입니다."); }
         // 채팅방 종료 메시지 전달 ( 저장도 해야 합니다. )
-        messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(), "상대방이 채팅방을 나갔습니다."); // 세부 내용 수정 필요
+        ChatMessage message = messageRepository.save(ChatMessage.createOut(id, user));
+        messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(), MessageResponseDto.createFromChatMessage(message)); // 세부 내용 수정 필요
     }
 
     // 사용자별 채팅방 전체 목록 가져오기
@@ -75,7 +76,7 @@ public class ChatRoomService {
         // 방 목록 찾기
         List<ChatRoom> chatRooms = roomRepository.findAllBy(user);
         // responseDto 만들기
-        List<RoomResponseDto> responseDtos = new ArrayList<>();
+        LinkedList<RoomResponseDto> responseDtos = new LinkedList<>();
 
         for (ChatRoom chatRoom : chatRooms ){
             // 메시지 목록 가져오기
@@ -85,13 +86,28 @@ public class ChatRoomService {
             if ( chatRoom.getAcceptor().getId() == userId ) {
                 if (!chatRoom.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
                     int unreadCnt = messageRepository.countMsg(chatRoom.getRequester().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
-                    responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt)); }
+                    if (chatRoom.getIsFixed()){ responseDtos.addFirst(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt));}
+                    else { responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt)); }
+                }
             } else if ( chatRoom.getRequester().getId() == userId ){
                 if (!chatRoom.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
                     int unreadCnt = messageRepository.countMsg(chatRoom.getAcceptor().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
-                    responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt)); }
+                    if (chatRoom.getIsFixed()){ responseDtos.addFirst(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt)); }
+                    else { responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt)); }
+                }
             }
         }
         return responseDtos;
     }
+
+    // 채팅방 즐겨찾기 추가
+    @Transactional
+    public void fixedRoom(Long roomId){
+
+        ChatRoom chatRoom = roomRepository.findById(roomId)
+                .orElseThrow(() -> new NullPointerException("ChatRoomController: 해당 채팅방이 존재하지 않습니다.")
+                );
+        chatRoom.fixedRoom();
+    }
+
 }
