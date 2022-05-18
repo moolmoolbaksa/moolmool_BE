@@ -172,6 +172,40 @@ public class BarterService {
     }
 
 
+    // 엄성훈 - 거래완료취소 유저의 isTrade를 true -> false 업데이트
+    @Transactional
+    public void cancelBarter(Long barterId, UserDetailsImpl userDetails) {
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                () -> new IllegalArgumentException("유저 정보가 없습니다.")
+        );
+        Long userId = user.getId();
+        Barter mybarter = barterRepository.findById(barterId).orElseThrow(
+                () -> new IllegalArgumentException("거래내역이 없습니다."));
+        // 거래중인 상태가 아니면 예외처리
+        if (mybarter.getStatus() == 2) {
+            // 거래하는 사람이 바이어라면
+            if (mybarter.getBuyerId().equals(userId)){
+                Boolean isTradeCheck = mybarter.getIsBuyerTrade();
+                isTradeCheck(isTradeCheck);
+                mybarter.updateTradBuyer(false);
+            } else {
+                Boolean isTradeCheck = mybarter.getIsSellerTrade();
+                isTradeCheck(isTradeCheck);
+                mybarter.updateTradSeller(false);
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+        }
+    }
+
+    // 거래완료를 하지 않았을 경우
+    private void isTradeCheck(Boolean isTradeCheck) {
+        if (isTradeCheck.equals(false)){
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+        }
+    }
+
+
     // 교환신청 취소 물건상태 2(교환중) -> 0(물품등록한 상태), 거래내역 삭제
     @Transactional
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {

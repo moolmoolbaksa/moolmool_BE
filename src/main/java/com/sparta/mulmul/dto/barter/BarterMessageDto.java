@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class BarterMessageDto {
-    private  Long barterId;
+    private Long barterId;
     private Boolean isTrade;
     private int status;
 
