@@ -30,9 +30,16 @@ public class BarterController {
         return barterService.showMyBarter(userDetails);
     }
 
+    //엄성훈 - 교환완료 취소
+    @PutMapping("/api/myhistory/cancel")
+    public ResponseEntity<OkDto> cancelBarter(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        barterService.cancelBarter(barterId, userDetails);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
     //엄성훈 - 교환신청 취소
     @DeleteMapping("/api/myhistory")
-    public ResponseEntity<OkDto> deleteItem(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<OkDto> deleteBarter(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         barterService.deleteBarter(barterId, userDetails);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }

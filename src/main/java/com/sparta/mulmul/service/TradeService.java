@@ -3,6 +3,7 @@ package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.BarterStatusDto;
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.NotificationType;
+import com.sparta.mulmul.dto.item.ItemStarDto;
 import com.sparta.mulmul.dto.trade.RequestTradeDto;
 import com.sparta.mulmul.dto.trade.TradeDecisionDto;
 import com.sparta.mulmul.dto.trade.TradeInfoDto;
@@ -14,8 +15,10 @@ import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -70,11 +73,21 @@ public class TradeService {
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
         sellerItem.statusUpdate(sellerItem.getId(), 1);
+
+        // 엄성훈 - 알람정보를 보내기 위해 리스트 추가
+        List<ItemStarDto> itemList = new ArrayList<>();
         for(Long buyerItemIds : requestTradeDto.getMyItemIds()) {
             Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
                     ()-> new IllegalArgumentException("아이템이 없습니다.")
             );
             buyerItem.statusUpdate(buyerItemIds, 2);
+            ItemStarDto itemStarDto = new ItemStarDto(
+                    buyerItem.getId(),
+                    buyerItem.getItemImg().split(",")[0],
+                    buyerItem.getTitle(),
+                    buyerItem.getContents()
+            );
+            itemList.add(itemStarDto);
         }
 
         //Long 형태인 아이디들을 String 형태로 변환
@@ -104,7 +117,7 @@ public class TradeService {
         Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
         // 리팩토링 필요
         messagingTemplate.convertAndSend(
-                "/sub/notification/" + requestTradeDto.getUserId(), NotificationDto.createFrom(notification)
+                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification,itemList)
         );
     }
 
