@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -175,8 +176,8 @@ public class MyUserService {
     // 이승재 / 유저 신고하기 기능
     @Transactional
     public String reportUser(Long userId, UserDetailsImpl userDetails) {
-        Report findReportLog = reportRepository.findByReporterId(userDetails.getUserId());
-        if (findReportLog.getReportedUserId().equals(userId)) {
+        Optional<Report> findReport = reportRepository.findByReporterIdAndReportedUserId(userDetails.getUserId(), userId);
+        if (findReport.isPresent()) {
             return "false";
         } else {
             User user = userRepository.findById(userId).orElseThrow(

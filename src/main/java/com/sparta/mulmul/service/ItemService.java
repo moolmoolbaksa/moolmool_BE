@@ -330,8 +330,8 @@ public class ItemService {
     // 이승재 / 아이템 신고하기
     @Transactional
     public String reportItem(Long itemId, UserDetailsImpl userDetails) {
-        Report findReport = reportRepository.findByReporterId(userDetails.getUserId());
-        if (findReport.getReportedItemId().equals(itemId)){
+        Optional<Report> findReport = reportRepository.findByReporterIdAndReportedItemId(userDetails.getUserId(), itemId);
+        if (findReport.isPresent()){
             return "false";
         }else {
 
