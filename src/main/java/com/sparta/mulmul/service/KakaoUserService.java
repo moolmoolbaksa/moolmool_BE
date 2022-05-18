@@ -14,6 +14,7 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.security.jwt.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -105,7 +106,12 @@ public class KakaoUserService {
             // 회원가입 알림 메시지 저장
             notificationRepository.save(
                     Notification.createFrom(kakaoUser));
+        } else {
+            if ( kakaoUser.getIsBan() != null && kakaoUser.getIsBan() ){
+                throw new AccessDeniedException("KaKaoUserService: 신고가 누적 5회 이상되어 로그인이 허용되지 않습니다.");
+            }
         }
+
         return kakaoUser;
     }
     // JWT 토큰 추출

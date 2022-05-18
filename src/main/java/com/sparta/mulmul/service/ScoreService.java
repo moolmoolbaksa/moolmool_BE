@@ -356,17 +356,15 @@ public class ScoreService {
             return new BarterStatusDto(true, true, barter.getStatus());
         }
 
-        if (myPosition.equals("buyer")){
-            // 알림 내역 저장 후 상대방에게 전송
-            Notification notification = notificationRepository.save(Notification.createOf3(barter, user.getNickname()));
+        // 알림 내역 저장 후 상대방에게 전송
+        Notification notification = notificationRepository.save(Notification.createOf2(barter, user.getNickname(), myPosition, "Barter"));
 
+        // 상대방의 sup주소로 전송
+        if (myPosition.equals("buyer")){
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
             );
         } else {
-            // 알림 내역 저장 후 상대방에게 전송
-            Notification notification = notificationRepository.save(Notification.createOf4(barter, user.getNickname()));
-
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + barter.getBuyerId(), NotificationDto.createFrom(notification)
             );
