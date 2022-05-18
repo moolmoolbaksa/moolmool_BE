@@ -13,6 +13,8 @@ import com.sparta.mulmul.service.ScoreService;
 import com.sparta.mulmul.service.TradeService;
 import com.sparta.mulmul.service.chat.ChatMessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +44,8 @@ public class NotificationController {
     @GetMapping("/notification/{notificationId}/chat")
     public List<MessageResponseDto> getMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                @PathVariable Long notificationId,
-                                               @RequestParam Long roomId){
+                                               @RequestParam Long roomId) {
+//                                               @PageableDefault(size = 20) Pageable pageable) {
 
         List<MessageResponseDto> responseDtos = messageService.getMessage(roomId, userDetails);
         notificationService.setRead(notificationId);

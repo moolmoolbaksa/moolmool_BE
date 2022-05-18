@@ -41,6 +41,9 @@ public class Item extends Timestamped{
     private int viewCnt;
 
     @Column(nullable = false)
+    private int reportCnt;
+
+    @Column(nullable = false)
     private int status;
 
     @Column(length = 1000)
@@ -83,5 +86,11 @@ public class Item extends Timestamped{
     public void scrabCntUpdate(Long id, int scrabCnt){
         this.id = id;
         this.scrabCnt = scrabCnt;
+    }
+
+    //이승재 / 아이템 신고 횟수 업데이트
+    public void reportCntUpdate(Long id, int reportCnt){
+        this.id = id;
+        this.reportCnt = reportCnt;
     }
 }

@@ -150,8 +150,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.addAllowedOrigin("https://main.d38cmg5gt99sfb.amplifyapp.com");
+//https://main.d38cmg5gt99sfb.amplifyapp.com
+        configuration.addAllowedOrigin("https://moolmooldoctor.firebaseapp.com");
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("http://kapi.kakao.com/v2/user/me");
         configuration.addAllowedOrigin("https://kapi.kakao.com/v2/user/me");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");

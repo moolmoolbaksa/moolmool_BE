@@ -3,6 +3,7 @@ package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.barter.BarterDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
+import com.sparta.mulmul.dto.barter.MyBarterDto;
 import com.sparta.mulmul.dto.barter.OpponentBarterDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;

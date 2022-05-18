@@ -39,12 +39,11 @@ public class ChatRoomService {
                 .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다."));
         User requester = userRepository.findById(userDetails.getUserId())
                 .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다."));
-        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장 -> 로직에 오류가 있기 때문에, 수정해야 합니다.
-        ChatRoom chatRoom = roomRepository.findByRequesterAndAcceptor(requester, acceptor)
-                .orElse(roomRepository.findByRequesterAndAcceptor(acceptor, requester)
-                        .orElse(roomRepository.save(ChatRoom.createOf(requester, acceptor))));
+        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
+        ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
+                        .orElseGet( () -> roomRepository.save(ChatRoom.createOf(requester, acceptor)));
         // 채팅방 개설 메시지 생성
-        messageRepository.save(ChatMessage.createInitOf(chatRoom.getId(), chatRoom.getId()));
+        messageRepository.save(ChatMessage.createInitOf(chatRoom.getId()));
 
         return chatRoom.getId();
     }
@@ -59,7 +58,7 @@ public class ChatRoomService {
         if ( chatRoom.getRequester() == user) { chatRoom.reqOut(true); }
         else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
         else { throw new AccessDeniedException("ChatRoomService: '나가기'는 채팅방에 존재하는 회원만 접근 가능한 서비스입니다."); }
-        // 채팅방 종료 메시지 전달
+        // 채팅방 종료 메시지 전달 ( 저장도 해야 합니다. )
         messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(), "상대방이 채팅방을 나갔습니다."); // 세부 내용 수정 필요
     }
 
@@ -80,12 +79,12 @@ public class ChatRoomService {
                     .orElseThrow( () -> new IllegalArgumentException("ChatRoomService: 채팅방 메시지를 설정해 주지 않았습니다. 방 개설과 함께 채팅 메시지를 작성하도록 설정하세요."));
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( chatRoom.getAcceptor().getId() == userId ) {
-                if (!chatRoom.getAccOut()) { // 만약 Acc가 나가지 않았다면
-                    int unreadCnt = messageRepository.countMsg(chatRoom.getRequester().getId(), chatRoom.getId());
+                if (!chatRoom.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
+                    int unreadCnt = messageRepository.countMsg(chatRoom.getRequester().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
                     responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt)); }
             } else if ( chatRoom.getRequester().getId() == userId ){
-                if (!chatRoom.getReqOut()) { // 만약 Req가 나가지 않았다면
-                    int unreadCnt = messageRepository.countMsg(chatRoom.getAcceptor().getId(), chatRoom.getId());
+                if (!chatRoom.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
+                    int unreadCnt = messageRepository.countMsg(chatRoom.getAcceptor().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
                     responseDtos.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt)); }
             }
         }

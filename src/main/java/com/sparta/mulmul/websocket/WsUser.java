@@ -8,18 +8,16 @@ import java.security.Principal;
 @NoArgsConstructor
 public class WsUser implements Principal {
 
-    private String name;
     private WsUserDto userDto;
 
     public static WsUser createFrom(WsUserDto userDto){
         WsUser user = new WsUser();
         user.userDto = userDto;
-        user.name = user.getName();
         return user;
     }
 
     @Override
-    public String getName() { return this.name; }
+    public String getName() { return userDto.getName(); }
 
     public Long getUserId() { return userDto.getUserId();}
 

@@ -32,18 +32,19 @@ public class User {
     private String profile = "http://kaihuastudio.com/common/img/default_profile.png";
     private String storeInfo;
     private String degree = "물물어린이";
-    private int raterCount;
+    private int raterCount= 0;
     private float totalGrade;
+    private int reportCnt;
     private float grade;
     private double latitude;
     private double longitude;
 
     // 회원 정보 초기화 (초기설정을 어떻게 해줄 것인지, 점수 알고리즘이 나오면 다시 만들어 보도록 합니다.)
-    public void initProfile(String address) {
+    public void initProfile(String address){
         this.address = address;
     }
 
-    public static User withPassword(UserRequestDto requestDto, String password) {
+    public static User withPassword(UserRequestDto requestDto, String password){
 
         User user = new User();
         user.username = requestDto.getUsername();
@@ -54,7 +55,7 @@ public class User {
     }
 
 
-    public static User fromKakaoUserWithPassword(KakaoUserInfoDto kakaoUserInfo, String password) {
+    public static User fromKakaoUserWithPassword(KakaoUserInfoDto kakaoUserInfo, String password){
 
         User user = new User();
         user.username = kakaoUserInfo.getEmail();
@@ -71,7 +72,7 @@ public class User {
         this.nickname = nickname;
         this.profile = profile;
         this.address = address;
-        this.storeInfo = storInfo;
+        this.storeInfo =storInfo;
 
     }
 
@@ -88,9 +89,14 @@ public class User {
     }
 
 
-    public void execptImageUpdate(String nickname, String address, String storeInfo) {
+    public void execptImageUpdate(String nickname, String address, String storeInfo){
         this.nickname = nickname;
         this.address = address;
         this.storeInfo = storeInfo;
+    }
+
+    public void reportCntUpdate(Long userId , int reportCnt){
+        this.id = userId;
+        this.reportCnt = reportCnt;
     }
 }
