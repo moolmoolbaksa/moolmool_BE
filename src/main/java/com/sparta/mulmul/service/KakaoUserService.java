@@ -93,6 +93,7 @@ public class KakaoUserService {
         Long kakaoId = kakaoUserInfo.getId();
         User kakaoUser = userRepository.findByKakaoId(kakaoId)
                 .orElse(null);
+        // 신고 누적시 처리 진행
 
         if (kakaoUser == null) {
             String password = passwordEncoder.encode(UUID.randomUUID().toString());
