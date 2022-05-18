@@ -68,6 +68,7 @@ public class User {
 
         return user;
     }
+
     public void update(String nickname, String profile, String address, String storInfo) {
 
         this.nickname = nickname;
