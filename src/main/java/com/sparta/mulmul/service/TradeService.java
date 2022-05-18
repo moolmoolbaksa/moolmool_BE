@@ -104,7 +104,7 @@ public class TradeService {
         Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
         // 리팩토링 필요
         messagingTemplate.convertAndSend(
-                "/sub/notification/" + requestTradeDto.getUserId(), NotificationDto.createFrom(notification)
+                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
         );
     }
 
