@@ -26,7 +26,7 @@ public class ItemService {
     private final LocationRepository locationRepository;
 
     // 이승재 / 보따리 아이템 등록하기
-    public void createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
+    public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
         List<String> imgUrlList = itemRequestDto.getImgUrl();
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
@@ -57,8 +57,9 @@ public class ItemService {
                 .bag(bag)
                 .build();
 
-        itemRepository.save(item);
-
+         item = itemRepository.save(item);
+         Long itemId = item.getId();
+        return itemId;
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {

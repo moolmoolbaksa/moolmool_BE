@@ -32,7 +32,7 @@ public class ItemController {
 
     // 이승재 / 보따리 아이템 등록하기
     @PostMapping("/api/items")
-    public ResponseEntity<OkDto> createItem(
+    public Long createItem(
             @RequestParam("category") String category,
             @RequestParam("favored") List<String> favored,
             @RequestParam("title") String title,
@@ -44,8 +44,8 @@ public class ItemController {
     ){
         List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
         ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
-        itemService.createItem(itemRequestDto, userDetails);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+        return itemService.createItem(itemRequestDto, userDetails);
+
     }
 
 
