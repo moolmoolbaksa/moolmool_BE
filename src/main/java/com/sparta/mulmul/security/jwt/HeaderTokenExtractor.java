@@ -19,8 +19,7 @@ public class HeaderTokenExtractor {
         }
 
         return header.substring(
-                HEADER_PREFIX.length(),
-                header.length()
+                HEADER_PREFIX.length()
         );
     }
 
@@ -30,8 +29,7 @@ public class HeaderTokenExtractor {
         }
 
         return header.substring(
-                HEADER_PREFIX.length(),
-                header.length()
+                HEADER_PREFIX.length()
         );
     }
 }
