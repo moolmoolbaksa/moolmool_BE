@@ -1,10 +1,7 @@
 package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.NotificationDto;
-import com.sparta.mulmul.dto.barter.BarterDto;
-import com.sparta.mulmul.dto.barter.BarterStatusDto;
-import com.sparta.mulmul.dto.barter.MyBarterDto;
-import com.sparta.mulmul.dto.barter.OpponentBarterDto;
+import com.sparta.mulmul.dto.barter.*;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Notification;
@@ -231,6 +228,7 @@ public class BarterService {
         }
 
         boolean isTrade;
+        Boolean opponentIsTrade;
         String myPosition;
         // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
         if (myBarter.getBuyerId().equals(userId)) {
@@ -274,27 +272,58 @@ public class BarterService {
             sellerItem.statusUpdate(sellerItem.getId(), 3);
             myBarter.updateTradeBarter(3, LocalDateTime.now());
 
+            // 내게 거래완료 메시지 보내기
+            sendMyMessage(barterId, myBarter, myPosition);
+
             return new BarterStatusDto(isTrade,false , myBarter.getStatus());
         }
 
-
-        if (myPosition.equals("buyer")){
             // 알림 내역 저장 후 상대방에게 전송
-            Notification notification = notificationRepository.save(Notification.createOf(myBarter, user.getNickname()));
+            Notification notification = notificationRepository.save(Notification.createOf2(myBarter, user.getNickname(), myPosition, "Barter"));
 
+        // 상대방의 sup주소로 전송
+        if (myPosition.equals("buyer")){
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + myBarter.getSellerId(), NotificationDto.createFrom(notification)
             );
         } else {
-            // 알림 내역 저장 후 상대방에게 전송
-            Notification notification = notificationRepository.save(Notification.createOf2(myBarter, user.getNickname()));
-
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + myBarter.getBuyerId(), NotificationDto.createFrom(notification)
             );
         }
+        // 내게 거래완료 메시지 보내기
+        sendMyMessage(barterId, myBarter, myPosition);
 
         return new BarterStatusDto(isTrade, false, myBarter.getStatus());
+    }
+
+    // 내게 거래완료 정보 메시지 보내기 리팩토링
+    private void sendMyMessage(Long barterId, Barter myBarter, String myPosition) {
+        Boolean opponentIsTrade;
+        // 나의 sup주소로 전송
+        if (myPosition.equals("buyer")){
+            // 내게 보낼 메시지 정보 담기
+            opponentIsTrade = myBarter.getIsSellerTrade();
+            BarterMessageDto messageDto = new BarterMessageDto(
+                    barterId,
+                    opponentIsTrade,
+                    myBarter.getStatus()
+            );
+            messagingTemplate.convertAndSend(
+                    "/sub/barter/" + myBarter.getBuyerId(), messageDto
+            );
+        } else {
+            // 내게 보낼 메시지 정보 담기
+            opponentIsTrade = myBarter.getIsBuyerTrade();
+            BarterMessageDto messageDto = new BarterMessageDto(
+                    barterId,
+                    opponentIsTrade,
+                    myBarter.getStatus()
+            );
+            messagingTemplate.convertAndSend(
+                    "/sub/barter/" + myBarter.getSellerId(), messageDto
+            );
+        }
     }
 }
 

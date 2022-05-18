@@ -46,7 +46,7 @@ public class ItemStarService {
 
         cnt = 0;
         for (String key : listKeySet) {
-            System.out.println("key : " + key + " , " + "value : " + map.get(key));
+//            System.out.println("key : " + key + " , " + "value : " + map.get(key));
             Long sellerItemId = Long.parseLong(key);
             Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
                     () -> new IllegalArgumentException("아이템 정보가 없습니다."));
