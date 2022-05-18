@@ -31,7 +31,7 @@ public class ItemController {
 
     // 이승재 / 보따리 아이템 등록하기
     @PostMapping("/api/items")
-    public ResponseEntity<OkDto> createItem(
+    public Long createItem(
             @RequestParam("category") String category,
             @RequestParam("favored") List<String> favored,
             @RequestParam("title") String title,
@@ -43,8 +43,8 @@ public class ItemController {
     ){
         List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
         ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
-        itemService.createItem(itemRequestDto, userDetails);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+        return itemService.createItem(itemRequestDto, userDetails);
+
     }
 
 
@@ -98,9 +98,13 @@ public class ItemController {
 
     // 이승재 아이템 신고하기
     @PutMapping("/api/report/item")
-    private ResponseEntity<OkDto> reportItem(@RequestParam Long itemId){
-        itemService.reportItem(itemId);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    private ResponseEntity<OkDto> reportItem(@RequestParam Long itemId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        String answer = itemService.reportItem(itemId, userDetails);
+        if(answer.equals("true")) {
+            return ResponseEntity.ok().body(OkDto.valueOf("true"));
+        }else{
+            return ResponseEntity.ok().body(OkDto.valueOf("false"));
+        }
     }
 
     // 이승재 아이템 검색하기

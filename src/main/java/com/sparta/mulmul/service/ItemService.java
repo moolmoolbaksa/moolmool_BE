@@ -7,7 +7,6 @@ import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,9 +23,10 @@ public class ItemService {
     private final ScrabRepository scrabRepository;
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
+    private final ReportRepository reportRepository;
 
     // 이승재 / 보따리 아이템 등록하기
-    public void createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
+    public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
         List<String> imgUrlList = itemRequestDto.getImgUrl();
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
@@ -57,8 +57,9 @@ public class ItemService {
                 .bag(bag)
                 .build();
 
-        itemRepository.save(item);
-
+         item = itemRepository.save(item);
+         Long itemId = item.getId();
+        return itemId;
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
@@ -233,16 +234,16 @@ public class ItemService {
             User user = userRepository.findById(userId).orElseThrow(
                     () -> new IllegalArgumentException("유저 정보가 없습니다.")
             );
-            if (user.getAddress().equals(address)) {
+            Location userLocation = locationRepository.findByArea(user.getAddress().split(" ")[1]);
+            Location itemLocation = locationRepository.findByArea(address.split(" ")[1]);
+            double userLat = userLocation.getLatitude();
+            double userLon = userLocation.getLongitude();
+            double itemLat = itemLocation.getLatitude();
+            double itemLon = itemLocation.getLongitude();
+
+            if (userLat== itemLat && userLon== itemLon) {
                 return "인근";
             } else {
-                Location userLocation = locationRepository.findByArea(user.getAddress().split(" ")[1]);
-                Location itemLocation = locationRepository.findByArea(address.split(" ")[1]);
-                double userLat = userLocation.getLatitude();
-                double userLon = userLocation.getLongitude();
-                double itemLat = itemLocation.getLatitude();
-                double itemLon = itemLocation.getLongitude();
-
                 double theta = userLon - itemLon;
                 double dist = Math.sin(deg2rad(userLat)) * Math.sin(deg2rad(itemLat)) + Math.cos(deg2rad(userLat)) * Math.cos(deg2rad(itemLat)) * Math.cos(deg2rad(theta));
 
@@ -328,14 +329,27 @@ public class ItemService {
 
     // 이승재 / 아이템 신고하기
     @Transactional
-    public void reportItem(Long itemId) {
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템 정보가 없습니다.")
-        );
-        int reportCnt = item.getReportCnt();
-        item.reportCntUpdate(itemId, reportCnt+1);
-        if(item.getReportCnt()==5){
-            item.statusUpdate(itemId, 5);
+    public String reportItem(Long itemId, UserDetailsImpl userDetails) {
+        Optional<Report> findReport = reportRepository.findByReporterIdAndReportedItemId(userDetails.getUserId(), itemId);
+        if (findReport.isPresent()){
+            return "false";
+        }else {
+
+            Item item = itemRepository.findById(itemId).orElseThrow(
+                    () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+            );
+            int reportCnt = item.getReportCnt();
+            item.reportCntUpdate(itemId, reportCnt + 1);
+
+            Report report = Report.builder()
+                    .reportedItemId(itemId)
+                    .reporterId(userDetails.getUserId())
+                    .build();
+            reportRepository.save(report);
+            if (item.getReportCnt() == 5) {
+                item.statusUpdate(itemId, 5);
+            }
+            return "true";
         }
     }
 
