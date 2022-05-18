@@ -107,8 +107,8 @@ public class KakaoUserService {
             notificationRepository.save(
                     Notification.createFrom(kakaoUser));
         } else {
-            if ( kakaoUser.getIsBan() ){
-                throw new AccessDeniedException("KaKaoUserService: 신고 누적 5회 이상되어 로그인이 허용되지 않습니다.");
+            if ( kakaoUser.getIsBan() != null && kakaoUser.getIsBan() ){
+                throw new AccessDeniedException("KaKaoUserService: 신고가 누적 5회 이상되어 로그인이 허용되지 않습니다.");
             }
         }
 
