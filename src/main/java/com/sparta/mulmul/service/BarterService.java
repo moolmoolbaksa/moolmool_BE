@@ -32,7 +32,6 @@ public class BarterService {
     private final NotificationRepository notificationRepository;
 
 
-
     // 성훈 - 거래내역서 보기
     public List<BarterDto> showMyBarter(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
@@ -160,7 +159,8 @@ public class BarterService {
         }
         return totalList;
     }
-// 성훈 리팩토링 (거래리스트)
+
+    // 성훈 리팩토링 (거래리스트)
     private OpponentBarterDto getMyBarterDto(Long itemId, Item Item) {
         OpponentBarterDto itemList = new OpponentBarterDto(
                 itemId,
@@ -184,7 +184,7 @@ public class BarterService {
         // 거래중인 상태가 아니면 예외처리
         if (mybarter.getStatus() == 2) {
             // 거래하는 사람이 바이어라면
-            if (mybarter.getBuyerId().equals(userId)){
+            if (mybarter.getBuyerId().equals(userId)) {
                 Boolean isTradeCheck = mybarter.getIsBuyerTrade();
                 isTradeCheck(isTradeCheck);
                 mybarter.updateTradBuyer(false);
@@ -200,7 +200,7 @@ public class BarterService {
 
     // 거래완료를 하지 않았을 경우
     private void isTradeCheck(Boolean isTradeCheck) {
-        if (isTradeCheck.equals(false)){
+        if (isTradeCheck.equals(false)) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
     }
@@ -253,16 +253,15 @@ public class BarterService {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
         );
-        Long userId = user.getId();
         // 거래내역을 조회한다.
         Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("거래내역이 없습니다."));
+        Long userId = user.getId();
         // 거래중인 상태가 아니면 예외처리
         if (myBarter.getStatus() != 2) {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
 
         boolean isTrade;
-        Boolean opponentIsTrade;
         String myPosition;
         // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
         if (myBarter.getBuyerId().equals(userId)) {
@@ -281,6 +280,8 @@ public class BarterService {
             isTrade = true;
             myPosition = "seller";
         }
+
+        System.out.println("내 포지션은 : " + myPosition);
 
         Boolean buyerTrade = myBarter.getIsBuyerTrade();
         Boolean sellerTrade = myBarter.getIsSellerTrade();
@@ -308,34 +309,37 @@ public class BarterService {
 
             // 내게 거래완료 메시지 보내기
             sendMyMessage(barterId, myBarter, myPosition);
-
-            return new BarterStatusDto(isTrade,false , myBarter.getStatus());
-        }
-
-            // 알림 내역 저장 후 상대방에게 전송
-            Notification notification = notificationRepository.save(Notification.createOf2(myBarter, user.getNickname(), myPosition, "Barter"));
-
-        // 상대방의 sup주소로 전송
-        if (myPosition.equals("buyer")){
-            messagingTemplate.convertAndSend(
-                    "/sub/notification/" + myBarter.getSellerId(), NotificationDto.createFrom(notification)
-            );
+            return new BarterStatusDto(isTrade, false, myBarter.getStatus());
         } else {
-            messagingTemplate.convertAndSend(
-                    "/sub/notification/" + myBarter.getBuyerId(), NotificationDto.createFrom(notification)
-            );
+            // 알림 내역 저장
+            Notification notification = notificationRepository.save(Notification.createOfBarter(myBarter, user.getNickname(), myPosition, "Barter"));
+            // 상대방의 sup주소로 전송
+            sendTradeMessage(myBarter, myPosition, notification);
+            // 내게 거래완료 메시지 보내기
+            sendMyMessage(barterId, myBarter, myPosition);
+            return new BarterStatusDto(isTrade, false, myBarter.getStatus());
         }
-        // 내게 거래완료 메시지 보내기
-        sendMyMessage(barterId, myBarter, myPosition);
+    }
 
-        return new BarterStatusDto(isTrade, false, myBarter.getStatus());
+    // 상대 sup주소로 메시지 보내기 (상대가 거래완료를 누르지 않았을 경우) 리팩토링
+    private void sendTradeMessage(Barter myBarter, String myPosition, Notification notification) {
+
+        if (myPosition.equals("buyer")) {
+            System.out.println("내포지션은 바이어 : " + myPosition);
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + myBarter.getSellerId(), NotificationDto.createFrom(notification));
+        } else {
+            System.out.println("내포지션은 셀러 : " + myPosition);
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + myBarter.getBuyerId(), NotificationDto.createFrom(notification));
+        }
     }
 
     // 내게 거래완료 정보 메시지 보내기 리팩토링
     private void sendMyMessage(Long barterId, Barter myBarter, String myPosition) {
         Boolean opponentIsTrade;
         // 나의 sup주소로 전송
-        if (myPosition.equals("buyer")){
+        if (myPosition.equals("buyer")) {
             // 내게 보낼 메시지 정보 담기
             opponentIsTrade = myBarter.getIsSellerTrade();
             BarterMessageDto messageDto = new BarterMessageDto(

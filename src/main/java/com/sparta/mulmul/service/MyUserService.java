@@ -38,8 +38,6 @@ public class MyUserService {
                 () -> new IllegalArgumentException("user not found")
         );
         Long userId = userDetails.getUserId();
-//        Bag bag = bagRepository.findByUserId(userId);
-//        Long bagId = bag.getId();
 
         // 한 유저의 모든 아이템을 보여줌
         List<Item> myItemList = itemRepository.findAllMyItem(userId);
@@ -60,9 +58,7 @@ public class MyUserService {
                     () -> new IllegalArgumentException("Item not found"));
             ItemUserResponseDto scrabitemDto = getItemUserDto(scrabItem);
             myScrapItemList.add(scrabitemDto);
-
         }
-
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
         return new MyPageResponseDto(
                 user.getNickname(),
@@ -92,8 +88,6 @@ public class MyUserService {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("user not found")
         );
-        String profile = imgUrl;
-
         if (imgUrl.equals("empty")){
             user.execptImageUpdate(
                     nickname,
@@ -104,16 +98,15 @@ public class MyUserService {
             // 유저 정보를 수정
             user.update(
                     nickname,
-                    profile,
+                    imgUrl,
                     address,
                     storeInfo
             );
         }
-
         // 수정된 정보를 Response하기위해 정보를 넣어 줌
         UserEditDtailResponseDto userEditDtailResponseDto = new UserEditDtailResponseDto(
                 nickname,
-                profile,
+                imgUrl,
                 address,
                 storeInfo
         );
