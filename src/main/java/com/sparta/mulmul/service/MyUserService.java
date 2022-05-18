@@ -8,12 +8,10 @@ import com.sparta.mulmul.dto.user.UserEditDtailResponseDto;
 import com.sparta.mulmul.dto.user.UserEditResponseDto;
 import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.Report;
 import com.sparta.mulmul.model.Scrab;
 import com.sparta.mulmul.model.User;
-import com.sparta.mulmul.repository.BagRepository;
-import com.sparta.mulmul.repository.ItemRepository;
-import com.sparta.mulmul.repository.ScrabRepository;
-import com.sparta.mulmul.repository.UserRepository;
+import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +29,7 @@ public class MyUserService {
     private final ItemRepository itemRepository;
     private final ScrabRepository scrabRepository;
     private final BagRepository bagRepository;
+    private final ReportRepository reportRepository;
 
     // 성훈_마이페이지_내 정보보기
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
@@ -175,16 +174,28 @@ public class MyUserService {
 
     // 이승재 / 유저 신고하기 기능
     @Transactional
-    public void reportUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
-        );
-        int reportCnt = user.getReportCnt();
+    public String reportUser(Long userId, UserDetailsImpl userDetails) {
+        Report findReportLog = reportRepository.findByReporterId(userDetails.getUserId());
+        if (findReportLog.getReportedUserId().equals(userId)) {
+            return "false";
+        } else {
+            User user = userRepository.findById(userId).orElseThrow(
+                    () -> new IllegalArgumentException("유저 정보가 없습니다.")
+            );
+            int reportCnt = user.getReportCnt();
 
-        user.reportCntUpdate(userId, reportCnt+1);
+            user.reportCntUpdate(userId, reportCnt + 1);
 
-        if(user.getReportCnt()==5){
-            userRepository.deleteById(userId);
+            Report report = Report.builder()
+                    .reportedUserId(userId)
+                    .reporterId(userDetails.getUserId())
+                    .build();
+
+            reportRepository.save(report);
+            if (user.getReportCnt() == 5) {
+                user.banUser(userId, true);
+            }
+            return "true";
         }
     }
 }

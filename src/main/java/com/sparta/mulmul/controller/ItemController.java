@@ -99,9 +99,13 @@ public class ItemController {
 
     // 이승재 아이템 신고하기
     @PutMapping("/api/report/item")
-    private ResponseEntity<OkDto> reportItem(@RequestParam Long itemId){
-        itemService.reportItem(itemId);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    private ResponseEntity<OkDto> reportItem(@RequestParam Long itemId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        String answer = itemService.reportItem(itemId, userDetails);
+        if(answer.equals("true")) {
+            return ResponseEntity.ok().body(OkDto.valueOf("true"));
+        }else{
+            return ResponseEntity.ok().body(OkDto.valueOf("false"));
+        }
     }
 
     // 이승재 아이템 검색하기

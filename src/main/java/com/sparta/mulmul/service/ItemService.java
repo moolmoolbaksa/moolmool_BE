@@ -7,7 +7,6 @@ import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,6 +23,7 @@ public class ItemService {
     private final ScrabRepository scrabRepository;
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
+    private final ReportRepository reportRepository;
 
     // 이승재 / 보따리 아이템 등록하기
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
@@ -329,14 +329,27 @@ public class ItemService {
 
     // 이승재 / 아이템 신고하기
     @Transactional
-    public void reportItem(Long itemId) {
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템 정보가 없습니다.")
-        );
-        int reportCnt = item.getReportCnt();
-        item.reportCntUpdate(itemId, reportCnt+1);
-        if(item.getReportCnt()==5){
-            item.statusUpdate(itemId, 5);
+    public String reportItem(Long itemId, UserDetailsImpl userDetails) {
+        Report findReport = reportRepository.findByReporterId(userDetails.getUserId());
+        if (findReport.getReportedItemId().equals(itemId)){
+            return "false";
+        }else {
+
+            Item item = itemRepository.findById(itemId).orElseThrow(
+                    () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+            );
+            int reportCnt = item.getReportCnt();
+            item.reportCntUpdate(itemId, reportCnt + 1);
+
+            Report report = Report.builder()
+                    .reportedItemId(itemId)
+                    .reporterId(userDetails.getUserId())
+                    .build();
+            reportRepository.save(report);
+            if (item.getReportCnt() == 5) {
+                item.statusUpdate(itemId, 5);
+            }
+            return "true";
         }
     }
 
