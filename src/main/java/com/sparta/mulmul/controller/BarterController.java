@@ -3,6 +3,7 @@ package com.sparta.mulmul.controller;
 import com.sparta.mulmul.dto.barter.BarterDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
 import com.sparta.mulmul.dto.OkDto;
+import com.sparta.mulmul.dto.barter.BarterTradeCheckDto;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.NotificationRepository;
@@ -32,9 +33,8 @@ public class BarterController {
 
     //엄성훈 - 교환완료 취소
     @PutMapping("/api/myhistory/cancel")
-    public ResponseEntity<OkDto> cancelBarter(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        barterService.cancelBarter(barterId, userDetails);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    public BarterTradeCheckDto cancelBarter(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return barterService.cancelBarter(barterId, userDetails);
     }
 
     //엄성훈 - 교환신청 취소

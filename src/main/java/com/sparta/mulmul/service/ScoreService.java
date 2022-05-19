@@ -251,8 +251,6 @@ public class ScoreService {
             barter.updateScoreBuyer(true);
         }
 
-
-
 //        // 응답 보너스 //
 //        // 10분이네 응답 보너스
 //        ChatRoom chatRoomCheck;
@@ -356,10 +354,16 @@ public class ScoreService {
             return new BarterStatusDto(true, true, barter.getStatus());
         }
 
-        // 알림 내역 저장 후 상대방에게 전송
-        Notification notification = notificationRepository.save(Notification.createOf2(barter, user.getNickname(), myPosition, "Barter"));
+        // 알림 내역 저장
+        Notification notification = notificationRepository.save(Notification.createOfBarter(barter, user.getNickname(), myPosition, "Barter"));
+        // 상대방의 sup주소로 알람전송
+        sendScoreMessage(barter, myPosition, notification);
 
-        // 상대방의 sup주소로 전송
+        return new BarterStatusDto(true, true, barter.getStatus());
+    }
+
+    // 메시지 보내기
+    private void sendScoreMessage(Barter barter, String myPosition, Notification notification) {
         if (myPosition.equals("buyer")){
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
@@ -369,8 +373,6 @@ public class ScoreService {
                     "/sub/notification/" + barter.getBuyerId(), NotificationDto.createFrom(notification)
             );
         }
-
-        return new BarterStatusDto(true, true, barter.getStatus());
     }
 
     // 등급 단계
