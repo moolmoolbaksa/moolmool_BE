@@ -57,7 +57,7 @@ public class ChatMessage extends CreationDate {
         return message;
     }
 
-    public static ChatMessage createOut(Long roomId, User user){
+    public static ChatMessage createOutOf(Long roomId, User user){
 
         ChatMessage message = new ChatMessage();
 

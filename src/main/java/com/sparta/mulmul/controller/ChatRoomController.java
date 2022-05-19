@@ -58,9 +58,10 @@ public class ChatRoomController {
 
     // 채팅 즐겨찾기 고정
     @PutMapping("/room/{roomId}")
-    public ResponseEntity<OkDto> fixedRoom(@PathVariable Long roomId){
+    public ResponseEntity<OkDto> fixedRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                           @PathVariable Long roomId){
 
-        roomService.fixedRoom(roomId);
+        roomService.fixedRoom(roomId, userDetails);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 

@@ -3,7 +3,6 @@ package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.BarterStatusDto;
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.NotificationType;
-import com.sparta.mulmul.dto.item.ItemStarDto;
 import com.sparta.mulmul.dto.trade.RequestTradeDto;
 import com.sparta.mulmul.dto.trade.TradeDecisionDto;
 import com.sparta.mulmul.dto.trade.TradeInfoDto;
@@ -15,14 +14,13 @@ import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -67,27 +65,17 @@ public class TradeService {
 
     // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
     @Transactional
-    public void requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
+    public String  requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
         sellerItem.statusUpdate(sellerItem.getId(), 1);
-
-        // 엄성훈 - 알람정보를 보내기 위해 리스트 추가
-        List<ItemStarDto> itemList = new ArrayList<>();
         for(Long buyerItemIds : requestTradeDto.getMyItemIds()) {
             Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
                     ()-> new IllegalArgumentException("아이템이 없습니다.")
             );
             buyerItem.statusUpdate(buyerItemIds, 2);
-            ItemStarDto itemStarDto = new ItemStarDto(
-                    buyerItem.getId(),
-                    buyerItem.getItemImg().split(",")[0],
-                    buyerItem.getTitle(),
-                    buyerItem.getContents()
-            );
-            itemList.add(itemStarDto);
         }
 
         //Long 형태인 아이디들을 String 형태로 변환
@@ -100,25 +88,31 @@ public class TradeService {
         String StringbuyerItemIds = String.join(",", buyerItemIds);
         String[] barterList = new String[]{StringbuyerItemIds, requestTradeDto.getItemId().toString()};
         String StringBarter = String.join(";", barterList);
-        // 거래 내역 생성
-        Barter barter = Barter.builder()
-                .buyerId(userDetails.getUserId())
-                .sellerId(requestTradeDto.getUserId())
-                .barter(StringBarter)
-                .status(1)
-                .isBuyerScore(false)
-                .isBuyerTrade(false)
-                .isSellerScore(false)
-                .isSellerTrade(false)
-                .build();
-        barterRepository.save(barter);
-        // 알림 내역 저장 후 상대방에게 전송
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(()->new NullPointerException("해당 회원이 존재하지 않습니다."));
-        Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
-        // 리팩토링 필요
-        messagingTemplate.convertAndSend(
-                "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification,itemList)
-        );
+        Optional<Barter> findBarter = barterRepository.findByBarter(StringBarter);
+        if (findBarter.isPresent()){
+            return "false";
+        }else {
+            // 거래 내역 생성
+            Barter barter = Barter.builder()
+                    .buyerId(userDetails.getUserId())
+                    .sellerId(requestTradeDto.getUserId())
+                    .barter(StringBarter)
+                    .status(1)
+                    .isBuyerScore(false)
+                    .isBuyerTrade(false)
+                    .isSellerScore(false)
+                    .isSellerTrade(false)
+                    .build();
+            barterRepository.save(barter);
+            // 알림 내역 저장 후 상대방에게 전송
+            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new NullPointerException("해당 회원이 존재하지 않습니다."));
+            Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
+            // 리팩토링 필요
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + requestTradeDto.getUserId(), NotificationDto.createFrom(notification)
+            );
+            return "true";
+        }
     }
 
 

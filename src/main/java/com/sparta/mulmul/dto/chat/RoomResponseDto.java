@@ -1,5 +1,6 @@
 package com.sparta.mulmul.dto.chat;
 
+import com.sparta.mulmul.dto.RoomDto;
 import com.sparta.mulmul.model.ChatMessage;
 import com.sparta.mulmul.model.ChatRoom;
 import com.sparta.mulmul.model.User;
@@ -19,9 +20,10 @@ public class RoomResponseDto {
     private String message;
     private LocalDateTime date;
     private Boolean isRead;
+    private Boolean isBanned = false;
     private int unreadCnt;
 
-    public static RoomResponseDto createOf(ChatRoom chatRoom, ChatMessage message, User user, int unreadCnt){
+    public static RoomResponseDto createOf(ChatRoom chatRoom, ChatMessage message, User user, int unreadCnt, boolean exist){
 
         RoomResponseDto responseDto = new RoomResponseDto();
 
@@ -34,8 +36,24 @@ public class RoomResponseDto {
         responseDto.date = message.getCreatedAt();
         responseDto.isRead = message.getIsRead();
         responseDto.unreadCnt = unreadCnt;
+        if (exist) { responseDto.isBanned = true; }
 
         return responseDto;
     }
 
+    public static RoomResponseDto createOf(RoomDto dto){
+
+        RoomResponseDto responseDto = new RoomResponseDto();
+
+        responseDto.roomId = dto.getRoomId();
+        responseDto.userId = dto.getAccId();
+        responseDto.nickname = dto.getAccNickname();
+        responseDto.profile = dto.getAccProfile();
+        responseDto.message = dto.getMessage();
+        responseDto.date = dto.getDate();
+        responseDto.isRead = dto.getIsRead();
+        responseDto.isBanned = dto.getIsBanned();
+
+        return responseDto;
+    }
 }
