@@ -47,13 +47,13 @@ public class AwsS3Service {
             String fileName = createFileName(file.getOriginalFilename());
             String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("/")+1);
             
-            MultipartFile resizedFile = resizeImage(fileName, fileFormatName, file, 768);
+//            MultipartFile resizedFile = resizeImage(fileName, fileFormatName, file, 768);
 
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(resizedFile.getSize());
+            objectMetadata.setContentLength(file.getSize());
             objectMetadata.setContentType(file.getContentType());
 
-            try(InputStream inputStream = resizedFile.getInputStream()) {
+            try(InputStream inputStream = file.getInputStream()) {
                 amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
             } catch(IOException e) {
