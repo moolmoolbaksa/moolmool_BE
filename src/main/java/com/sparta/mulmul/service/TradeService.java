@@ -117,7 +117,7 @@ public class TradeService {
 
 
     // 이승재 교환신청 확인 페이지
-    public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
+    public TradeDecisionDto wtradeDecision(Long baterId, UserDetailsImpl userDetails) {
         Barter barter = barterRepository.findById(baterId).orElseThrow(
                 ()-> new IllegalArgumentException("거래내역이 없습니다.")
         );

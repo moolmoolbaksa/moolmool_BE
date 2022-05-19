@@ -210,14 +210,17 @@ public class ItemService {
         Long buyerId = userDetails.getUserId();
         Long sellerId = user.getId();
         List<Barter> barterList = barterRepository.findAllByBuyerIdAndSellerId(buyerId, sellerId);
-        if(barterList.isEmpty()){
-            traded = "false";
-        }
+        int tradeCnt = 0;
         for(Barter barter : barterList){
-            if(barter.getBarter().split(";")[0].equals(itemId)){
-                traded = "true";
+            if(barter.getBarter().split(";")[1].equals(itemId.toString())){
+                tradeCnt++;
             }
         }
+        if(barterList.isEmpty() || tradeCnt==0 ){
+            traded = "false";
+        }else if(tradeCnt>0){
+            traded = "true";
+     }
 
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 user.getId(),
