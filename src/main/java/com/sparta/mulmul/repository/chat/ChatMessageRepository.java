@@ -39,8 +39,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     @Query("UPDATE ChatMessage msg SET msg.isRead = true WHERE msg.roomId = :roomId AND msg.senderId <> :userId AND msg.isRead = false")
     void updateChatMessage(Long roomId, Long userId);
 
-    // mySQL로 네이티브 쿼리를 작성해 줘야 할 것 같습니다.
-//    @Query("SELECT msg FROM ChatMessage msg WHERE msg.roomId IN :roomIds")
-    @Query(value = "SELECT * FROM chat_message msg WHERE msg.room_id IN (SELECT msg.room_id, MAX(msg.room_id) FROM chat_message msg)", nativeQuery = true)
+    @Query(value = "SELECT * FROM chat_message WHERE (room_id, message_id) " +
+            "IN (SELECT room_id, MAX(message_id) FROM chat_message " +
+            "GROUP BY room_id " +
+            "HAVING room_id IN :roomIds)",
+            nativeQuery = true)
     List<ChatMessage> findFirstByRoomIds(@Param("roomIds") List<Long> roomIds);
 }
