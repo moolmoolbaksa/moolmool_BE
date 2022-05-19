@@ -25,6 +25,17 @@ public class ItemStarService {
 
         Map<String, Integer> map = new HashMap<>();
         int cnt = 0;
+        searchSellerItem(barterList, map, cnt);
+        List<String> listKeySet = new ArrayList<>(map.keySet());
+        // 내림차순
+        Collections.sort(listKeySet, (value1, value2) -> (map.get(value2).compareTo(map.get(value1))));
+
+        cnt = 0;
+        brackTopThree(itemStarDtoList, map, cnt, listKeySet);
+        return itemStarDtoList;
+    }
+
+    private void searchSellerItem(List<Barter> barterList, Map<String, Integer> map, int cnt) {
         for (Barter eachBarter : barterList) {
             String sellerItem = eachBarter.getBarter().split(";")[1];
             Integer count = map.get(sellerItem);
@@ -39,14 +50,11 @@ public class ItemStarService {
                 break;
             }
         }
+    }
 
-        List<String> listKeySet = new ArrayList<>(map.keySet());
-        // 내림차순
-        Collections.sort(listKeySet, (value1, value2) -> (map.get(value2).compareTo(map.get(value1))));
-
-        cnt = 0;
+    private void brackTopThree(List<ItemStarDto> itemStarDtoList, Map<String, Integer> map, int cnt, List<String> listKeySet) {
         for (String key : listKeySet) {
-//            System.out.println("key : " + key + " , " + "value : " + map.get(key));
+            System.out.println("key : " + key + " , " + "value : " + map.get(key));
             Long sellerItemId = Long.parseLong(key);
             Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
                     () -> new IllegalArgumentException("아이템 정보가 없습니다."));
@@ -63,7 +71,6 @@ public class ItemStarService {
                 break;
             }
         }
-        return itemStarDtoList;
     }
 }
 
