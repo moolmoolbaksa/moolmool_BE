@@ -87,11 +87,11 @@ public class ChatRoomService {
                 .orElseThrow( () -> new NullPointerException("ChatRoomService: getRooms) 존재하지 않는 회원입니다.")
                 );
         // 방 목록 찾기
-        List<ChatRoom> chatRooms = roomRepository.findAllBy(user);
-//        List<RoomDto> dtos = roomRepository.findAllWithMessage(user);
+//        List<ChatRoom> chatRooms = roomRepository.findAllBy(user);
+        List<RoomDto> dtos = roomRepository.findAllWith(user);
 
         // 메시지 리스트 만들기
-        return setMessages(chatRooms, userDetails.getUserId());
+        return getTest(dtos, userDetails.getUserId());
     }
 
     // 채팅방 즐겨찾기 추가
@@ -156,12 +156,12 @@ public class ChatRoomService {
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( dto.getAccId() == userId ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
-                    if (dto.getIsFixed()){ prefix.add(RoomResponseDto.createOf(dto)); }
+                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(dto)); }
                     else { suffix.add(RoomResponseDto.createOf(dto)); }
                 }
             } else if ( dto.getReqId() == userId ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
-                    if (dto.getIsFixed()){ prefix.add(RoomResponseDto.createOf(dto)); }
+                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(dto)); }
                     else { suffix.add(RoomResponseDto.createOf(dto)); }
                 }
             }

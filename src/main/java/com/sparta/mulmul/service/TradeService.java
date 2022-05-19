@@ -159,7 +159,14 @@ public class TradeService {
         }
         //구매자 닉네임
         String opponentNickname = buyer.getNickname();
-        return new TradeDecisionDto(opponentNickname, nickname, degree, title, contents, image, barterItem);
+        //거래 상태 확인
+        String accepted;
+        if(barter.getStatus()==2){
+            accepted ="true";
+        }else {
+            accepted="false";
+        }
+        return new TradeDecisionDto(opponentNickname, nickname, degree, title, contents, image, accepted, barterItem);
     }
 
 
