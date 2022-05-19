@@ -1,5 +1,6 @@
 package com.sparta.mulmul.repository.chat;
 
+import com.sparta.mulmul.dto.UnreadCountDto;
 import com.sparta.mulmul.model.ChatMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -47,4 +48,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             "HAVING room_id IN :roomIds)",
             nativeQuery = true)
     List<ChatMessage> findFirstByRoomIds(@Param("roomIds") List<Long> roomIds);
+
+//    // 메시지 안읽은 개수 카운트 리스트
+//    @Query("SELECT msg.room_id AS roomId, COUNT(CASE WHEN ) FROM chat_message msg WHERE msg.sender_id = :user_id AND msg.room_id = ")
+//    List<UnreadCountDto> countMessages();
 }

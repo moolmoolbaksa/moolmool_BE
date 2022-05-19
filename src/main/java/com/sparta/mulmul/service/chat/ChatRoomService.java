@@ -156,13 +156,13 @@ public class ChatRoomService {
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( dto.getAccId() == userId ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
-                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(dto)); }
-                    else { suffix.add(RoomResponseDto.createOf(dto)); }
+                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(dto, "acceptor")); }
+                    else { suffix.add(RoomResponseDto.createOf(dto, "acceptor")); }
                 }
             } else if ( dto.getReqId() == userId ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
-                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(dto)); }
-                    else { suffix.add(RoomResponseDto.createOf(dto)); }
+                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(dto, "requester")); }
+                    else { suffix.add(RoomResponseDto.createOf(dto, "requester")); }
                 }
             }
         }
