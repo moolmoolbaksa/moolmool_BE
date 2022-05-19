@@ -376,7 +376,7 @@ public class BarterService {
                     myPosition
             );
             messagingTemplate.convertAndSend(
-                    "/sub/barter/" + myBarter.getBuyerId(), messageDto
+                    "/sub/barter/" + myBarter.getSellerId(), messageDto
             );
         } else {
             // 내게 보낼 메시지 정보 담기
@@ -388,7 +388,7 @@ public class BarterService {
                     myPosition
             );
             messagingTemplate.convertAndSend(
-                    "/sub/barter/" + myBarter.getSellerId(), messageDto
+                    "/sub/barter/" + myBarter.getBuyerId(), messageDto
             );
         }
     }
