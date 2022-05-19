@@ -18,14 +18,15 @@ public class BarterDto {
     private LocalDateTime date;
     private int status;
     private String myPosition;
-    private Boolean isScore;
     private Boolean isTrade;
+    private Boolean isScore;
+    private Boolean userIsTrade;
     private List<OpponentBarterDto> myItem;
     private List<OpponentBarterDto> barterItem;
 
 
 
-    public BarterDto(Long barterId, Long userId, String usernickname, String profile, LocalDateTime date, int status, String myPosition , Boolean isTrade, Boolean isScore, List<OpponentBarterDto> myItem, List<OpponentBarterDto> barterItem) {
+    public BarterDto(Long barterId, Long userId, String usernickname, String profile, LocalDateTime date, int status, String myPosition , Boolean isTrade, Boolean isScore, Boolean userIsTrade , List<OpponentBarterDto> myItem, List<OpponentBarterDto> barterItem) {
 
         this.barterId = barterId;
         this.userId = userId;
@@ -36,6 +37,7 @@ public class BarterDto {
         this.myPosition = myPosition;
         this.isTrade = isTrade;
         this.isScore = isScore;
+        this.userIsTrade = userIsTrade;
         this.myItem = myItem;
         this.barterItem = barterItem;
     }

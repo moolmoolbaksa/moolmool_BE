@@ -47,6 +47,7 @@ public class BarterService {
         String myPosition = null;
         // 나의 거래완료 여부
         Boolean myTradeCheck;
+        Boolean opponentTradeCheck;
         // 나의 평가완료 여부
         Boolean myScoreCheck;
 
@@ -118,10 +119,12 @@ public class BarterService {
             if (myPosition.equals("buyer")) {
                 myTradeCheck = barters.getIsBuyerTrade();
                 myScoreCheck = barters.getIsBuyerScore();
+                opponentTradeCheck = barters.getIsSellerTrade();
                 //내포지션이 셀러라면 거래내역의 상태 확인하기
             } else {
                 myTradeCheck = barters.getIsSellerTrade();
                 myScoreCheck = barters.getIsSellerScore();
+                opponentTradeCheck = barters.getIsBuyerTrade();
             }
 
             if (status == 2 || status == 1) {
@@ -135,6 +138,7 @@ public class BarterService {
                         myPosition,
                         myTradeCheck,
                         myScoreCheck,
+                        opponentTradeCheck,
                         myBarterList,
                         barterList
                 );
@@ -151,6 +155,7 @@ public class BarterService {
                         myPosition,
                         myTradeCheck,
                         myScoreCheck,
+                        opponentTradeCheck,
                         myBarterList,
                         barterList
                 );
@@ -174,13 +179,14 @@ public class BarterService {
 
     // 엄성훈 - 거래완료취소 유저의 isTrade를 true -> false 업데이트
     @Transactional
-    public void cancelBarter(Long barterId, UserDetailsImpl userDetails) {
+    public BarterTradeCheckDto cancelBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("유저 정보가 없습니다.")
         );
         Long userId = user.getId();
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(
                 () -> new IllegalArgumentException("거래내역이 없습니다."));
+        BarterTradeCheckDto oppononetTreadeCheck;
         // 거래중인 상태가 아니면 예외처리
         if (mybarter.getStatus() == 2) {
             // 거래하는 사람이 바이어라면
@@ -188,14 +194,17 @@ public class BarterService {
                 Boolean isTradeCheck = mybarter.getIsBuyerTrade();
                 isTradeCheck(isTradeCheck);
                 mybarter.updateTradBuyer(false);
+                oppononetTreadeCheck = new BarterTradeCheckDto(mybarter.getIsSellerTrade());
             } else {
                 Boolean isTradeCheck = mybarter.getIsSellerTrade();
                 isTradeCheck(isTradeCheck);
                 mybarter.updateTradSeller(false);
+                oppononetTreadeCheck = new BarterTradeCheckDto(mybarter.getIsBuyerTrade());
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
+        return oppononetTreadeCheck;
     }
 
     // 거래완료를 하지 않았을 경우
@@ -261,7 +270,7 @@ public class BarterService {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
 
-        boolean isTrade;
+        boolean opponentTrade;
         String myPosition;
         // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
         if (myBarter.getBuyerId().equals(userId)) {
@@ -269,7 +278,8 @@ public class BarterService {
                 throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "완료된 거래입니다");
             }
             myBarter.updateTradBuyer(true);
-            isTrade = true;
+            // 상대방의 거래유무
+            opponentTrade = myBarter.getIsSellerTrade();
             myPosition = "buyer";
             // 유저가 셀러라면 셀러거래완료를 true로 변경한다.
         } else {
@@ -277,11 +287,9 @@ public class BarterService {
                 throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "완료된 거래입니다");
             }
             myBarter.updateTradSeller(true);
-            isTrade = true;
+            opponentTrade = myBarter.getIsBuyerTrade();
             myPosition = "seller";
         }
-
-        System.out.println("내 포지션은 : " + myPosition);
 
         Boolean buyerTrade = myBarter.getIsBuyerTrade();
         Boolean sellerTrade = myBarter.getIsSellerTrade();
@@ -309,7 +317,7 @@ public class BarterService {
 
             // 내게 거래완료 메시지 보내기
             sendMyMessage(barterId, myBarter, myPosition);
-            return new BarterStatusDto(isTrade, false, myBarter.getStatus());
+            return new BarterStatusDto(opponentTrade, false, myBarter.getStatus());
         } else {
             // 알림 내역 저장
             Notification notification = notificationRepository.save(Notification.createOfBarter(myBarter, user.getNickname(), myPosition, "Barter"));
@@ -317,7 +325,7 @@ public class BarterService {
             sendTradeMessage(myBarter, myPosition, notification);
             // 내게 거래완료 메시지 보내기
             sendMyMessage(barterId, myBarter, myPosition);
-            return new BarterStatusDto(isTrade, false, myBarter.getStatus());
+            return new BarterStatusDto(opponentTrade, false, myBarter.getStatus());
         }
     }
 
@@ -325,11 +333,9 @@ public class BarterService {
     private void sendTradeMessage(Barter myBarter, String myPosition, Notification notification) {
 
         if (myPosition.equals("buyer")) {
-            System.out.println("내포지션은 바이어 : " + myPosition);
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + myBarter.getSellerId(), NotificationDto.createFrom(notification));
         } else {
-            System.out.println("내포지션은 셀러 : " + myPosition);
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + myBarter.getBuyerId(), NotificationDto.createFrom(notification));
         }
