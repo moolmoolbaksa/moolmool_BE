@@ -19,9 +19,10 @@ public class RoomResponseDto {
     private String message;
     private LocalDateTime date;
     private Boolean isRead;
+    private Boolean isBanned = false;
     private int unreadCnt;
 
-    public static RoomResponseDto createOf(ChatRoom chatRoom, ChatMessage message, User user, int unreadCnt){
+    public static RoomResponseDto createOf(ChatRoom chatRoom, ChatMessage message, User user, int unreadCnt, boolean exist){
 
         RoomResponseDto responseDto = new RoomResponseDto();
 
@@ -34,6 +35,7 @@ public class RoomResponseDto {
         responseDto.date = message.getCreatedAt();
         responseDto.isRead = message.getIsRead();
         responseDto.unreadCnt = unreadCnt;
+        if (exist) { responseDto.isBanned = true; }
 
         return responseDto;
     }
