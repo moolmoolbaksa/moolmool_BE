@@ -48,7 +48,7 @@ public class MyUserService {
             ItemUserResponseDto itemResponseDto = getItemUserDto(items);
             myItemResponseList.add(itemResponseDto);
         }
-        List<Scrab> myScrabList = scrabRepository.findTop3ByUserIdAndScrab(userId, true);
+        List<Scrab> myScrabList = scrabRepository.findTop3ByUserIdAndScrabOrderByModifiedAtDesc(userId, true);
         List<ItemUserResponseDto> myScrapItemList = new ArrayList<>();
 
         for (Scrab myscrap : myScrabList) {
@@ -117,7 +117,7 @@ public class MyUserService {
 
     // 이승재 / 찜한 아이템 보여주기
     public List<MyScrabItemDto> scrabItem(UserDetailsImpl userDetails) {
-        List<Scrab> scrabList = scrabRepository.findAllByUserId(userDetails.getUserId());
+        List<Scrab> scrabList = scrabRepository.findAllByUserIdOrderByModifiedAtDesc(userDetails.getUserId());
 
         List<MyScrabItemDto> myScrabItemDtoList = new ArrayList<>();
         for (Scrab scrab : scrabList) {
@@ -129,7 +129,8 @@ public class MyUserService {
                 String title = item.getTitle();
                 String contents = item.getContents();
                 String image = item.getItemImg().split(",")[0];
-                MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image);
+                int status = item.getStatus();
+                MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image, status);
                 myScrabItemDtoList.add(myScrabItemDto);
             }
         }

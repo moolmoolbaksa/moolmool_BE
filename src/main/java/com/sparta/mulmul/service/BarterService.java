@@ -127,40 +127,18 @@ public class BarterService {
                 opponentTradeCheck = barters.getIsBuyerTrade();
             }
 
-            if (status == 2 || status == 1) {
-                BarterDto barterFin = new BarterDto(
-                        barterId,
-                        opponentId,
-                        opponentUser.getNickname(),
-                        opponentUser.getProfile(),
-                        null,
-                        status,
-                        myPosition,
-                        myTradeCheck,
-                        myScoreCheck,
-                        opponentTradeCheck,
-                        myBarterList,
-                        barterList
-                );
-                totalList.add(barterFin);
-                // 거래완료, 평가완료일 경우
-            } else if (status == 3 || status == 4) {
-                BarterDto barterFin = new BarterDto(
-                        barterId,
-                        opponentId,
-                        opponentUser.getNickname(),
-                        opponentUser.getProfile(),
-                        date,
-                        status,
-                        myPosition,
-                        myTradeCheck,
-                        myScoreCheck,
-                        opponentTradeCheck,
-                        myBarterList,
-                        barterList
-                );
-                totalList.add(barterFin);
-            }
+            addBarterInfo(totalList,
+                    opponentId,
+                    myPosition,
+                    myTradeCheck,
+                    opponentTradeCheck,
+                    myScoreCheck,
+                    barterId,
+                    date,
+                    myBarterList,
+                    barterList,
+                    opponentUser,
+                    status);
         }
         return totalList;
     }
@@ -176,6 +154,43 @@ public class BarterService {
         return itemList;
     }
 
+    // 성훈 리팩토링 (거래리스트 정보넣기 )
+    private void addBarterInfo(List<BarterDto> totalList, Long opponentId, String myPosition, Boolean myTradeCheck, Boolean opponentTradeCheck, Boolean myScoreCheck, Long barterId, LocalDateTime date, List<OpponentBarterDto> myBarterList, List<OpponentBarterDto> barterList, User opponentUser, int status) {
+        if (status == 2 || status == 1) {
+            BarterDto barterFin = new BarterDto(
+                    barterId,
+                    opponentId,
+                    opponentUser.getNickname(),
+                    opponentUser.getProfile(),
+                    null,
+                    status,
+                    myPosition,
+                    myTradeCheck,
+                    myScoreCheck,
+                    opponentTradeCheck,
+                    myBarterList,
+                    barterList
+            );
+            totalList.add(barterFin);
+            // 거래완료, 평가완료일 경우
+        } else if (status == 3 || status == 4) {
+            BarterDto barterFin = new BarterDto(
+                    barterId,
+                    opponentId,
+                    opponentUser.getNickname(),
+                    opponentUser.getProfile(),
+                    date,
+                    status,
+                    myPosition,
+                    myTradeCheck,
+                    myScoreCheck,
+                    opponentTradeCheck,
+                    myBarterList,
+                    barterList
+            );
+            totalList.add(barterFin);
+        }
+    }
 
     // 엄성훈 - 거래완료취소 유저의 isTrade를 true -> false 업데이트
     @Transactional
@@ -189,20 +204,26 @@ public class BarterService {
         BarterTradeCheckDto oppononetTreadeCheck;
         // 거래중인 상태가 아니면 예외처리
         if (mybarter.getStatus() == 2) {
-            // 거래하는 사람이 바이어라면
-            if (mybarter.getBuyerId().equals(userId)) {
-                Boolean isTradeCheck = mybarter.getIsBuyerTrade();
-                isTradeCheck(isTradeCheck);
-                mybarter.updateTradBuyer(false);
-                oppononetTreadeCheck = new BarterTradeCheckDto(mybarter.getIsSellerTrade());
-            } else {
-                Boolean isTradeCheck = mybarter.getIsSellerTrade();
-                isTradeCheck(isTradeCheck);
-                mybarter.updateTradSeller(false);
-                oppononetTreadeCheck = new BarterTradeCheckDto(mybarter.getIsBuyerTrade());
-            }
+            // 거래하는 상대방이 바이어라면
+            oppononetTreadeCheck = getBarterTradeCheckDto(userId, mybarter);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+        }
+        return oppononetTreadeCheck;
+    }
+
+    private BarterTradeCheckDto getBarterTradeCheckDto(Long userId, Barter mybarter) {
+        BarterTradeCheckDto oppononetTreadeCheck;
+        if (mybarter.getBuyerId().equals(userId)) {
+            Boolean isTradeCheck = mybarter.getIsBuyerTrade();
+            isTradeCheck(isTradeCheck);
+            mybarter.updateTradBuyer(false);
+            oppononetTreadeCheck = new BarterTradeCheckDto(mybarter.getIsSellerTrade());
+        } else {
+            Boolean isTradeCheck = mybarter.getIsSellerTrade();
+            isTradeCheck(isTradeCheck);
+            mybarter.updateTradSeller(false);
+            oppononetTreadeCheck = new BarterTradeCheckDto(mybarter.getIsBuyerTrade());
         }
         return oppononetTreadeCheck;
     }
@@ -351,7 +372,8 @@ public class BarterService {
             BarterMessageDto messageDto = new BarterMessageDto(
                     barterId,
                     opponentIsTrade,
-                    myBarter.getStatus()
+                    myBarter.getStatus(),
+                    myPosition
             );
             messagingTemplate.convertAndSend(
                     "/sub/barter/" + myBarter.getSellerId(), messageDto
@@ -362,7 +384,8 @@ public class BarterService {
             BarterMessageDto messageDto = new BarterMessageDto(
                     barterId,
                     opponentIsTrade,
-                    myBarter.getStatus()
+                    myBarter.getStatus(),
+                    myPosition
             );
             messagingTemplate.convertAndSend(
                     "/sub/barter/" + myBarter.getBuyerId(), messageDto
