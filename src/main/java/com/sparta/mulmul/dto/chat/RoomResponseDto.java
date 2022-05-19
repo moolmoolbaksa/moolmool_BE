@@ -49,12 +49,10 @@ public class RoomResponseDto {
         responseDto.userId = dto.getAccId();
         responseDto.nickname = dto.getAccNickname();
         responseDto.profile = dto.getAccProfile();
-        // 메시지에 관한 정보도 같이 검색해 와야 한다. 최신 메시지 단 한 건이면 된다.
         responseDto.message = dto.getMessage();
         responseDto.date = dto.getDate();
         responseDto.isRead = dto.getIsRead();
-        responseDto.unreadCnt = 0;
-        responseDto.isBanned = true;
+        responseDto.isBanned = dto.getIsBanned();
 
         return responseDto;
     }

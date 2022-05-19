@@ -29,7 +29,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "WHERE (r.acceptor_id = :user OR r.requester_id = :user) " +
             "ORDER BY r.modified_at DESC",
             nativeQuery = true)
-    List<RoomDto> findAllWithMessage(@Param("user") User user);
+    List<RoomDto> findAllWith(@Param("user") User user);
 
     @Query("SELECT room FROM ChatRoom room JOIN FETCH room.acceptor JOIN FETCH room.requester WHERE room.id = :roomId")
     Optional<ChatRoom> findByIdFetch(Long roomId);
