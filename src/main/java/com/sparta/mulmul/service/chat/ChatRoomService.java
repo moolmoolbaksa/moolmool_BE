@@ -1,5 +1,6 @@
 package com.sparta.mulmul.service.chat;
 
+import com.sparta.mulmul.dto.TestDto;
 import com.sparta.mulmul.model.ChatMessage;
 
 import com.sparta.mulmul.dto.user.UserRequestDto;
@@ -87,6 +88,10 @@ public class ChatRoomService {
                 );
         // 방 목록 찾기
         List<ChatRoom> chatRooms = roomRepository.findAllBy(user);
+//        List<TestDto> dtos = roomRepository.findAllWithCnt(user);
+//        for ( TestDto dto : dtos ){
+//            System.out.println(dto.getRoomId() + "번 " + dto.getModifiedAt() + "닉네임: " + dto.getAcceptor().getNickname());
+//        }
         // 메시지 리스트 만들기
         return setMessages(chatRooms, userDetails.getUserId());
     }
@@ -106,16 +111,13 @@ public class ChatRoomService {
 
         List<RoomResponseDto> prefix = new ArrayList<>();
         List<RoomResponseDto> suffix = new ArrayList<>();
-
         List<Long> roomIds = new ArrayList<>();
 
-        for (ChatRoom chatRoom : chatRooms ){
-            roomIds.add(chatRoom.getId());
-        }
+        for ( ChatRoom chatRoom : chatRooms ){ roomIds.add(chatRoom.getId()); }
 
         List<ChatMessage> messages = messageRepository.findFirstByRoomIds(roomIds);
 
-        for (ChatRoom chatRoom : chatRooms ){
+        for ( ChatRoom chatRoom : chatRooms ){
             // 메시지 목록 가져오기
             for (ChatMessage message : messages) {
                 if (chatRoom.getId() == message.getRoomId()){

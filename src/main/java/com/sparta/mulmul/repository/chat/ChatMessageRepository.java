@@ -39,7 +39,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     @Query("UPDATE ChatMessage msg SET msg.isRead = true WHERE msg.roomId = :roomId AND msg.senderId <> :userId AND msg.isRead = false")
     void updateChatMessage(Long roomId, Long userId);
 
-    @Query(value = "SELECT * FROM chat_message WHERE (room_id, message_id) " +
+    @Query(value =
+            "SELECT * FROM chat_message WHERE (room_id, message_id) " +
             "IN (SELECT room_id, MAX(message_id) FROM chat_message " +
             "GROUP BY room_id " +
             "HAVING room_id IN :roomIds)",
