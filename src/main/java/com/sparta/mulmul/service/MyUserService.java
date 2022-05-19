@@ -129,7 +129,8 @@ public class MyUserService {
                 String title = item.getTitle();
                 String contents = item.getContents();
                 String image = item.getItemImg().split(",")[0];
-                MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image);
+                int status = item.getStatus();
+                MyScrabItemDto myScrabItemDto = new MyScrabItemDto(itemId, title, contents, image, status);
                 myScrabItemDtoList.add(myScrabItemDto);
             }
         }
