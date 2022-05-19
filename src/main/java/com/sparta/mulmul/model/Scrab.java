@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Scrab {
+public class Scrab extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
