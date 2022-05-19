@@ -56,19 +56,19 @@ public class Notification extends CreationDate {
         return  notification;
     }
 
-    public static Notification createOf2(Barter barter, String nickname, String value, String type){
+    public static Notification createOfBarter(Barter barter, String nickname, String value, String type){
 
         Notification notification = new Notification();
         if (value.equals( "buyer")){
-            notification.userId = barter.getBuyerId();
-        } else {
             notification.userId = barter.getSellerId();
+        } else {
+            notification.userId = barter.getBuyerId();
         }
         notification.changeId = barter.getId();
         notification.nickname = nickname;
         notification.isRead = false;
         if (type.equals("Barter")){
-            notification.type = NotificationType.BARTER;
+            notification.type = NotificationType.FINISH;
         } else {
             notification.type = NotificationType.SCORE;
         }

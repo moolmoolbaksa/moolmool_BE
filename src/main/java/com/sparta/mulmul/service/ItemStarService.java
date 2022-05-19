@@ -59,7 +59,7 @@ public class ItemStarService {
             );
             itemStarDtoList.add(itemStar);
             cnt++;
-            if (cnt == 5) {
+            if (cnt == 3) {
                 break;
             }
         }

@@ -87,7 +87,7 @@ public class ChatMessageService {
         messageRepository.updateChatMessage(roomId, userDetails.getUserId());
 
         for (ChatMessage message : messages) {
-            responseDtos.add(MessageResponseDto.createFromChatMessage(message));
+            responseDtos.add(MessageResponseDto.createFrom(message));
         }
         return responseDtos;
     }

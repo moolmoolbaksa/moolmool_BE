@@ -220,6 +220,7 @@ public class ItemService {
             traded = "false";
         }else if(tradeCnt>0){
             traded = "true";
+
      }
 
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(

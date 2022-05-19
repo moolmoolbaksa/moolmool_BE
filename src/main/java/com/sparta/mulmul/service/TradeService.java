@@ -117,7 +117,7 @@ public class TradeService {
 
 
     // 이승재 교환신청 확인 페이지
-    public TradeDecisionDto wtradeDecision(Long baterId, UserDetailsImpl userDetails) {
+    public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
         Barter barter = barterRepository.findById(baterId).orElseThrow(
                 ()-> new IllegalArgumentException("거래내역이 없습니다.")
         );
@@ -159,7 +159,15 @@ public class TradeService {
         }
         //구매자 닉네임
         String opponentNickname = buyer.getNickname();
-        return new TradeDecisionDto(opponentNickname, nickname, degree, title, contents, image, barterItem);
+
+        //거래 상태 확인
+        String accepted;
+        if(barter.getStatus()==2){
+            accepted ="true";
+        }else {
+            accepted="false";
+        }
+        return new TradeDecisionDto(opponentNickname, nickname, degree, title, contents, image, accepted, barterItem);
     }
 
 

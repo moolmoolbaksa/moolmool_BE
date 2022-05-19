@@ -30,6 +30,12 @@ public class ChatRoom extends Timestamped {
     @Column(nullable = false)
     private Boolean accOut;
 
+    @Column(nullable = false)
+    private Boolean accFixed = false;
+
+    @Column(nullable = false)
+    private Boolean reqFixed = false;
+
     public static ChatRoom createOf(User requester, User acceptor){
 
         ChatRoom room = new ChatRoom();
@@ -44,4 +50,12 @@ public class ChatRoom extends Timestamped {
 
     public void reqOut(Boolean bool) { this.reqOut = bool; }
     public void accOut(Boolean bool) { this.accOut = bool; }
+
+    public void fixedRoom(String flag) {
+        if (flag.equals("acceptor")) {
+            this.accFixed = true;
+        } else {
+            this.reqFixed = true;
+        }
+    }
 }

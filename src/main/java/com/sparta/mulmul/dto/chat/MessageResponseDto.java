@@ -31,7 +31,7 @@ public class MessageResponseDto {
         return responseDto;
     }
 
-    public static MessageResponseDto createFromChatMessage(ChatMessage message){
+    public static MessageResponseDto createFrom(ChatMessage message){
 
         MessageResponseDto responseDto = new MessageResponseDto();
 
