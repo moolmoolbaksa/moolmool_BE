@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +65,7 @@ public class TradeService {
 
     // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
     @Transactional
-    public void requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
+    public String  requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
@@ -87,25 +88,31 @@ public class TradeService {
         String StringbuyerItemIds = String.join(",", buyerItemIds);
         String[] barterList = new String[]{StringbuyerItemIds, requestTradeDto.getItemId().toString()};
         String StringBarter = String.join(";", barterList);
-        // 거래 내역 생성
-        Barter barter = Barter.builder()
-                .buyerId(userDetails.getUserId())
-                .sellerId(requestTradeDto.getUserId())
-                .barter(StringBarter)
-                .status(1)
-                .isBuyerScore(false)
-                .isBuyerTrade(false)
-                .isSellerScore(false)
-                .isSellerTrade(false)
-                .build();
-        barterRepository.save(barter);
-        // 알림 내역 저장 후 상대방에게 전송
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(()->new NullPointerException("해당 회원이 존재하지 않습니다."));
-        Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
-        // 리팩토링 필요
-        messagingTemplate.convertAndSend(
-                "/sub/notification/" + requestTradeDto.getUserId(), NotificationDto.createFrom(notification)
-        );
+        Optional<Barter> findBarter = barterRepository.findByBarter(StringBarter);
+        if (findBarter.isPresent()){
+            return "false";
+        }else {
+            // 거래 내역 생성
+            Barter barter = Barter.builder()
+                    .buyerId(userDetails.getUserId())
+                    .sellerId(requestTradeDto.getUserId())
+                    .barter(StringBarter)
+                    .status(1)
+                    .isBuyerScore(false)
+                    .isBuyerTrade(false)
+                    .isSellerScore(false)
+                    .isSellerTrade(false)
+                    .build();
+            barterRepository.save(barter);
+            // 알림 내역 저장 후 상대방에게 전송
+            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new NullPointerException("해당 회원이 존재하지 않습니다."));
+            Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
+            // 리팩토링 필요
+            messagingTemplate.convertAndSend(
+                    "/sub/notification/" + requestTradeDto.getUserId(), NotificationDto.createFrom(notification)
+            );
+            return "true";
+        }
     }
 
 

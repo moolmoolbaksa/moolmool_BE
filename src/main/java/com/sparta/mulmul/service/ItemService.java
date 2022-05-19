@@ -24,6 +24,7 @@ public class ItemService {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final ReportRepository reportRepository;
+    private final BarterRepository barterRepository;
 
     // 이승재 / 보따리 아이템 등록하기
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
@@ -203,6 +204,21 @@ public class ItemService {
             Long userId = userDetails.getUserId();
             distance = getDistance(userId, item.getAddress());
         }
+
+        // 교환신청했는지 확인하기
+        String traded = null;
+        Long buyerId = userDetails.getUserId();
+        Long sellerId = user.getId();
+        List<Barter> barterList = barterRepository.findAllByBuyerIdAndSellerId(buyerId, sellerId);
+        if(barterList.isEmpty()){
+            traded = "false";
+        }
+        for(Barter barter : barterList){
+            if(barter.getBarter().split(";")[0].equals(itemId)){
+                traded = "true";
+            }
+        }
+
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 user.getId(),
                 itemId,
@@ -221,8 +237,8 @@ public class ItemService {
                 scrabCnt,
                 item.getType(),
                 favored,
-                isSrab
-        );
+                isSrab,
+                traded);
         return itemDetailResponseDto;
     }
 
