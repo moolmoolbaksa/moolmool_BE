@@ -1,5 +1,6 @@
 package com.sparta.mulmul.dto.chat;
 
+import com.sparta.mulmul.dto.RoomDto;
 import com.sparta.mulmul.model.ChatMessage;
 import com.sparta.mulmul.model.ChatRoom;
 import com.sparta.mulmul.model.User;
@@ -40,4 +41,21 @@ public class RoomResponseDto {
         return responseDto;
     }
 
+    public static RoomResponseDto createOf(RoomDto dto){
+
+        RoomResponseDto responseDto = new RoomResponseDto();
+
+        responseDto.roomId = dto.getRoomId();
+        responseDto.userId = dto.getAccId();
+        responseDto.nickname = dto.getAccNickname();
+        responseDto.profile = dto.getAccProfile();
+        // 메시지에 관한 정보도 같이 검색해 와야 한다. 최신 메시지 단 한 건이면 된다.
+        responseDto.message = dto.getMessage();
+        responseDto.date = dto.getDate();
+        responseDto.isRead = dto.getIsRead();
+        responseDto.unreadCnt = 0;
+        responseDto.isBanned = true;
+
+        return responseDto;
+    }
 }

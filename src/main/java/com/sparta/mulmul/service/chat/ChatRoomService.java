@@ -1,6 +1,6 @@
 package com.sparta.mulmul.service.chat;
 
-import com.sparta.mulmul.dto.TestDto;
+import com.sparta.mulmul.dto.RoomDto;
 import com.sparta.mulmul.model.ChatMessage;
 
 import com.sparta.mulmul.dto.user.UserRequestDto;
@@ -88,22 +88,25 @@ public class ChatRoomService {
                 );
         // 방 목록 찾기
         List<ChatRoom> chatRooms = roomRepository.findAllBy(user);
-//        List<TestDto> dtos = roomRepository.findAllWithCnt(user);
-//        for ( TestDto dto : dtos ){
-//            System.out.println(dto.getRoomId() + "번 " + dto.getModifiedAt() + "닉네임: " + dto.getAcceptor().getNickname());
-//        }
+//        List<RoomDto> dtos = roomRepository.findAllWithMessage(user);
+
         // 메시지 리스트 만들기
         return setMessages(chatRooms, userDetails.getUserId());
     }
 
     // 채팅방 즐겨찾기 추가
     @Transactional
-    public void fixedRoom(Long roomId){
+    public void fixedRoom(Long roomId, UserDetailsImpl userDetails){
 
+        // fetchJoin 필요
         ChatRoom chatRoom = roomRepository.findById(roomId)
                 .orElseThrow(() -> new NullPointerException("ChatRoomController: 해당 채팅방이 존재하지 않습니다.")
                 );
-        chatRoom.fixedRoom();
+        String flag;
+        if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ){ flag = "acceptor"; }
+        else { flag = "requester"; }
+
+        chatRoom.fixedRoom(flag);
     }
 
     // 메시지 리스트 만들기
@@ -126,17 +129,40 @@ public class ChatRoomService {
                         if (!chatRoom.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
                             boolean exist = bannedRepository.existsByUser(chatRoom.getAcceptor(), chatRoom.getRequester()); // 플래그로 작동하도록 수정 필요
                             int unreadCnt = messageRepository.countMsg(chatRoom.getRequester().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
-                            if (chatRoom.getIsFixed()){ prefix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt, exist)); }
+                            if (chatRoom.getAccFixed()){ prefix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt, exist)); }
                             else { suffix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt, exist)); }
                         }
                     } else if ( chatRoom.getRequester().getId() == userId ){
                         if (!chatRoom.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
                             boolean exist = bannedRepository.existsByUser(chatRoom.getAcceptor(), chatRoom.getRequester());
                             int unreadCnt = messageRepository.countMsg(chatRoom.getAcceptor().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
-                            if (chatRoom.getIsFixed()){ prefix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt, exist)); }
+                            if (chatRoom.getReqFixed()){ prefix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt, exist)); }
                             else { suffix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt, exist)); }
                         }
                     }
+                }
+            }
+        }
+        prefix.addAll(suffix);
+        return prefix;
+    }
+
+    public List<RoomResponseDto> getTest(List<RoomDto> roomDtos, Long userId){
+
+        List<RoomResponseDto> prefix = new ArrayList<>();
+        List<RoomResponseDto> suffix = new ArrayList<>();
+
+        for (RoomDto dto : roomDtos) {
+            // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
+            if ( dto.getAccId() == userId ) {
+                if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
+                    if (dto.getIsFixed()){ prefix.add(RoomResponseDto.createOf(dto)); }
+                    else { suffix.add(RoomResponseDto.createOf(dto)); }
+                }
+            } else if ( dto.getReqId() == userId ){
+                if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
+                    if (dto.getIsFixed()){ prefix.add(RoomResponseDto.createOf(dto)); }
+                    else { suffix.add(RoomResponseDto.createOf(dto)); }
                 }
             }
         }
