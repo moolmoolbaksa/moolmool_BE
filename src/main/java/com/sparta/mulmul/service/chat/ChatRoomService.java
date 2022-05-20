@@ -52,7 +52,12 @@ public class ChatRoomService {
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
                         .orElseGet( () -> {
                             ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
-                            messageRepository.save(ChatMessage.createInitOf(c.getId())); // 채팅방 개설 메시지 생성
+                            // 채팅방 개설 메시지 생성
+                            messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
+                                    MessageResponseDto.createFrom(
+                                            messageRepository.save(ChatMessage.createInitOf(c.getId()))
+                                    )
+                            );
                             return c;
                         });
         return chatRoom.getId();
