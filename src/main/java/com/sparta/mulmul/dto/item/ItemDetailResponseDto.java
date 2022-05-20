@@ -33,6 +33,7 @@ public class ItemDetailResponseDto {
     private String[] favored;
     private Boolean isScrab;
     private String traded;
+    private Long barterId;
 
 
     // 이승재 / 아이템 상세페이지
@@ -55,7 +56,8 @@ public class ItemDetailResponseDto {
                            String type,
                            String[] favored,
                            Boolean isScrab,
-                                 String traded) {
+                                 String traded,
+                                 Long barterId) {
         this.userId = i;
         this.itemId = itemId;
         this.nickname = nickname;
@@ -76,5 +78,6 @@ public class ItemDetailResponseDto {
         this.favored = favored;
         this.isScrab = isScrab;
         this.traded = traded;
+        this.barterId = barterId;
     }
 }
