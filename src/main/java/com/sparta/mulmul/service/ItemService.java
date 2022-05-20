@@ -334,7 +334,7 @@ public class ItemService {
         List<String> images = itemUpdateRequestDto.getImages();
         List<String> imagesUrl = itemUpdateRequestDto.getImagesUrl();
         List<String> imagesJoind = new ArrayList<>();
-        if(images.isEmpty()) {
+        if(images.contains("null")) {
             imagesJoind.addAll(imagesUrl);
         }else{
             imagesJoind.addAll(imagesUrl);
