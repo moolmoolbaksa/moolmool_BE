@@ -31,10 +31,10 @@ public class ChatRoom extends Timestamped {
     private Boolean accOut;
 
     @Column(nullable = false)
-    private Boolean accFixed = false;
+    private Boolean accFixed;
 
     @Column(nullable = false)
-    private Boolean reqFixed = false;
+    private Boolean reqFixed;
 
     public static ChatRoom createOf(User requester, User acceptor){
 
@@ -44,6 +44,8 @@ public class ChatRoom extends Timestamped {
         room.acceptor = acceptor;
         room.reqOut = false;
         room.accOut = true;
+        room.accFixed = false;
+        room.reqFixed = false;
 
         return room;
     }
