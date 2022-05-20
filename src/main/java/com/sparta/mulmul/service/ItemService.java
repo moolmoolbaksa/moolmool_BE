@@ -3,6 +3,7 @@ import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
 import com.sparta.mulmul.dto.item.ItemRequestDto;
 import com.sparta.mulmul.dto.item.ItemResponseDto;
+import com.sparta.mulmul.dto.item.ItemUpdateRequestDto;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -324,20 +325,20 @@ public class ItemService {
 
     // 이승재 / 아이템 수정
     @Transactional
-    public void updateItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails, Long itemId) {
+    public void updateItem(ItemUpdateRequestDto itemUpdateRequestDto, UserDetailsImpl userDetails, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
-        List<String> images = itemRequestDto.getImages();
-        List<String> imagesUrl = itemRequestDto.getImagesUrl();
+        List<String> images = itemUpdateRequestDto.getImages();
+        List<String> imagesUrl = itemUpdateRequestDto.getImagesUrl();
         List<String> imagesJoind = new ArrayList<>();
         imagesJoind.addAll(imagesUrl);
         imagesJoind.addAll(images);
-        List<String> favoredList = itemRequestDto.getFavored();
+        List<String> favoredList = itemUpdateRequestDto.getFavored();
         String imgUrl = String.join(",", imagesJoind);
         String favored = String.join(",", favoredList);
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
-            item.itemUpdate(itemRequestDto, imgUrl, favored);
+            item.itemUpdate(itemUpdateRequestDto, imgUrl, favored);
         }
     }
 
