@@ -42,31 +42,37 @@ public class AwsS3Service {
     private final UserRepository userRepository;
 
     public List<String> uploadFile(List<MultipartFile> multipartFiles) {
-        List<String> imageUrlList = new ArrayList<>();
+        try {
+            List<String> imageUrlList = new ArrayList<>();
 
-        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
-        multipartFiles.forEach(file -> {
-            String fileName = createFileName(file.getOriginalFilename());
-            String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("/")+1);
+            // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
+            multipartFiles.forEach(file -> {
+                String fileName = createFileName(file.getOriginalFilename());
+                String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
 
-            MultipartFile resizedFile = resizeImage(fileName, fileFormatName, file, 768);
+                MultipartFile resizedFile = resizeImage(fileName, fileFormatName, file, 768);
 
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(resizedFile.getSize());
-            objectMetadata.setContentType(file.getContentType());
+                ObjectMetadata objectMetadata = new ObjectMetadata();
+                objectMetadata.setContentLength(resizedFile.getSize());
+                objectMetadata.setContentType(file.getContentType());
 
-            try(InputStream inputStream = resizedFile.getInputStream()) {
-                amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-            } catch(IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
-            }
-            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
-            Image image = new Image(fileName, imgUrl);
-            imageRepository.save(image);
-            imageUrlList.add(imgUrl);
-        });
-        return imageUrlList;
+                try (InputStream inputStream = resizedFile.getInputStream()) {
+                    amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+                            .withCannedAcl(CannedAccessControlList.PublicRead));
+                } catch (IOException e) {
+                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+                }
+                String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
+                Image image = new Image(fileName, imgUrl);
+                imageRepository.save(image);
+                imageUrlList.add(imgUrl);
+            });
+            return imageUrlList;
+        }catch (NullPointerException e){
+            List<String> imageUrlList = new ArrayList<>();
+            imageUrlList =null;
+            return imageUrlList;
+        }
     }
 
     MultipartFile resizeImage(String fileName, String fileFormatName, MultipartFile originalImage, int targetWidth) {
