@@ -20,6 +20,7 @@ public class ItemDetailResponseDto {
     private float grade;
     private String profile;
     private int status;
+    private String category;
     private List<String> images;
     private List<DetailPageBagDto> bagInfos;
     private String  title;
@@ -42,6 +43,7 @@ public class ItemDetailResponseDto {
                            float v,
                            String profile,
                            int status,
+                           String category,
                            List<String> itemImgList,
                            List<DetailPageBagDto> bagInfos,
                            String title,
@@ -61,6 +63,7 @@ public class ItemDetailResponseDto {
         this.grade = v;
         this.profile = profile;
         this.status = status;
+        this.category = category;
         this.images = itemImgList;
         this.bagInfos = bagInfos;
         this.title = title;
