@@ -33,8 +33,6 @@ dependencies {
 
     // 이미지 업로드
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-    implementation 'com.github.downgoon:marvin:1.5.5'
-    implementation 'com.github.downgoon:MarvinPlugins:1.5.5'
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
     implementation 'commons-codec:commons-codec:1.5'

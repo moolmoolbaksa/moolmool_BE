@@ -11,9 +11,6 @@ import com.sparta.mulmul.repository.ImageRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-
-import marvin.image.MarvinImage;
-import org.marvinproject.image.transform.scale.Scale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
@@ -50,6 +47,8 @@ public class AwsS3Service {
                 String fileName = createFileName(file.getOriginalFilename());
                 String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
 
+
+                // 이미지 리사이즈 작업
                 MultipartFile resizedFile = resizeImage(fileName, fileFormatName, file, 768);
 
                 ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -87,29 +86,6 @@ public class AwsS3Service {
             ImageIO.write(outputImage, fileFormatName, baos);
             baos.flush();
             return new MockMultipartFile(fileName, baos.toByteArray());
-//            // newWidth : newHeight = originWidth : originHeight
-//            int originWidth = image.getWidth();
-//            int originHeight = image.getHeight();
-//            System.out.println(originWidth + originHeight + " 기존이미지 크기");
-//            // origin 이미지가 resizing될 사이즈보다 작을 경우 resizing 작업 안 함
-//            if(originWidth < targetWidth)
-//                return originalImage;
-//
-//            MarvinImage imageMarvin = new MarvinImage(image);
-//
-//            Scale scale = new Scale();
-//            scale.load();
-//            scale.setAttribute("newWidth", targetWidth);
-//            scale.setAttribute("newHeight", targetWidth * originHeight / originWidth);
-//            scale.process(imageMarvin.clone(), imageMarvin, null, null, false);
-//            System.out.println(scale+" 스케일");
-//            BufferedImage imageNoAlpha = imageMarvin.getBufferedImageNoAlpha();
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            ImageIO.write(imageNoAlpha, fileFormatName, baos);
-//            baos.flush();
-//
-//            return new MockMultipartFile(fileName, baos.toByteArray());
-//
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 리사이즈에 실패했습니다.");
         }
@@ -187,7 +163,10 @@ public class AwsS3Service {
             String fileName = createFileName(multipartFile.getOriginalFilename());
             String fileFormatName = multipartFile.getContentType().substring(multipartFile.getContentType().lastIndexOf("/")+1);
 
+
+            // 이미지 리사이즈 작업
             MultipartFile resizedFile = resizeImage(fileName, fileFormatName, multipartFile, 768);
+
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(resizedFile.getSize());
             objectMetadata.setContentType(multipartFile.getContentType());
