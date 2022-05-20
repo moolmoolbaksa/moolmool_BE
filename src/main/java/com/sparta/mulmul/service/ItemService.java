@@ -352,6 +352,8 @@ public class ItemService {
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
             item.setDeleted(itemId, 6);
         }
+        // 아이템이 삭제되었다면, 거래중인 아이템 거래내역 전원이 삭제되어야 합니다.
+        // 혹시 알림에 있었다면 삭제되어야 합니다.
     }
 
     // 이승재 / 아이템 신고하기

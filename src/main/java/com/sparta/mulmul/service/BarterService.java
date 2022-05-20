@@ -1,6 +1,7 @@
 package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.NotificationDto;
+import com.sparta.mulmul.dto.NotificationType;
 import com.sparta.mulmul.dto.barter.*;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
@@ -34,10 +35,9 @@ public class BarterService {
 
     // 성훈 - 거래내역서 보기
     public List<BarterDto> showMyBarter(UserDetailsImpl userDetails) {
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                () -> new IllegalArgumentException("유저 정보가 없습니다.")
-        );
-
+        if ( !userRepository.existsById(userDetails.getUserId()) ) {
+            throw new NullPointerException("BarterService: 유저 정보가 없습니다.");
+        }
         Long userId = userDetails.getUserId();
         // (거래 물품리스트들과 거래내역의 Id값)이 포함된 거래내역 리스트를 담을 Dto
         List<BarterDto> totalList = new ArrayList<>();
@@ -52,7 +52,7 @@ public class BarterService {
         Boolean myScoreCheck;
 
         // 유저의 거래내역 리스트를 전부 조회한다
-        List<Barter> mybarterList = barterRepository.findAllByBuyerIdOrSellerId(userId, userId);
+        List<Barter> mybarterList = barterRepository.findAllByUserId(userId);
 
         // 내가 거래한 거래리스트를 대입한다.
         // barterId, buyerId, SellerId를 분리한다.
@@ -64,17 +64,17 @@ public class BarterService {
             List<OpponentBarterDto> barterList = new ArrayList<>();
 
             String barter = barters.getBarter();
-            //barter 거래내역 id split하기 -> 파싱하여 거래항 물품의 Id값을 찾기
+            //barter 거래내역 id split하기 -> 파싱하여 거래항 물품의 Id값을 찾기 -> 스플릿하여 Long 터입으로 변환이 가능할까?
             String[] barterIds = barter.split(";");
             String[] buyerItemIdList = barterIds[0].split(",");
             String[] sellerItemIdList = barterIds[1].split(",");
 
 
-            // 바이어(유저)의 물품을 찾아서 정보를 넣기
+            // 바이어(유저)의 물품을 찾아서 정보를 넣기 -> 쿼리를 이용해 한방에 찾아온 후 구분하는 방법을 써보자.
             for (String buyerItemId : buyerItemIdList) {
                 Long itemId = Long.parseLong(buyerItemId);
                 Item buyerItem = itemRepository.findById(itemId).orElseThrow(
-                        () -> new IllegalArgumentException("buyerItem not found")
+                        () -> new NullPointerException("BarterService: 구매자의 아이템을 찾을 수 없습니다.")
                 );
 
                 OpponentBarterDto buyerItemList = getMyBarterDto(itemId, buyerItem);
@@ -84,13 +84,14 @@ public class BarterService {
                     myBarterList.add(buyerItemList);
                     // 바이어가 유저이기 때문에, 상대방은 셀러가 된다.
                     opponentId = barters.getSellerId();
-                    myPosition = "buyer";
+                    myPosition = "buyer"; //ENUM으로 변경 필요
                 } else {
                     barterList.add(buyerItemList);
                     opponentId = barters.getBuyerId();
                 }
             }
 
+            // 리팩토링 됨. 동일한 코드가 반복되고 있다.
             //셀러(유저)의 물품을 찾아서 정보를 넣기
             for (String sellerItemId : sellerItemIdList) {
                 Long itemId = Long.parseLong(sellerItemId);
@@ -110,7 +111,7 @@ public class BarterService {
 
             // 상대 유저 정보
             User opponentUser = userRepository.findById(opponentId).orElseThrow(
-                    () -> new IllegalArgumentException("유저 정보가 없습니다.")
+                    () -> new NullPointerException("유저 정보가 없습니다.")
             );
             // 거래상태 정보 1 : 신청중 / 2 : 거래중 / 3 : 거래완료 / 4 : 평가완료
             int status = barters.getStatus();
@@ -196,36 +197,36 @@ public class BarterService {
     @Transactional
     public BarterTradeCheckDto cancelBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                () -> new IllegalArgumentException("유저 정보가 없습니다.")
+                () -> new IllegalArgumentException("BarterService: 거래완료취소) 유저 정보가 없습니다.")
         );
         Long userId = user.getId();
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(
-                () -> new IllegalArgumentException("거래내역이 없습니다."));
-        BarterTradeCheckDto oppononetTreadeCheck;
+                () -> new IllegalArgumentException("BarterService: 거래내역이 없습니다."));
+        BarterTradeCheckDto oppononetTradeCheck;
         // 거래중인 상태가 아니면 예외처리
         if (mybarter.getStatus() == 2) {
             // 거래하는 상대방이 바이어라면
-            oppononetTreadeCheck = getBarterTradeCheckDto(userId, mybarter);
+            oppononetTradeCheck = getBarterTradeCheckDto(userId, mybarter);
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "BarterService: 현재 거래중인 상태가 아닙니다.");
         }
-        return oppononetTreadeCheck;
+        return oppononetTradeCheck;
     }
 
     private BarterTradeCheckDto getBarterTradeCheckDto(Long userId, Barter mybarter) {
-        BarterTradeCheckDto oppononetTreadeCheck;
+        BarterTradeCheckDto oppononetTradeCheck;
         if (mybarter.getBuyerId().equals(userId)) {
             Boolean isTradeCheck = mybarter.getIsBuyerTrade();
             isTradeCheck(isTradeCheck);
             mybarter.updateTradBuyer(false);
-            oppononetTreadeCheck = new BarterTradeCheckDto(mybarter.getIsSellerTrade());
+            oppononetTradeCheck = new BarterTradeCheckDto(mybarter.getIsSellerTrade());
         } else {
             Boolean isTradeCheck = mybarter.getIsSellerTrade();
             isTradeCheck(isTradeCheck);
             mybarter.updateTradSeller(false);
-            oppononetTreadeCheck = new BarterTradeCheckDto(mybarter.getIsBuyerTrade());
+            oppononetTradeCheck = new BarterTradeCheckDto(mybarter.getIsBuyerTrade());
         }
-        return oppononetTreadeCheck;
+        return oppononetTradeCheck;
     }
 
     // 거래완료를 하지 않았을 경우
@@ -271,6 +272,8 @@ public class BarterService {
             sellerItem.statusUpdate(sellerItem.getId(), setStatus);
             // 거래내역 삭제
             barterRepository.deleteById(barterId);
+            // 알림에서 삭제
+            notificationRepository.deleteByChangeIdAndType(barterId, NotificationType.BARTER);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
@@ -288,7 +291,7 @@ public class BarterService {
         Long userId = user.getId();
         // 거래중인 상태가 아니면 예외처리
         if (myBarter.getStatus() != 2) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "BarterService: 거래완료) 거래중인 상태가 아닙니다.");
         }
 
         boolean opponentTrade;
@@ -296,7 +299,7 @@ public class BarterService {
         // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
         if (myBarter.getBuyerId().equals(userId)) {
             if (myBarter.getIsBuyerTrade()) {
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "완료된 거래입니다");
+                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "BarterService: 거래완료) 내 물건에 대해서 거래완료를 할 수 없습니다.");
             }
             myBarter.updateTradBuyer(true);
             // 상대방의 거래유무
@@ -389,6 +392,35 @@ public class BarterService {
             );
         }
     }
+
+//    private void refac(String[] idList, Long userId, String position){
+//
+//        String myPosition;
+//        List<OpponentBarterDto> myBarterList = new ArrayList<>();
+//        List<OpponentBarterDto> barterList = new ArrayList<>();
+//        // 바이어(유저)의 물품을 찾아서 정보를 넣기 -> 쿼리를 이용해 한방에 찾아온 후 구분하는 방법을 써보자.
+//        for (String id : idList) {
+//            Long itemId = Long.parseLong(id);
+//            Item item = itemRepository.findById(itemId).orElseThrow(
+//                    () -> new NullPointerException("BarterService: 구매자의 아이템을 찾을 수 없습니다.")
+//            );
+//
+//            OpponentBarterDto itemList = getMyBarterDto(itemId, item);
+//
+//            //바이어가 유저라면
+//            if (item.getBag().getUserId().equals(userId)) {
+//                myBarterList.add(itemList);
+//                // 바이어가 유저이기 때문에, 상대방은 셀러가 된다.
+//                myPosition = position; //ENUM으로 변경 필요
+//            } else {
+//                barterList.add(itemList);
+//            }
+//        }
+//    }
+//
+//    private enum Position{
+//        BUYER, SELLER
+//    }
 }
 
 
