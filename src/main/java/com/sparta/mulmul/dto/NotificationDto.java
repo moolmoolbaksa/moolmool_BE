@@ -20,6 +20,9 @@ public class NotificationDto {
     private LocalDateTime date;
     private List<ItemStarDto> itemList;
 
+    private Long userId;
+    private String profile;
+
     public static NotificationDto createFrom(Notification notification){
 
         NotificationDto dto = new NotificationDto();

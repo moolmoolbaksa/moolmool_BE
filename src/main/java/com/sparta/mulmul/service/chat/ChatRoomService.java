@@ -6,7 +6,9 @@ import com.sparta.mulmul.model.ChatMessage;
 import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.dto.chat.*;
 import com.sparta.mulmul.model.ChatRoom;
+import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.model.User;
+import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.repository.chat.ChatBannedRepository;
 import com.sparta.mulmul.repository.chat.ChatMessageRepository;
@@ -24,6 +26,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ChatRoomService {
 
+    private final NotificationRepository notificationRepository;
     private final ChatRoomRepository roomRepository;
     private final ChatMessageRepository messageRepository;
     private final SimpMessageSendingOperations messagingTemplate;
@@ -48,11 +51,12 @@ public class ChatRoomService {
         if (bannedRepository.existsByUser(acceptor, requester)) {
             throw new AccessDeniedException("ChatRoomService: 차단한 회원과는 채팅을 시도할 수 없습니다.");
         }
-        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
+        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장, 메시지를 전달할 때 상대 이미지와 프로필 사진을 같이 전달해 줘야 함.
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
                         .orElseGet( () -> {
                             ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
                             // 채팅방 개설 메시지 생성
+                            notificationRepository.save(Notification.createOf(c, requester)); // 알림 작성 및 전달
                             messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
                                     MessageResponseDto.createFrom(
                                             messageRepository.save(ChatMessage.createInitOf(c.getId()))
