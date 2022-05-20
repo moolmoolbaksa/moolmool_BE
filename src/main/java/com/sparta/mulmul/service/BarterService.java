@@ -70,7 +70,7 @@ public class BarterService {
             String[] sellerItemIdList = barterIds[1].split(",");
 
 
-            // 바이어(유저)의 물품을 찾아서 정보를 넣기 -> 쿼리를 이용해 한방에 찾아온 후 구분하는 방법을 써보자.
+            // 바이어(유저)의 물품을 찾아서 정보를 넣기
             for (String buyerItemId : buyerItemIdList) {
                 Long itemId = Long.parseLong(buyerItemId);
                 Item buyerItem = itemRepository.findById(itemId).orElseThrow(
@@ -83,7 +83,7 @@ public class BarterService {
                 if (buyerItem.getBag().getUserId().equals(userId)) {
                     myBarterList.add(buyerItemList);
                     // 바이어가 유저이기 때문에, 상대방은 셀러가 된다.
-                    opponentId = barters.getSellerId();
+                    opponentId = barters.getSellerId(); // 왜 for 문 안에서 계속해서 재할당을 하고 있는지? 전체적인 로직의 구조상 문제가 보인다.
                     myPosition = "buyer"; //ENUM으로 변경 필요
                 } else {
                     barterList.add(buyerItemList);
@@ -91,10 +91,10 @@ public class BarterService {
                 }
             }
 
-            // 리팩토링 됨. 동일한 코드가 반복되고 있다.
+            // 리팩토링 가능함. 동일한 코드가 반복되고 있다.
             //셀러(유저)의 물품을 찾아서 정보를 넣기
             for (String sellerItemId : sellerItemIdList) {
-                Long itemId = Long.parseLong(sellerItemId);
+                Long itemId = Long.parseLong(sellerItemId); // Jpa 구분을 통해 한번에 검색이 가능하다.
                 Item sellerItem = itemRepository.findById(itemId).orElseThrow(
                         () -> new IllegalArgumentException("sellerItem not found")
                 );
@@ -113,7 +113,7 @@ public class BarterService {
             User opponentUser = userRepository.findById(opponentId).orElseThrow(
                     () -> new NullPointerException("유저 정보가 없습니다.")
             );
-            // 거래상태 정보 1 : 신청중 / 2 : 거래중 / 3 : 거래완료 / 4 : 평가완료
+            // 거래상태 정보 1 : 신청중 / 2 : 거래중 / 3 : 거래완료 / 4 : 평가완료 / 6: 삭제됨
             int status = barters.getStatus();
 
             //내포지션이 바이어라면 거래내역의 상태 확인하기
@@ -392,35 +392,6 @@ public class BarterService {
             );
         }
     }
-
-//    private void refac(String[] idList, Long userId, String position){
-//
-//        String myPosition;
-//        List<OpponentBarterDto> myBarterList = new ArrayList<>();
-//        List<OpponentBarterDto> barterList = new ArrayList<>();
-//        // 바이어(유저)의 물품을 찾아서 정보를 넣기 -> 쿼리를 이용해 한방에 찾아온 후 구분하는 방법을 써보자.
-//        for (String id : idList) {
-//            Long itemId = Long.parseLong(id);
-//            Item item = itemRepository.findById(itemId).orElseThrow(
-//                    () -> new NullPointerException("BarterService: 구매자의 아이템을 찾을 수 없습니다.")
-//            );
-//
-//            OpponentBarterDto itemList = getMyBarterDto(itemId, item);
-//
-//            //바이어가 유저라면
-//            if (item.getBag().getUserId().equals(userId)) {
-//                myBarterList.add(itemList);
-//                // 바이어가 유저이기 때문에, 상대방은 셀러가 된다.
-//                myPosition = position; //ENUM으로 변경 필요
-//            } else {
-//                barterList.add(itemList);
-//            }
-//        }
-//    }
-//
-//    private enum Position{
-//        BUYER, SELLER
-//    }
 }
 
 

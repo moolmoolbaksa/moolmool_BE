@@ -60,8 +60,7 @@ public class ItemService {
                 .build();
 
          item = itemRepository.save(item);
-         Long itemId = item.getId();
-        return itemId;
+        return item.getId();
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
@@ -72,8 +71,8 @@ public class ItemService {
                 if (item.getStatus() == 1 || item.getStatus() == 0) {
                     List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
                     int scrabCnt = 0;
-                    for (Scrab scrab1 : scrabs) {
-                        if (scrab1.getScrab().equals(true)) {
+                    for (Scrab scrab : scrabs) {
+                        if (scrab.getScrab().equals(true)) {
                             scrabCnt++;
                         }
                     }
