@@ -59,7 +59,8 @@ public class ItemController {
             @PathVariable Long itemId
 
     ){
-        List<String> images = awsS3Service.uploadFile(multipartFiles);
+            List<String> images = awsS3Service.uploadFile(multipartFiles);
+
         ItemUpdateRequestDto itemUpdateRequestDto = new ItemUpdateRequestDto(category, favored, title, contents, imagesUrl,images, type);
         itemService.updateItem(itemUpdateRequestDto, userDetails, itemId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
