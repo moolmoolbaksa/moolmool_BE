@@ -334,8 +334,12 @@ public class ItemService {
         List<String> images = itemUpdateRequestDto.getImages();
         List<String> imagesUrl = itemUpdateRequestDto.getImagesUrl();
         List<String> imagesJoind = new ArrayList<>();
-        imagesJoind.addAll(imagesUrl);
-        imagesJoind.addAll(images);
+        if(images.contains("null")) {
+            imagesJoind.addAll(imagesUrl);
+        }else{
+            imagesJoind.addAll(imagesUrl);
+            imagesJoind.addAll(images);
+        }
         List<String> favoredList = itemUpdateRequestDto.getFavored();
         String imgUrl = String.join(",", imagesJoind);
         String favored = String.join(",", favoredList);

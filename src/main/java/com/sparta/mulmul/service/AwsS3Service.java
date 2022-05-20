@@ -70,7 +70,7 @@ public class AwsS3Service {
             return imageUrlList;
         }catch (NullPointerException e){
             List<String> imageUrlList = new ArrayList<>();
-            imageUrlList =null;
+            imageUrlList.add("null");
             return imageUrlList;
         }
     }
