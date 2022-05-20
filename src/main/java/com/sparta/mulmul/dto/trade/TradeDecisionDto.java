@@ -15,7 +15,8 @@ public class TradeDecisionDto {
     private String accepted;
     private List<TradeInfoImagesDto> barterItem;
 
-    public TradeDecisionDto(String opponentNickname, String nickname, String degree, String title, String contents, String image,String accepted, List<TradeInfoImagesDto> barterItem){
+
+    public TradeDecisionDto(String opponentNickname, String nickname, String degree, String title, String contents, String image, String accepted,List<TradeInfoImagesDto> barterItem){
         this.opponentNickname = opponentNickname;
         this.nickname = nickname;
         this.degree = degree;

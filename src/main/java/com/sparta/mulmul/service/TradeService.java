@@ -159,7 +159,6 @@ public class TradeService {
         }
         //구매자 닉네임
         String opponentNickname = buyer.getNickname();
-
         //거래 상태 확인
         String accepted;
         if(barter.getStatus()==2){

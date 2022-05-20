@@ -41,18 +41,32 @@ public class RoomResponseDto {
         return responseDto;
     }
 
-    public static RoomResponseDto createOf(RoomDto dto){
+    public static RoomResponseDto createOf(RoomDto dto, String flag){
 
         RoomResponseDto responseDto = new RoomResponseDto();
 
         responseDto.roomId = dto.getRoomId();
-        responseDto.userId = dto.getAccId();
-        responseDto.nickname = dto.getAccNickname();
-        responseDto.profile = dto.getAccProfile();
         responseDto.message = dto.getMessage();
         responseDto.date = dto.getDate();
         responseDto.isRead = dto.getIsRead();
         responseDto.isBanned = dto.getIsBanned();
+
+        switch ( flag ) {
+
+            case "acceptor" :
+                responseDto.userId = dto.getAccId();
+                responseDto.nickname = dto.getAccNickname();
+                responseDto.profile = dto.getAccProfile();
+                break;
+
+            case "requester" :
+                responseDto.userId = dto.getReqId();
+                responseDto.nickname = dto.getReqNickname();
+                responseDto.profile = dto.getReqProfile();
+                break;
+
+            default: break;
+        }
 
         return responseDto;
     }
