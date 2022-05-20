@@ -210,42 +210,7 @@ public class BarterService {
 
 
             // 바이어(유저)의 물품을 찾아서 정보를 넣기
-            for (String buyerItemId : buyerItemIdList) {
-                Long itemId = Long.parseLong(buyerItemId);
-                Item buyerItem = itemRepository.findById(itemId).orElseThrow(
-                        () -> new IllegalArgumentException("buyerItem not found")
-                );
-
-                OpponentBarterDto buyerItemList = getMyBarterDto(itemId, buyerItem);
-
-                //바이어가 유저라면
-                if (buyerItem.getBag().getUserId().equals(userId)) {
-                    myBarterList.add(buyerItemList);
-                    // 바이어가 유저이기 때문에, 상대방은 셀러가 된다.
-                    opponentId = barters.getSellerId();
-                    myPosition = "buyer";
-                } else {
-                    barterList.add(buyerItemList);
-                    opponentId = barters.getBuyerId();
-                }
-            }
-
-            //셀러(유저)의 물품을 찾아서 정보를 넣기
-            for (String sellerItemId : sellerItemIdList) {
-                Long itemId = Long.parseLong(sellerItemId);
-                Item sellerItem = itemRepository.findById(itemId).orElseThrow(
-                        () -> new IllegalArgumentException("sellerItem not found")
-                );
-
-                OpponentBarterDto sellerItemList = getMyBarterDto(itemId, sellerItem);
-                //셀러가 유저라면
-                if (sellerItem.getBag().getUserId().equals(userId)) {
-                    myBarterList.add(sellerItemList);
-                    myPosition = "seller";
-                } else {
-                    barterList.add(sellerItemList);
-                }
-            }
+            splitAddList(userId, myBarterList, barterList, buyerItemIdList, sellerItemIdList);
 
             // 상대 유저 정보
             User opponentUser = userRepository.findById(opponentId).orElseThrow(() -> new IllegalArgumentException("유저 정보가 없습니다."));
@@ -257,11 +222,15 @@ public class BarterService {
                 myTradeCheck = barters.getIsBuyerTrade();
                 myScoreCheck = barters.getIsBuyerScore();
                 opponentTradeCheck = barters.getIsSellerTrade();
+                myPosition = "buyer";
+                opponentId = barters.getSellerId();
                 //내포지션이 셀러라면 거래내역의 상태 확인하기
             } else {
                 myTradeCheck = barters.getIsSellerTrade();
                 myScoreCheck = barters.getIsSellerScore();
                 opponentTradeCheck = barters.getIsBuyerTrade();
+                myPosition = "seller";
+                opponentId = barters.getBuyerId();
             }
 
             addBarterInfo(totalList,
@@ -280,15 +249,46 @@ public class BarterService {
         return totalList;
     }
 
+    private void splitAddList(Long userId, List<OpponentBarterDto> myBarterList, List<OpponentBarterDto> barterList, String[] buyerItemIdList, String[] sellerItemIdList) {
+        for (String buyerItemId : buyerItemIdList) {
+            Long itemId = Long.parseLong(buyerItemId);
+            Item buyerItem = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("buyerItem not found"));
+
+            OpponentBarterDto buyerItemList = getMyBarterDto(itemId, buyerItem);
+
+            //바이어가 유저라면
+            if (buyerItem.getBag().getUserId().equals(userId)) {
+                myBarterList.add(buyerItemList);
+                // 바이어가 유저이기 때문에, 상대방은 셀러가 된다.
+            } else {
+                barterList.add(buyerItemList);
+            }
+        }
+
+        //셀러(유저)의 물품을 찾아서 정보를 넣기
+        for (String sellerItemId : sellerItemIdList) {
+            Long itemId = Long.parseLong(sellerItemId);
+            Item sellerItem = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("sellerItem not found"));
+
+            OpponentBarterDto sellerItemList = getMyBarterDto(itemId, sellerItem);
+
+            //셀러가 유저라면
+            if (sellerItem.getBag().getUserId().equals(userId)) {
+                myBarterList.add(sellerItemList);
+            } else {
+                barterList.add(sellerItemList);
+            }
+        }
+    }
+
     // 성훈 리팩토링 (거래리스트)
     private OpponentBarterDto getMyBarterDto(Long itemId, Item Item) {
-        OpponentBarterDto itemList = new OpponentBarterDto(
+        return new OpponentBarterDto(
                 itemId,
                 Item.getTitle(),
                 Item.getItemImg().split(",")[0],
                 Item.getContents()
         );
-        return itemList;
     }
 
     // 성훈 리팩토링 (거래리스트 정보넣기 )
