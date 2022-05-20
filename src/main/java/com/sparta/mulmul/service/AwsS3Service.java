@@ -22,11 +22,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,14 +48,14 @@ public class AwsS3Service {
         multipartFiles.forEach(file -> {
             String fileName = createFileName(file.getOriginalFilename());
             String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("/")+1);
-            
-//            MultipartFile resizedFile = resizeImage(fileName, fileFormatName, file, 768);
+
+            MultipartFile resizedFile = resizeImage(fileName, fileFormatName, file, 768);
 
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
+            objectMetadata.setContentLength(resizedFile.getSize());
             objectMetadata.setContentType(file.getContentType());
 
-            try(InputStream inputStream = file.getInputStream()) {
+            try(InputStream inputStream = resizedFile.getInputStream()) {
                 amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
             } catch(IOException e) {
@@ -70,30 +72,38 @@ public class AwsS3Service {
     MultipartFile resizeImage(String fileName, String fileFormatName, MultipartFile originalImage, int targetWidth) {
         try {
             // MultipartFile -> BufferedImage Convert
-            BufferedImage image = ImageIO.read(originalImage.getInputStream());
-            // newWidth : newHeight = originWidth : originHeight
-            int originWidth = image.getWidth();
-            int originHeight = image.getHeight();
-
-            // origin 이미지가 resizing될 사이즈보다 작을 경우 resizing 작업 안 함
-            if(originWidth < targetWidth)
-                return originalImage;
-
-            MarvinImage imageMarvin = new MarvinImage(image);
-
-            Scale scale = new Scale();
-            scale.load();
-            scale.setAttribute("newWidth", targetWidth);
-            scale.setAttribute("newHeight", targetWidth * originHeight / originWidth);
-            scale.process(imageMarvin.clone(), imageMarvin, null, null, false);
-
-            BufferedImage imageNoAlpha = imageMarvin.getBufferedImageNoAlpha();
+            BufferedImage inputImage = ImageIO.read(originalImage.getInputStream());
+            BufferedImage outputImage = new BufferedImage(targetWidth, targetWidth, inputImage.getType());
+            Graphics2D graphics2D = outputImage.createGraphics();
+            graphics2D.drawImage(inputImage, 0, 0, targetWidth, targetWidth, null);
+            graphics2D.dispose();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(imageNoAlpha, fileFormatName, baos);
+            ImageIO.write(outputImage, fileFormatName, baos);
             baos.flush();
-
             return new MockMultipartFile(fileName, baos.toByteArray());
-
+//            // newWidth : newHeight = originWidth : originHeight
+//            int originWidth = image.getWidth();
+//            int originHeight = image.getHeight();
+//            System.out.println(originWidth + originHeight + " 기존이미지 크기");
+//            // origin 이미지가 resizing될 사이즈보다 작을 경우 resizing 작업 안 함
+//            if(originWidth < targetWidth)
+//                return originalImage;
+//
+//            MarvinImage imageMarvin = new MarvinImage(image);
+//
+//            Scale scale = new Scale();
+//            scale.load();
+//            scale.setAttribute("newWidth", targetWidth);
+//            scale.setAttribute("newHeight", targetWidth * originHeight / originWidth);
+//            scale.process(imageMarvin.clone(), imageMarvin, null, null, false);
+//            System.out.println(scale+" 스케일");
+//            BufferedImage imageNoAlpha = imageMarvin.getBufferedImageNoAlpha();
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            ImageIO.write(imageNoAlpha, fileFormatName, baos);
+//            baos.flush();
+//
+//            return new MockMultipartFile(fileName, baos.toByteArray());
+//
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 리사이즈에 실패했습니다.");
         }

@@ -48,6 +48,7 @@ public class Barter extends Timestamped {
     @Column(nullable = false)
     private Boolean isSellerScore;
 
+
     private LocalDateTime tradeTime;
 
 

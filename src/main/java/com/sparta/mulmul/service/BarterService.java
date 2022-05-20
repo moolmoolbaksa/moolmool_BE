@@ -94,8 +94,6 @@ public class BarterService {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }
     }
-
-
     // 성훈 - 거래 완료
     @Transactional
     public BarterStatusDto OkayBarter(Long barterId, UserDetailsImpl userDetails) {
@@ -248,7 +246,6 @@ public class BarterService {
         }
         return totalList;
     }
-
     // 성훈 - 상대와 나의 바터리스트에 각각 아이템 정보를 넣기
     private void BarterCheckAddList(Barter barters, Long userId, List<OpponentBarterDto> myBarterList, OpponentBarterDto ItemList, List<OpponentBarterDto> barterList) {
         if (barters.getBuyerId().equals(userId)) {
@@ -350,7 +347,6 @@ public class BarterService {
             );
         }
     }
-
     // 아이템 상태 업데이트
     private void updateStatus(String[] buyerItemId, String sellerItemId) {
         int setStatus = 0;
@@ -370,5 +366,3 @@ public class BarterService {
 
 
 }
-
-
