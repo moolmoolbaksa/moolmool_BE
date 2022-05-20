@@ -364,14 +364,12 @@ public class BarterService {
 
     // 내게 거래완료 정보 메시지 보내기 리팩토링
     private void sendMyMessage(Long barterId, Barter myBarter, String myPosition) {
-        Boolean opponentIsTrade;
         // 나의 sup주소로 전송
         if (myPosition.equals("buyer")) {
             // 내게 보낼 메시지 정보 담기
-            opponentIsTrade = myBarter.getIsSellerTrade();
             BarterMessageDto messageDto = new BarterMessageDto(
                     barterId,
-                    opponentIsTrade,
+                    myBarter.getIsBuyerTrade(),
                     myBarter.getStatus(),
                     myPosition
             );
@@ -380,10 +378,9 @@ public class BarterService {
             );
         } else {
             // 내게 보낼 메시지 정보 담기
-            opponentIsTrade = myBarter.getIsBuyerTrade();
             BarterMessageDto messageDto = new BarterMessageDto(
                     barterId,
-                    opponentIsTrade,
+                    myBarter.getIsSellerTrade(),
                     myBarter.getStatus(),
                     myPosition
             );
