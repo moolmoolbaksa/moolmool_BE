@@ -208,12 +208,14 @@ public class ItemService {
 
         // 교환신청했는지 확인하기
         String traded = null;
+        Long barterId = Long.valueOf(0);
         Long buyerId = userDetails.getUserId();
         Long sellerId = user.getId();
         List<Barter> barterList = barterRepository.findAllByBuyerIdAndSellerId(buyerId, sellerId);
         int tradeCnt = 0;
         for(Barter barter : barterList){
             if(barter.getBarter().split(";")[1].equals(itemId.toString())){
+                barterId = barter.getId();
                 tradeCnt++;
             }
         }
@@ -244,7 +246,8 @@ public class ItemService {
                 item.getType(),
                 favored,
                 isSrab,
-                traded);
+                traded,
+                barterId);
         return itemDetailResponseDto;
     }
 
