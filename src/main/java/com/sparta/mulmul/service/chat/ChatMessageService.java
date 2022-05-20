@@ -129,5 +129,6 @@ public class ChatMessageService {
         RoomMsgUpdateDto msgUpdateDto = RoomMsgUpdateDto.createFrom(requestDto);
         messagingTemplate.convertAndSend("/sub/chat/rooms/" + user.getUserId(), msgUpdateDto); // 개별 채팅 목록 보기 업데이트
         messagingTemplate.convertAndSend("/sub/chat/room/" + requestDto.getRoomId(), responseDto); // 채팅방 내부로 메시지 전송
+        System.out.println("/sub/chat/room/" + requestDto.getRoomId() + " 로 메시지를 전송하였습니다.");
     }
 }

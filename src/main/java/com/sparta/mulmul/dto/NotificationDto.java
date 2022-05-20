@@ -2,6 +2,7 @@ package com.sparta.mulmul.dto;
 
 import com.sparta.mulmul.dto.item.ItemStarDto;
 import com.sparta.mulmul.model.Notification;
+import com.sparta.mulmul.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -51,4 +52,22 @@ public class NotificationDto {
 
         return dto;
     }
+
+    public static NotificationDto createOf(Notification notification, User user){
+
+        NotificationDto dto = new NotificationDto();
+
+        dto.notificationId = notification.getId();
+        dto.changeId = notification.getChangeId();
+        dto.nickname = notification.getNickname();
+        dto.isRead = notification.getIsRead();
+        dto.type = notification.getType();
+        dto.date = notification.getCreatedAt();
+
+        dto.userId = user.getId();
+        dto.profile = user.getProfile();
+
+        return dto;
+    }
+
 }
