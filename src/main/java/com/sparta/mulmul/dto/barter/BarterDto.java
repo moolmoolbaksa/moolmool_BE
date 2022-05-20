@@ -32,7 +32,11 @@ public class BarterDto {
         this.userId = userId;
         this.usernickname = usernickname;
         this.profile = profile;
-        this.date = date;
+        if (status == 2 || status == 1){
+            this.date = null;
+        } else{
+            this.date = date;
+        }
         this.status = status;
         this.myPosition = myPosition;
         this.isTrade = isTrade;
