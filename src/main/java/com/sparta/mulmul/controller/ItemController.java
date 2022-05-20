@@ -1,10 +1,7 @@
 package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.*;
-import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
-import com.sparta.mulmul.dto.item.ItemRequestDto;
-import com.sparta.mulmul.dto.item.ItemResponseDto;
-import com.sparta.mulmul.dto.item.ItemStarDto;
+import com.sparta.mulmul.dto.item.*;
 import com.sparta.mulmul.dto.trade.RequestTradeDto;
 import com.sparta.mulmul.dto.trade.TradeDecisionDto;
 import com.sparta.mulmul.dto.trade.TradeInfoDto;
@@ -63,8 +60,8 @@ public class ItemController {
 
     ){
         List<String> images = awsS3Service.uploadFile(multipartFiles);
-        ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imagesUrl,images, type);
-        itemService.updateItem(itemRequestDto, userDetails, itemId);
+        ItemUpdateRequestDto itemUpdateRequestDto = new ItemUpdateRequestDto(category, favored, title, contents, imagesUrl,images, type);
+        itemService.updateItem(itemUpdateRequestDto, userDetails, itemId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 

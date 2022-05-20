@@ -1,6 +1,7 @@
 package com.sparta.mulmul.model;
 
 import com.sparta.mulmul.dto.item.ItemRequestDto;
+import com.sparta.mulmul.dto.item.ItemUpdateRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,17 +70,17 @@ public class Item extends Timestamped{
 
 
     // 이승재 / 아이템 수정
-    public void itemUpdate(ItemRequestDto itemRequestDto, String imgUrl, String favored) {
-        this.title = itemRequestDto.getTitle();
-        this.contents = itemRequestDto.getContents();
-        this.category = itemRequestDto.getCategory();
+    public void itemUpdate(ItemUpdateRequestDto itemUpdateRequestDto, String imgUrl, String favored) {
+        this.title = itemUpdateRequestDto.getTitle();
+        this.contents = itemUpdateRequestDto.getContents();
+        this.category = itemUpdateRequestDto.getCategory();
         this.favored = imgUrl;
         this.itemImg = favored;
-        this.type = itemRequestDto.getType();
+        this.type = itemUpdateRequestDto.getType();
     }
 
     // 이승재 / 삭제
-    public void setDeleted(Long id, int status{
+    public void setDeleted(Long id, int status){
         this.id = id;
         this.status = status;
     }
