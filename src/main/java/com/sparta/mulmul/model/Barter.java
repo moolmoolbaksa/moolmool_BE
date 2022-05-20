@@ -46,7 +46,7 @@ public class Barter extends Timestamped {
     private Boolean isBuyerScore;
 
     @Column(nullable = false)
-    private Boolean isSellerScore ;
+    private Boolean isSellerScore;
 
     private LocalDateTime tradeTime;
 
