@@ -14,6 +14,9 @@ public interface BarterRepository extends JpaRepository<Barter, Long> {
 
     List<Barter> findAllByBuyerIdOrSellerId(Long userId, Long userId1);
 
+    @Query("SELECT b FROM Barter b WHERE b.buyerId = :userId OR b.sellerId = :userId")
+    List<Barter> findAllByUserId(@Param("userId") Long userId);
+
     @Query("select b from Barter b where b.status = :status order by b.sellerId desc")
     List<Barter> findAllByBarter(@Param("status") int status);
 

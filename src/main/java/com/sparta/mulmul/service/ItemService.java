@@ -60,8 +60,7 @@ public class ItemService {
                 .build();
 
          item = itemRepository.save(item);
-         Long itemId = item.getId();
-        return itemId;
+        return item.getId();
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
@@ -72,8 +71,8 @@ public class ItemService {
                 if (item.getStatus() == 1 || item.getStatus() == 0) {
                     List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
                     int scrabCnt = 0;
-                    for (Scrab scrab1 : scrabs) {
-                        if (scrab1.getScrab().equals(true)) {
+                    for (Scrab scrab : scrabs) {
+                        if (scrab.getScrab().equals(true)) {
                             scrabCnt++;
                         }
                     }
@@ -355,6 +354,8 @@ public class ItemService {
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
             item.setDeleted(itemId, 6);
         }
+        // 아이템이 삭제되었다면, 거래중인 아이템 거래내역 전원이 삭제되어야 합니다.
+        // 혹시 알림에 있었다면 삭제되어야 합니다.
     }
 
     // 이승재 / 아이템 신고하기

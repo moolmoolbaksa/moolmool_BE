@@ -50,11 +50,16 @@ public class ChatRoomService {
         }
         // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
-                        .orElseGet( () -> {
-                            ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
-                            messageRepository.save(ChatMessage.createInitOf(c.getId())); // 채팅방 개설 메시지 생성
-                            return c;
-                        });
+                .orElseGet( () -> {
+                    ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
+                    // 채팅방 개설 메시지 생성
+                    messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
+                            MessageResponseDto.createFrom(
+                                    messageRepository.save(ChatMessage.createInitOf(c.getId()))
+                            )
+                    );
+                    return c;
+                });
         return chatRoom.getId();
     }
 
@@ -87,11 +92,9 @@ public class ChatRoomService {
                 .orElseThrow( () -> new NullPointerException("ChatRoomService: getRooms) 존재하지 않는 회원입니다.")
                 );
         // 방 목록 찾기
-//        List<ChatRoom> chatRooms = roomRepository.findAllBy(user);
         List<RoomDto> dtos = roomRepository.findAllWith(user);
-
         // 메시지 리스트 만들기
-        return getTest(dtos, userDetails.getUserId());
+        return getMessages(dtos, userDetails.getUserId());
     }
 
     // 채팅방 즐겨찾기 추가
@@ -109,45 +112,7 @@ public class ChatRoomService {
         chatRoom.fixedRoom(flag);
     }
 
-    // 메시지 리스트 만들기
-    private List<RoomResponseDto> setMessages(List<ChatRoom> chatRooms, Long userId){
-
-        List<RoomResponseDto> prefix = new ArrayList<>();
-        List<RoomResponseDto> suffix = new ArrayList<>();
-        List<Long> roomIds = new ArrayList<>();
-
-        for ( ChatRoom chatRoom : chatRooms ){ roomIds.add(chatRoom.getId()); }
-
-        List<ChatMessage> messages = messageRepository.findFirstByRoomIds(roomIds);
-
-        for ( ChatRoom chatRoom : chatRooms ){
-            // 메시지 목록 가져오기
-            for (ChatMessage message : messages) {
-                if (chatRoom.getId() == message.getRoomId()){
-                    // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
-                    if ( chatRoom.getAcceptor().getId() == userId ) {
-                        if (!chatRoom.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
-                            boolean exist = bannedRepository.existsByUser(chatRoom.getAcceptor(), chatRoom.getRequester()); // 플래그로 작동하도록 수정 필요
-                            int unreadCnt = messageRepository.countMsg(chatRoom.getRequester().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
-                            if (chatRoom.getAccFixed()){ prefix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt, exist)); }
-                            else { suffix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getRequester(), unreadCnt, exist)); }
-                        }
-                    } else if ( chatRoom.getRequester().getId() == userId ){
-                        if (!chatRoom.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
-                            boolean exist = bannedRepository.existsByUser(chatRoom.getAcceptor(), chatRoom.getRequester());
-                            int unreadCnt = messageRepository.countMsg(chatRoom.getAcceptor().getId(), chatRoom.getId()); // 상대방이 보낸 메시지 중 읽지 않은 메시지의 개수를 찾습니다.
-                            if (chatRoom.getReqFixed()){ prefix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt, exist)); }
-                            else { suffix.add(RoomResponseDto.createOf(chatRoom, message, chatRoom.getAcceptor(), unreadCnt, exist)); }
-                        }
-                    }
-                }
-            }
-        }
-        prefix.addAll(suffix);
-        return prefix;
-    }
-
-    public List<RoomResponseDto> getTest(List<RoomDto> roomDtos, Long userId){
+    public List<RoomResponseDto> getMessages(List<RoomDto> roomDtos, Long userId){
 
         List<RoomResponseDto> prefix = new ArrayList<>();
         List<RoomResponseDto> suffix = new ArrayList<>();
@@ -156,13 +121,15 @@ public class ChatRoomService {
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( dto.getAccId() == userId ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
-                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(dto, "acceptor")); }
-                    else { suffix.add(RoomResponseDto.createOf(dto, "acceptor")); }
+                    int unreadCnt = messageRepository.countMsg(dto.getReqId(), dto.getRoomId());
+                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf("acceptor", dto, unreadCnt)); }
+                    else { suffix.add(RoomResponseDto.createOf("acceptor", dto, unreadCnt)); }
                 }
             } else if ( dto.getReqId() == userId ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
-                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(dto, "requester")); }
-                    else { suffix.add(RoomResponseDto.createOf(dto, "requester")); }
+                    int unreadCnt = messageRepository.countMsg(dto.getAccId(), dto.getRoomId());
+                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf("requester", dto, unreadCnt)); }
+                    else { suffix.add(RoomResponseDto.createOf("requester", dto, unreadCnt)); }
                 }
             }
         }
