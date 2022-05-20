@@ -37,16 +37,16 @@ public class Barter extends Timestamped {
     private int status;
 
     @Column(nullable = false)
-    private Boolean isBuyerTrade = false;
+    private Boolean isBuyerTrade;
 
     @Column(nullable = false)
-    private Boolean isSellerTrade = false;
+    private Boolean isSellerTrade;
 
     @Column(nullable = false)
-    private Boolean isBuyerScore = false;
+    private Boolean isBuyerScore;
 
     @Column(nullable = false)
-    private Boolean isSellerScore = false;
+    private Boolean isSellerScore ;
 
     private LocalDateTime tradeTime;
 

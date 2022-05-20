@@ -51,18 +51,19 @@ public class ItemController {
     //이승재 / 아이템 수정 (미리 구현)
     @PutMapping("/api/items/{itemId}")
     public ResponseEntity<OkDto> updateItem(
-            @RequestParam(value = "category", required = false) String category,
-            @RequestParam(value = "favored", required = false) List<String> favored,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "contents", required = false) String contents,
-            @RequestParam(value = "images", required = false) List<MultipartFile> multipartFiles,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "favored", required = false) List<String> favored,
             @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "imagesUrl", required = false) List<String> imagesUrl,
+            @RequestParam(value = "images", required = false) List<MultipartFile> multipartFiles,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long itemId
 
     ){
-        List<String> imgUrl = awsS3Service.uploadFile(multipartFiles);
-        ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imgUrl, type);
+        List<String> images = awsS3Service.uploadFile(multipartFiles);
+        ItemRequestDto itemRequestDto = new ItemRequestDto(category, favored, title, contents, imagesUrl,images, type);
         itemService.updateItem(itemRequestDto, userDetails, itemId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }

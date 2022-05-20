@@ -231,6 +231,7 @@ public class ItemService {
                 user.getGrade(),
                 user.getProfile(),
                 item.getStatus(),
+                item.getCategory(),
                 itemImgList,
                 bagInfos,
                 item.getTitle(),
@@ -327,9 +328,13 @@ public class ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
-        List<String> imgUrlList = itemRequestDto.getImgUrl();
+        List<String> images = itemRequestDto.getImages();
+        List<String> imagesUrl = itemRequestDto.getImagesUrl();
+        List<String> imagesJoind = new ArrayList<>();
+        imagesJoind.addAll(imagesUrl);
+        imagesJoind.addAll(images);
         List<String> favoredList = itemRequestDto.getFavored();
-        String imgUrl = String.join(",", imgUrlList);
+        String imgUrl = String.join(",", imagesJoind);
         String favored = String.join(",", favoredList);
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
             item.itemUpdate(itemRequestDto, imgUrl, favored);
@@ -338,12 +343,13 @@ public class ItemService {
 
 
     // 이승재 / 아이템 삭제
+    @Transactional
     public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
         );
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
-            itemRepository.deleteById(itemId);
+            item.setDeleted(itemId, 6);
         }
     }
 

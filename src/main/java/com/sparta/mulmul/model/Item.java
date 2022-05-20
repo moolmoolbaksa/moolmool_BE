@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.checkerframework.checker.units.qual.N;
 
 import javax.persistence.*;
 
@@ -55,6 +56,7 @@ public class Item extends Timestamped{
     @Column(nullable = false)
     private String favored;
 
+
     @ManyToOne
     private Bag bag;
 
@@ -74,6 +76,12 @@ public class Item extends Timestamped{
         this.favored = imgUrl;
         this.itemImg = favored;
         this.type = itemRequestDto.getType();
+    }
+
+    // 이승재 / 삭제
+    public void setDeleted(Long id, int status{
+        this.id = id;
+        this.status = status;
     }
 
     // 이승재 / 아이템 상태 업데이트
