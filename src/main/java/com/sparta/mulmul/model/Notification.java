@@ -69,7 +69,7 @@ public class Notification extends CreationDate {
         notification.isRead = false;
         if (type.equals("Barter")){
             notification.type = NotificationType.FINISH;
-        } else {
+        } else if (type.equals("Score")) {
             notification.type = NotificationType.SCORE;
         }
 
