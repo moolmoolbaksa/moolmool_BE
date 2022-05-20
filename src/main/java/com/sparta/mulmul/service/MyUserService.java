@@ -41,24 +41,10 @@ public class MyUserService {
 
         // 한 유저의 모든 아이템을 보여줌
         List<Item> myItemList = itemRepository.findAllMyItem(userId);
-//        List<Item> myItemList = itemRepository.findAllByBagIdOrBagId(bagId, bagId);
-        List<ItemUserResponseDto> myItemResponseList = new ArrayList<>();
-        // 내 보유 아이템을 리스트 형식으로 담기
-        for (Item items : myItemList) {
-            ItemUserResponseDto itemResponseDto = getItemUserDto(items);
-            myItemResponseList.add(itemResponseDto);
-        }
+        List<ItemUserResponseDto> myItemResponseList = addItemList(myItemList);
+        // 스크랩 정도 넣어주기
         List<Scrab> myScrabList = scrabRepository.findTop3ByUserIdAndScrabOrderByModifiedAtDesc(userId, true);
-        List<ItemUserResponseDto> myScrapItemList = new ArrayList<>();
-
-        for (Scrab myscrap : myScrabList) {
-
-            Long myScrapItemId = myscrap.getItemId();
-            Item scrabItem = itemRepository.findById(myScrapItemId).orElseThrow(
-                    () -> new IllegalArgumentException("Item not found"));
-            ItemUserResponseDto scrabitemDto = getItemUserDto(scrabItem);
-            myScrapItemList.add(scrabitemDto);
-        }
+        List<ItemUserResponseDto> myScrapItemList = addScrapItemList(myScrabList);
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
         return new MyPageResponseDto(
                 user.getNickname(),
@@ -72,14 +58,6 @@ public class MyUserService {
         );
     }
 
-    private ItemUserResponseDto getItemUserDto(Item scrabItem) {
-        ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
-                scrabItem.getId(),
-                scrabItem.getItemImg().split(",")[0],
-                scrabItem.getStatus()
-        );
-        return scrabitemDto;
-    }
 
     // 성훈_마이페이지_내 정보수정
     @Transactional
@@ -88,21 +66,8 @@ public class MyUserService {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new IllegalArgumentException("user not found")
         );
-        if (imgUrl.equals("empty")){
-            user.execptImageUpdate(
-                    nickname,
-                    address,
-                    storeInfo
-            );
-        }else {
-            // 유저 정보를 수정
-            user.update(
-                    nickname,
-                    imgUrl,
-                    address,
-                    storeInfo
-            );
-        }
+        // 유저 정보 수정
+        updateInfo(nickname, address, storeInfo, imgUrl, user);
         // 수정된 정보를 Response하기위해 정보를 넣어 줌
         UserEditDtailResponseDto userEditDtailResponseDto = new UserEditDtailResponseDto(
                 nickname,
@@ -191,6 +156,61 @@ public class MyUserService {
                 user.banUser(userId, true);
             }
             return "true";
+        }
+    }
+
+
+    // 한 유저의 모든 아이템을 보여줌
+    private List<ItemUserResponseDto> addItemList(List<Item> myItemList) {
+        List<ItemUserResponseDto> myItemResponseList = new ArrayList<>();
+        // 내 보유 아이템을 리스트 형식으로 담기
+        for (Item items : myItemList) {
+            ItemUserResponseDto itemResponseDto = getItemUserDto(items);
+            myItemResponseList.add(itemResponseDto);
+        }
+        return myItemResponseList;
+    }
+
+    private ItemUserResponseDto getItemUserDto(Item scrabItem) {
+        ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
+                scrabItem.getId(),
+                scrabItem.getItemImg().split(",")[0],
+                scrabItem.getStatus()
+        );
+        return scrabitemDto;
+    }
+
+    // 스크랩 정도 넣어주기
+    private List<ItemUserResponseDto> addScrapItemList(List<Scrab> myScrabList) {
+        List<ItemUserResponseDto> myScrapItemList = new ArrayList<>();
+
+        for (Scrab myscrap : myScrabList) {
+
+            Long myScrapItemId = myscrap.getItemId();
+            Item scrabItem = itemRepository.findById(myScrapItemId).orElseThrow(
+                    () -> new IllegalArgumentException("Item not found"));
+            ItemUserResponseDto scrabitemDto = getItemUserDto(scrabItem);
+            myScrapItemList.add(scrabitemDto);
+        }
+        return myScrapItemList;
+    }
+
+    // 유저 정보 수정
+    private void updateInfo(String nickname, String address, String storeInfo, String imgUrl, User user) {
+        if (imgUrl.equals("empty")){
+            user.execptImageUpdate(
+                    nickname,
+                    address,
+                    storeInfo
+            );
+        }else {
+            // 유저 정보를 수정
+            user.update(
+                    nickname,
+                    imgUrl,
+                    address,
+                    storeInfo
+            );
         }
     }
 }
