@@ -65,4 +65,13 @@ public class ChatRoomController {
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
+    // 채팅 차단하기
+    @GetMapping("/room/{userId}/banned")
+    public ResponseEntity<OkDto> setBanned(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                        @PathVariable Long userId){
+
+        roomService.setBanned(userDetails, userId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
 }

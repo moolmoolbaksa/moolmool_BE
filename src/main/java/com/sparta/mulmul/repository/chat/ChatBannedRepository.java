@@ -13,7 +13,4 @@ public interface ChatBannedRepository extends JpaRepository<ChatBanned, Long> {
             "WHERE (c.user = :user) AND (c.bannedUser = :bannedUser) OR (c.user = :bannedUser AND c.bannedUser = :user)")
     boolean existsByUser(@Param("user") User user, @Param("bannedUser") User bannedUser);
 
-//    @Query(value = "", nativeQuery = true)
-
-
 }

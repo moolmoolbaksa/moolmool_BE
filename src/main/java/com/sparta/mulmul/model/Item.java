@@ -74,8 +74,8 @@ public class Item extends Timestamped{
         this.title = itemUpdateRequestDto.getTitle();
         this.contents = itemUpdateRequestDto.getContents();
         this.category = itemUpdateRequestDto.getCategory();
-        this.favored = imgUrl;
-        this.itemImg = favored;
+        this.favored = favored;
+        this.itemImg = imgUrl;
         this.type = itemUpdateRequestDto.getType();
     }
 
