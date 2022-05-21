@@ -1,6 +1,5 @@
 package com.sparta.mulmul.repository.chat;
 
-import com.sparta.mulmul.dto.UnreadCountDto;
 import com.sparta.mulmul.model.ChatMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -14,7 +13,7 @@ import java.util.List;
 
 import java.util.Optional;
 
-public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
+public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>, MessageQuerydsl {
 
     List<ChatMessage> findAllByRoomIdOrderByIdDesc(Long roomId);
 
