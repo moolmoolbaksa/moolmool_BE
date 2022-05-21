@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.sparta.mulmul.dto.NotificationType.*;
+
 @RequiredArgsConstructor
 @Service
 public class BarterService {
@@ -90,6 +92,7 @@ public class BarterService {
             updateStatus(buyerItemId, sellerItemId);
             // 거래내역 삭제
             barterRepository.deleteById(barterId);
+            notificationRepository.deleteByChangeIdAndType(barterId, BARTER);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
         }

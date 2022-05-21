@@ -1,12 +1,11 @@
 package com.sparta.mulmul.service.chat;
 
 import com.sparta.mulmul.dto.RoomDto;
-import com.sparta.mulmul.model.ChatMessage;
+import com.sparta.mulmul.model.*;
 
 import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.dto.chat.*;
-import com.sparta.mulmul.model.ChatRoom;
-import com.sparta.mulmul.model.User;
+import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.repository.chat.ChatBannedRepository;
 import com.sparta.mulmul.repository.chat.ChatMessageRepository;
@@ -20,10 +19,14 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 
+import static com.sparta.mulmul.service.chat.ChatRoomService.UserTypeEnum.Type.ACCEPTOR;
+import static com.sparta.mulmul.service.chat.ChatRoomService.UserTypeEnum.Type.REQUESTER;
+
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
 
+    private final NotificationRepository notificationRepository;
     private final ChatRoomRepository roomRepository;
     private final ChatMessageRepository messageRepository;
     private final SimpMessageSendingOperations messagingTemplate;
@@ -31,6 +34,7 @@ public class ChatRoomService {
     private final ChatBannedRepository bannedRepository;
 
     // 채팅방 만들기
+    @Transactional
     public Long createRoom(UserDetailsImpl userDetails, UserRequestDto requestDto){
         // 유효성 검사
         Long acceptorId = requestDto.getUserId();
@@ -48,18 +52,20 @@ public class ChatRoomService {
         if (bannedRepository.existsByUser(acceptor, requester)) {
             throw new AccessDeniedException("ChatRoomService: 차단한 회원과는 채팅을 시도할 수 없습니다.");
         }
-        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장
+        // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장, 메시지를 전달할 때 상대 이미지와 프로필 사진을 같이 전달해 줘야 함.
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
-                .orElseGet( () -> {
-                    ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
-                    // 채팅방 개설 메시지 생성
-                    messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
-                            MessageResponseDto.createFrom(
-                                    messageRepository.save(ChatMessage.createInitOf(c.getId()))
-                            )
-                    );
-                    return c;
-                });
+                        .orElseGet( () -> {
+                            ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
+                            // 채팅방 개설 메시지 생성
+                            notificationRepository.save(Notification.createOf(c, requester)); // 알림 작성 및 전달
+                            messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
+                                    MessageResponseDto.createFrom(
+                                            messageRepository.save(ChatMessage.createInitOf(c.getId()))
+                                    )
+                            );
+                            return c;
+                        });
+        chatRoom.enter(); // 채팅방에 들어간 상태로 변경 -> 람다를 사용해 일괄처리할 방법이 있는지 연구해 보도록 합니다.
         return chatRoom.getId();
     }
 
@@ -106,8 +112,8 @@ public class ChatRoomService {
                 .orElseThrow(() -> new NullPointerException("ChatRoomController: 해당 채팅방이 존재하지 않습니다.")
                 );
         String flag;
-        if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ){ flag = "acceptor"; }
-        else { flag = "requester"; }
+        if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ){ flag = ACCEPTOR; }
+        else { flag = REQUESTER; }
 
         chatRoom.fixedRoom(flag);
     }
@@ -116,24 +122,66 @@ public class ChatRoomService {
 
         List<RoomResponseDto> prefix = new ArrayList<>();
         List<RoomResponseDto> suffix = new ArrayList<>();
+        List<Long> roomIds = new ArrayList<>();
+
+        for ( RoomDto roomDto : roomDtos ) { roomIds.add(roomDto.getRoomId()); }
+        List<UnreadCntDto> cntDtos = messageRepository.getUnreadCnts(roomIds, userId);
 
         for (RoomDto dto : roomDtos) {
+            long unreadCnt = 0;
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( dto.getAccId() == userId ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
-                    int unreadCnt = messageRepository.countMsg(dto.getReqId(), dto.getRoomId());
-                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf("acceptor", dto, unreadCnt)); }
-                    else { suffix.add(RoomResponseDto.createOf("acceptor", dto, unreadCnt)); }
+                    for ( UnreadCntDto cntDto : cntDtos ) {
+                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
+                    }
+                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt)); }
+                    else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt)); }
                 }
             } else if ( dto.getReqId() == userId ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
-                    int unreadCnt = messageRepository.countMsg(dto.getAccId(), dto.getRoomId());
-                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf("requester", dto, unreadCnt)); }
-                    else { suffix.add(RoomResponseDto.createOf("requester", dto, unreadCnt)); }
+                    for ( UnreadCntDto cntDto : cntDtos ) {
+                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
+                    }
+                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt)); }
+                    else { suffix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt)); }
                 }
             }
         }
         prefix.addAll(suffix);
         return prefix;
+    }
+
+    // 회원 차단 기능 -> 추후 상호 차단 기능으로 업그레이드 해야 합니다.
+    public void setBanned(UserDetailsImpl userDetails, Long bannedId){
+
+        User user = userRepository
+                .findById(userDetails.getUserId())
+                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단을 요청한 회원이 존재하지 않습니다.")
+                );
+        User bannedUser = userRepository
+                .findById(bannedId)
+                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단이 요청된 회원이 존재하지 않습니다.")
+                );
+
+        if ( bannedRepository.existsByUser(user, bannedUser) ) {
+            throw new AccessDeniedException("ChatRoomService: 이미 차단된 회원입니다.");
+        } else {
+            bannedRepository.save(ChatBanned.createOf(user, bannedUser));
+        }
+    }
+
+    public enum UserTypeEnum {
+        ACCEPTOR(Type.ACCEPTOR),
+        REQUESTER(Type.REQUESTER);
+
+        private final String userType;
+
+        UserTypeEnum(String userType) { this.userType = userType; }
+
+        public static class Type {
+            public static final String ACCEPTOR = "ACCEPTOR";
+            public static final String REQUESTER = "REQUESTER";
+        }
     }
 }

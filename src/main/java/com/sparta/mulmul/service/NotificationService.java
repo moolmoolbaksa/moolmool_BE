@@ -1,8 +1,11 @@
 package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.NotificationDto;
+import com.sparta.mulmul.dto.NotificationType;
+import com.sparta.mulmul.model.ChatRoom;
 import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.repository.NotificationRepository;
+import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -17,6 +20,7 @@ import java.util.List;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final ChatRoomRepository roomRepository;
     private final SimpMessageSendingOperations messagingTemplate;
 
     // 알림 전체 목록
@@ -26,7 +30,16 @@ public class NotificationService {
         List<NotificationDto> dtos = new ArrayList<>();
 
         for (Notification notification : notifications){
-            dtos.add(NotificationDto.createFrom(notification));
+            if ( notification.getType() == NotificationType.CHAT ) {
+                ChatRoom chatRoom = roomRepository.findByIdFetch(notification.getChangeId())
+                        .orElseThrow( () -> new NullPointerException("NotificationService: 채팅방이 존재하지 않습니다."));
+                if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ) {
+                    dtos.add(NotificationDto.createOf(notification, chatRoom.getRequester()));
+                } else {
+                    dtos.add(NotificationDto.createOf(notification, chatRoom.getAcceptor()));
+                }
+            } else { dtos.add(NotificationDto.createFrom(notification)); }
+
         }
         return dtos;
     }

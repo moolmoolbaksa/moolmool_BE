@@ -3,6 +3,7 @@ package com.sparta.mulmul.utils;
 import com.sparta.mulmul.dto.chat.MessageRequestDto;
 import org.springframework.stereotype.Component;
 
+// 여유가 된다면, DB에 저장된 자료를 추출해 PostConstructor로 등록해 주도록 합니다.
 @Component
 public class LanguageFilter {
 

@@ -7,7 +7,10 @@ buildscript {
 plugins {
     id 'org.springframework.boot' version '2.6.7'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+<<<<<<< HEAD
 
+=======
+>>>>>>> 15d9223dc7fd5e68dcabe18b0fbaa508e7c17213
     //querydsl 추가
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'java'
@@ -56,8 +59,8 @@ dependencies {
     // XSS 방어
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
     //querydsl 추가
-    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}" // 큰따옴표 반드시 지켜 써야함
+
 }
 
 tasks.named('test') {

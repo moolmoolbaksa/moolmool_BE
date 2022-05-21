@@ -2,9 +2,11 @@ package com.sparta.mulmul.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
+
+import static com.sparta.mulmul.service.chat.ChatRoomService.UserTypeEnum.Type.ACCEPTOR;
+import static com.sparta.mulmul.service.chat.ChatRoomService.UserTypeEnum.Type.REQUESTER;
 
 @Getter @Entity
 @NoArgsConstructor
@@ -54,10 +56,19 @@ public class ChatRoom extends Timestamped {
     public void accOut(Boolean bool) { this.accOut = bool; }
 
     public void fixedRoom(String flag) {
-        if (flag.equals("acceptor")) {
-            this.accFixed = true;
-        } else {
-            this.reqFixed = true;
+
+        switch ( flag ) {
+            case ACCEPTOR:
+                this.accFixed = true; break;
+            case REQUESTER:
+                this.reqFixed = true; break;
+            default:
+                throw new IllegalArgumentException("ChatRoom: 올바른 인자값을 입력해 주세요.(ACCEPTOR/REQUESTER)");
         }
+    }
+
+    public void enter(){
+        this.accOut = false;
+        this.reqOut = false;
     }
 }
