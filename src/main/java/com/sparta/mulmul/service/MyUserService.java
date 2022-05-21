@@ -171,6 +171,7 @@ public class MyUserService {
         return myItemResponseList;
     }
 
+    // DTO에 아이템정보 넣기
     private ItemUserResponseDto getItemUserDto(Item scrabItem) {
         ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
                 scrabItem.getId(),
@@ -185,7 +186,6 @@ public class MyUserService {
         List<ItemUserResponseDto> myScrapItemList = new ArrayList<>();
 
         for (Scrab myscrap : myScrabList) {
-
             Long myScrapItemId = myscrap.getItemId();
             Item scrabItem = itemRepository.findById(myScrapItemId).orElseThrow(
                     () -> new IllegalArgumentException("Item not found"));

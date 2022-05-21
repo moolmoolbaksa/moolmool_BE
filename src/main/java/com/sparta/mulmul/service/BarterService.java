@@ -21,6 +21,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -128,6 +129,13 @@ public class BarterService {
             opponentTrade = myBarter.getIsBuyerTrade();
             myPosition = "seller";
         }
+
+//        List<Barter> atherBarter = barterRepository.findAllBySellerId(myBarter.getSellerId());
+//        if (atherBarter) {
+//            for (Barter eachBarter : atherBarter){
+//
+//            }
+//        }
 
         Boolean buyerTrade = myBarter.getIsBuyerTrade();
         Boolean sellerTrade = myBarter.getIsSellerTrade();
