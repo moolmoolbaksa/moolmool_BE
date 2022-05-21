@@ -21,9 +21,9 @@ public class RoomResponseDto {
     private LocalDateTime date;
     private Boolean isRead;
     private Boolean isBanned = false;
-    private int unreadCnt;
+    private long unreadCnt;
 
-    public static RoomResponseDto createOf(String flag, RoomDto dto, int unreadCnt){
+    public static RoomResponseDto createOf(String flag, RoomDto dto, long unreadCnt){
 
         RoomResponseDto responseDto = new RoomResponseDto();
 

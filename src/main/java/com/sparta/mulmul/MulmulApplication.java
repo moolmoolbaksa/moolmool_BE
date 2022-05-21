@@ -1,5 +1,6 @@
 package com.sparta.mulmul;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cache.CacheManager;
@@ -11,6 +12,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.web.config.PageableHandlerMethodArgumentResolverCustomizer;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.TimeZone;
 
 @EnableCaching
@@ -32,6 +35,9 @@ public class MulmulApplication {
     public void started(){
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
     }
+
+    @PersistenceContext
+    EntityManager em;
 
     static { System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true"); }
 

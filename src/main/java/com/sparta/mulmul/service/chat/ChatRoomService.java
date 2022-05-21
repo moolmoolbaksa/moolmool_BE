@@ -122,18 +122,27 @@ public class ChatRoomService {
 
         List<RoomResponseDto> prefix = new ArrayList<>();
         List<RoomResponseDto> suffix = new ArrayList<>();
+        List<Long> roomIds = new ArrayList<>();
+
+        for ( RoomDto roomDto : roomDtos ) { roomIds.add(roomDto.getRoomId()); }
+        List<UnreadCntDto> cntDtos = messageRepository.getUnreadCnts(roomIds, userId);
 
         for (RoomDto dto : roomDtos) {
+            long unreadCnt = 0;
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( dto.getAccId() == userId ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
-                    int unreadCnt = messageRepository.countMsg(dto.getReqId(), dto.getRoomId());
+                    for ( UnreadCntDto cntDto : cntDtos ) {
+                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
+                    }
                     if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt)); }
                     else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt)); }
                 }
             } else if ( dto.getReqId() == userId ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
-                    int unreadCnt = messageRepository.countMsg(dto.getAccId(), dto.getRoomId());
+                    for ( UnreadCntDto cntDto : cntDtos ) {
+                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
+                    }
                     if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt)); }
                     else { suffix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt)); }
                 }
