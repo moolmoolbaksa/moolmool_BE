@@ -8,6 +8,10 @@ import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -63,56 +67,16 @@ public class ItemService {
         return item.getId();
     }
     //이승재 / 전체 아이템 조회(카테고리별)
-    public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
+    public List<ItemResponseDto> getItems(int pageNo, String category, UserDetailsImpl userDetails) {
+        Pageable pageable = getPageable(pageNo);
         if(category.isEmpty()){
-            List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
+            Page<Item> itemList = itemRepository.findAllItemOrderByCreatedAtDesc(pageable);
             List<ItemResponseDto> items = new ArrayList<>();
             for(Item item : itemList) {
-                if (item.getStatus() == 1 || item.getStatus() == 0) {
-                    List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                    int scrabCnt = 0;
-                    for (Scrab scrab : scrabs) {
-                        if (scrab.getScrab().equals(true)) {
-                            scrabCnt++;
-                        }
-                    }
-                    String distance;
-                    if(userDetails.equals(null)){
-                        distance = "null";
-                    }else {
-                        Long userId = userDetails.getUserId();
-                        distance = getDistance(userId, item.getAddress());
-                    }
-                    ItemResponseDto itemResponseDto = new ItemResponseDto(
-                            item.getId(),
-                            item.getCategory(),
-                            item.getTitle(),
-                            item.getContents(),
-                            item.getItemImg().split(",")[0],
-                            distance,
-                            scrabCnt,
-                            item.getViewCnt(),
-                            item.getStatus());
-                    items.add(itemResponseDto);
-                }
-            }
-            return items;
-        }
-        List<Item> itemList = itemRepository.findAllByCategory(category);
-        List<ItemResponseDto> items = new ArrayList<>();
-        Long userId = userDetails.getUserId();
-        for(Item item : itemList) {
-            if (item.getStatus() == 0 || item.getStatus() == 1) {
-                boolean isScrab;
-                if (scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()) {
-                    isScrab = true;
-                } else {
-                    isScrab = false;
-                }
                 List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
                 int scrabCnt = 0;
-                for (Scrab scrab1 : scrabs) {
-                    if (scrab1.getScrab().equals(true)) {
+                for (Scrab scrab : scrabs) {
+                    if (scrab.getScrab().equals(true)) {
                         scrabCnt++;
                     }
                 }
@@ -120,6 +84,7 @@ public class ItemService {
                 if(userDetails.equals(null)){
                     distance = "null";
                 }else {
+                    Long userId = userDetails.getUserId();
                     distance = getDistance(userId, item.getAddress());
                 }
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
@@ -131,15 +96,65 @@ public class ItemService {
                         distance,
                         scrabCnt,
                         item.getViewCnt(),
-                        item.getStatus(),
-                        isScrab);
+                        item.getStatus());
                 items.add(itemResponseDto);
-
             }
+            return items;
+        }
+        Page<Item> itemList = itemRepository.findAllItemByCategoryOrderByCreatedAtDesc(category, pageable);
+        List<ItemResponseDto> items = new ArrayList<>();
+        Long userId = userDetails.getUserId();
+        for(Item item : itemList) {
+//            if (item.getStatus() == 0 || item.getStatus() == 1) {
+            Long itemId = item.getId();
+            boolean isScrab = checkScrab(userId, itemId);
+
+            List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
+            int scrabCnt = 0;
+            for (Scrab scrab1 : scrabs) {
+                if (scrab1.getScrab().equals(true)) {
+                    scrabCnt++;
+                }
+            }
+            String distance;
+            if(userDetails.equals(null)){
+                distance = "null";
+            }else {
+                distance = getDistance(userId, item.getAddress());
+            }
+            ItemResponseDto itemResponseDto = new ItemResponseDto(
+                    itemId,
+                    item.getCategory(),
+                    item.getTitle(),
+                    item.getContents(),
+                    item.getItemImg().split(",")[0],
+                    distance,
+                    scrabCnt,
+                    item.getViewCnt(),
+                    item.getStatus(),
+                    isScrab);
+            items.add(itemResponseDto);
+
+//            }
         }
         return items;
     }
 
+    // 이승재 / 페이징 처리
+    private Pageable getPageable(int pageNo) {
+        Sort.Direction direction = Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, "createdAt");
+        return PageRequest.of(pageNo, 10, sort);
+    }
+
+    //이승재 / 구독정보 확인
+    private boolean checkScrab(Long userId, Long itemId){
+        if(scrabRepository.findByUserIdAndItemId(userId, itemId).isPresent()){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     // 이승재 / 아이템 상세페이지
     @Transactional
