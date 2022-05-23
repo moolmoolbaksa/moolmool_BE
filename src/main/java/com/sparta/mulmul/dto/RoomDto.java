@@ -17,7 +17,7 @@ public interface RoomDto {
     Boolean getIsRead();
     Boolean getAccFixed();
     Boolean getReqFixed();
-    Boolean getIsBanned();
+    Long getIsBanned();
     LocalDateTime getDate();
     String getMessage();
 
