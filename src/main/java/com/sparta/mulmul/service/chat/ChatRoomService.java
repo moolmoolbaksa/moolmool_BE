@@ -1,6 +1,8 @@
 package com.sparta.mulmul.service.chat;
 
+import com.sparta.mulmul.dto.BannedUserDto;
 import com.sparta.mulmul.dto.RoomDto;
+import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.model.*;
 
 import com.sparta.mulmul.dto.user.UserRequestDto;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 
+import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.service.chat.ChatRoomService.UserTypeEnum.Type.ACCEPTOR;
 import static com.sparta.mulmul.service.chat.ChatRoomService.UserTypeEnum.Type.REQUESTER;
 
@@ -43,21 +46,21 @@ public class ChatRoomService {
         }
         // 채팅 상대 찾아오기
         User acceptor = userRepository.findById(acceptorId)
-                .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다.")
+                .orElseThrow( () -> new CustomException(NOT_FOUND_USER)
                 );
         User requester = userRepository.findById(userDetails.getUserId())
-                .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다.")
+                .orElseThrow( () -> new CustomException(NOT_FOUND_USER)
                 );
         // 채팅방 차단 회원인지 검색
-        if (bannedRepository.existsByUser(acceptor, requester)) {
-            throw new AccessDeniedException("ChatRoomService: 차단한 회원과는 채팅을 시도할 수 없습니다.");
+        if (bannedRepository.existsByUsers(acceptor, requester)) {
+            throw new CustomException(BANNED_CHAT_USER);
         }
         // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장, 메시지를 전달할 때 상대 이미지와 프로필 사진을 같이 전달해 줘야 함.
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
                         .orElseGet( () -> {
                             ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
                             // 채팅방 개설 메시지 생성
-                            notificationRepository.save(Notification.createOf(c, requester)); // 알림 작성 및 전달
+                            notificationRepository.save(Notification.createOf(c, acceptor)); // 알림 작성 및 전달
                             messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
                                     MessageResponseDto.createFrom(
                                             messageRepository.save(ChatMessage.createInitOf(c.getId()))
@@ -74,11 +77,11 @@ public class ChatRoomService {
     public void exitRoom(Long id, UserDetailsImpl userDetails){
         // 회원 찾기
         User user = userRepository.findById(userDetails.getUserId())
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 해당 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
         // 채팅방 찾아오기
         ChatRoom chatRoom = roomRepository.findById(id)
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 해당 채팅방이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT)
                 );
         if ( chatRoom.getRequester() == user) { chatRoom.reqOut(true); }
         else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
@@ -95,7 +98,7 @@ public class ChatRoomService {
     public List<RoomResponseDto> getRooms(UserDetailsImpl userDetails){
         // 회원 찾기
         User user = userRepository.findById(userDetails.getUserId())
-                .orElseThrow( () -> new NullPointerException("ChatRoomService: getRooms) 존재하지 않는 회원입니다.")
+                .orElseThrow( () -> new CustomException(NOT_FOUND_USER)
                 );
         // 방 목록 찾기
         List<RoomDto> dtos = roomRepository.findAllWith(user);
@@ -109,7 +112,7 @@ public class ChatRoomService {
 
         // fetchJoin 필요
         ChatRoom chatRoom = roomRepository.findById(roomId)
-                .orElseThrow(() -> new NullPointerException("ChatRoomController: 해당 채팅방이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT)
                 );
         String flag;
         if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ){ flag = ACCEPTOR; }
@@ -152,7 +155,7 @@ public class ChatRoomService {
         return prefix;
     }
 
-    // 회원 차단 기능 -> 추후 상호 차단 기능으로 업그레이드 해야 합니다.
+    // 회원 차단 기능
     public void setBanned(UserDetailsImpl userDetails, Long bannedId){
 
         User user = userRepository
@@ -165,10 +168,43 @@ public class ChatRoomService {
                 );
 
         if ( bannedRepository.existsByUser(user, bannedUser) ) {
-            throw new AccessDeniedException("ChatRoomService: 이미 차단된 회원입니다.");
+            throw new AccessDeniedException("ChatRoomService: 이미 차단한 회원입니다.");
         } else {
             bannedRepository.save(ChatBanned.createOf(user, bannedUser));
         }
+    }
+
+    // 차단 회원 불러오기
+    public List<BannedUserDto> getBanned(UserDetailsImpl userDetails){
+        User user = userRepository
+                .findById(userDetails.getUserId())
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+        List<User> bannedUsers = bannedRepository.findAllMyBannedByUser(user);
+
+        List<BannedUserDto> userDtos = new ArrayList<>();
+
+        for (User banndUser : bannedUsers){ userDtos.add(BannedUserDto.createFrom(banndUser)); }
+
+        return userDtos;
+    }
+
+    // 회원 차단 풀기
+    @Transactional
+    public void releaseBanned(UserDetailsImpl userDetails, Long bannedId){
+
+        User user = userRepository
+                .findById(userDetails.getUserId())
+                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단을 요청한 회원이 존재하지 않습니다.")
+                );
+        User bannedUser = userRepository
+                .findById(bannedId)
+                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단이 요청된 회원이 존재하지 않습니다.")
+                );
+
+        ChatBanned banned = bannedRepository.findByUsers(user, bannedUser)
+                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단목록이 존재하지 않습니다."));
+
+        banned.releaseBanned();
     }
 
     public enum UserTypeEnum {

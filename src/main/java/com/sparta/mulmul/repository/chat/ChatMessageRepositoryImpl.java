@@ -3,6 +3,7 @@ package com.sparta.mulmul.repository.chat;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.mulmul.dto.chat.UnreadCntDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,13 +11,10 @@ import java.util.List;
 import static com.sparta.mulmul.model.QChatMessage.*;
 
 @Repository
+@RequiredArgsConstructor
 public class ChatMessageRepositoryImpl implements MessageQuerydsl {
 
     private final JPAQueryFactory queryFactory;
-
-    public ChatMessageRepositoryImpl(JPAQueryFactory queryFactory){
-        this.queryFactory = queryFactory;
-    }
 
     @Override
     public List<UnreadCntDto> getUnreadCnts(List<Long> roomIds, Long userId){
