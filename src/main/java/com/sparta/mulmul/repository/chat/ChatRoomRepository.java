@@ -26,7 +26,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
                     "INNER JOIN user u2 ON r.requester_id = u2.id " +
                     "INNER JOIN chat_message msg ON (msg.room_id, msg.message_id) " +
                         "IN (SELECT room_id, MAX(message_id) FROM chat_message GROUP BY room_id) AND r.room_id = msg.room_id " +
-                    "LEFT JOIN chat_banned ban ON ( r.acceptor_id = ban.user_id OR r.requester_id = ban.banned_user_id ) AND ban.is_banned = true " + // 하나의 결과만 가져와야함
+                    "LEFT JOIN chat_banned ban ON r.acceptor_id = ban.user_id OR r.requester_id = ban.banned_user_id " + // 하나의 결과만 가져와야함
             "WHERE (r.acceptor_id = :user OR r.requester_id = :user) " +
             "ORDER BY r.modified_at DESC",
             nativeQuery = true)
