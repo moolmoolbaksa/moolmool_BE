@@ -73,13 +73,11 @@ public class ItemService {
             Page<Item> itemList = itemRepository.findAllItemOrderByCreatedAtDesc(pageable);
             List<ItemResponseDto> items = new ArrayList<>();
             for(Item item : itemList) {
-                    List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                    int scrabCnt = 0;
-                    for (Scrab scrab : scrabs) {
-                        if (scrab.getScrab().equals(true)) {
-                            scrabCnt++;
-                        }
-                    }
+
+                    //구독 개수
+                    List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
+                    int scrabCnt = scrabs.size();
+                    // 거리 계산
                     String distance = getDistance(userDetails, item);
                     ItemResponseDto itemResponseDto = new ItemResponseDto(
                             item.getId(),
@@ -103,13 +101,10 @@ public class ItemService {
                 Long itemId = item.getId();
                 boolean isScrab = checkScrab(userId, itemId);
 
-                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                int scrabCnt = 0;
-                for (Scrab scrab1 : scrabs) {
-                    if (scrab1.getScrab().equals(true)) {
-                        scrabCnt++;
-                    }
-                }
+                //구독 개수
+                List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
+                int scrabCnt = scrabs.size();
+
                 // 거리 계산
                 String distance = getDistance(userDetails, item);
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
@@ -288,7 +283,6 @@ public class ItemService {
             }
         }
     }
-
     private double deg2rad(double deg){
         return (deg * Math.PI / 180.0);
     }
