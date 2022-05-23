@@ -4,7 +4,9 @@ import static com.sparta.mulmul.model.QScrab.*;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import com.sparta.mulmul.dto.barter.BarterHotItemListDto;
 import com.sparta.mulmul.dto.barter.BarterItemListDto;
+import com.sparta.mulmul.dto.barter.QBarterHotItemListDto;
 import com.sparta.mulmul.dto.barter.QBarterItemListDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
@@ -95,6 +97,21 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                         item.title,
                         item.itemImg,
                         item.contents
+                ))
+                .from(item)
+                .where(item.id.eq(itemId))
+                .fetchOne();
+    }
+
+    @Override
+    public BarterHotItemListDto findByHotBarterItems(Long itemId) {
+        return queryFactory
+                .select(new QBarterHotItemListDto(
+                        item.id,
+                        item.title,
+                        item.itemImg,
+                        item.contents,
+                        item.status
                 ))
                 .from(item)
                 .where(item.id.eq(itemId))

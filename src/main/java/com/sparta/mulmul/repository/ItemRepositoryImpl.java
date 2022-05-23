@@ -8,9 +8,6 @@ import com.sparta.mulmul.dto.barter.QBarterItemListDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
 import com.sparta.mulmul.model.Item;
-import com.sparta.mulmul.model.QBag;
-import com.sparta.mulmul.model.QBarter;
-import com.sparta.mulmul.model.QScrab;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.sparta.mulmul.model.QBag.*;
-import static com.sparta.mulmul.model.QBarter.barter1;
 import static com.sparta.mulmul.model.QItem.item;
 import static com.sparta.mulmul.model.QScrab.scrab1;
 
@@ -28,10 +23,12 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
 
     private final JPAQueryFactory queryFactory;
 
-    public ItemRepositoryImpl(JPAQueryFactory queryFactory) {this.queryFactory = queryFactory;}
+    public ItemRepositoryImpl(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
+    }
 
     @Override
-    public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable){
+    public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable) {
         List<Item> results = queryFactory
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)))
@@ -43,7 +40,7 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
     }
 
     @Override
-    public Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable){
+    public Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable) {
         List<Item> results = queryFactory
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)).and(item.category.eq(category)))
@@ -60,10 +57,10 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
 
         return queryFactory
                 .select(new QItemUserResponseDto(
-                                item.id,
-                                item.itemImg,
-                                item.status
-                                ))
+                        item.id,
+                        item.itemImg,
+                        item.status
+                ))
                 .from(item)
                 .where(
                         item.bag.userId.eq(userId),
@@ -119,7 +116,9 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
                 .where(item.id.eq(itemId))
                 .fetchOne();
     }
-    }
+}
+
+
 
 
 
