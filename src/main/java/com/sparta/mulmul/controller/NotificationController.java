@@ -81,14 +81,6 @@ public class NotificationController {
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
-    // 교환 신청 취소
-    @GetMapping("/notification/{notificationId}/cancel") // 교환 신청 취소에 대해 이 주소로 요청을 보내면 작동합니다.
-    public ResponseEntity<OkDto> cancelBarter(@PathVariable Long notificationId){
-
-        notificationService.setRead(notificationId);
-        return ResponseEntity.ok().body(OkDto.valueOf("true"));
-    }
-
     // 회원 가입 메시지
     @GetMapping("/notification/{notificationId}/signup") // 회원가입 축하 메시지에 대해 이 주소로 요청을 보내면 작동합니다.
     public ResponseEntity<OkDto> signup(@PathVariable Long notificationId){
