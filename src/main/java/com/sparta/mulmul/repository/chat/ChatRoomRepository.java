@@ -20,7 +20,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Query(value =
             "SELECT DISTINCT r.room_id AS roomId, r.acc_out AS accOut, r.req_out AS reqOut, r.acc_fixed AS accFixed, r.req_fixed AS reqFixed, " +
                     "u1.id AS accId, u1.nickname AS accNickname, u1.profile AS accProfile, u2.id AS reqId, u2.nickname AS reqNickname, u2.profile AS reqProfile, " +
-                    "msg.message AS message, msg.created_at AS date, CASE WHEN COUNT(ban.is_banned) > 0 THEN true ELSE false end AS isBanned " +
+                    "msg.message AS message, msg.created_at AS date, CASE WHEN ban.is_banned = true THEN 1 ELSE 0 END AS isBanned " +
             "FROM chat_room r " +
                     "INNER JOIN user u1 ON r.acceptor_id = u1.id " +
                     "INNER JOIN user u2 ON r.requester_id = u2.id " +
