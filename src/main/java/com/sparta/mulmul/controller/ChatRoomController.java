@@ -1,5 +1,6 @@
 package com.sparta.mulmul.controller;
 
+import com.sparta.mulmul.dto.BannedUserDto;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.dto.chat.MessageResponseDto;
@@ -68,9 +69,24 @@ public class ChatRoomController {
     // 채팅 차단하기
     @GetMapping("/room/{userId}/banned")
     public ResponseEntity<OkDto> setBanned(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                        @PathVariable Long userId){
+                                           @PathVariable Long userId){
 
         roomService.setBanned(userDetails, userId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
+    // 차단 유저 목록 보기
+    @GetMapping("/room/banned")
+    public List<BannedUserDto> getBanned(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        return roomService.getBanned(userDetails);
+    }
+
+    // 차단 유저 해제하기
+    @PutMapping("/room/{userId}/banned")
+    public ResponseEntity<OkDto> releaseBanned(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                               @PathVariable Long userId){
+
+        roomService.releaseBanned(userDetails, userId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 
