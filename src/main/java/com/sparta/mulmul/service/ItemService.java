@@ -256,8 +256,10 @@ public class ItemService {
             User user = userRepository.findById(userId).orElseThrow(
                     () -> new IllegalArgumentException("유저 정보가 없습니다.")
             );
-            Location userLocation = locationRepository.findByArea(user.getAddress().split(" ")[1]);
-            Location itemLocation = locationRepository.findByArea(address.split(" ")[1]);
+            String userAddress = user.getAddress().split(" ")[0]+" " +user.getAddress().split(" ")[1];
+            String itemAddress = address.split(" ")[0] + " " + address.split(" ")[1];
+            Location userLocation = locationRepository.findByArea(userAddress);
+            Location itemLocation = locationRepository.findByArea(itemAddress);
             double userLat = userLocation.getLatitude();
             double userLon = userLocation.getLongitude();
             double itemLat = itemLocation.getLatitude();

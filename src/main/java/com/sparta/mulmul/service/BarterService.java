@@ -340,7 +340,7 @@ public class BarterService {
                     barterId,
                     myBarter.getIsBuyerTrade(),
                     myBarter.getStatus(),
-                    myPosition
+                    "seller"
             );
             messagingTemplate.convertAndSend(
                     "/sub/barter/" + myBarter.getSellerId(), messageDto
@@ -351,7 +351,7 @@ public class BarterService {
                     barterId,
                     myBarter.getIsSellerTrade(),
                     myBarter.getStatus(),
-                    myPosition
+                    "buyer"
             );
             messagingTemplate.convertAndSend(
                     "/sub/barter/" + myBarter.getBuyerId(), messageDto
