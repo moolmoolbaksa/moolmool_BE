@@ -8,6 +8,10 @@ import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -63,26 +67,17 @@ public class ItemService {
         return item.getId();
     }
     //이승재 / 전체 아이템 조회(카테고리별)
-    public List<ItemResponseDto> getItems(String category, UserDetailsImpl userDetails) {
+    public List<ItemResponseDto> getItems(int pageNo, String category, UserDetailsImpl userDetails) {
+        Pageable pageable = getPageable(pageNo);
         if(category.isEmpty()){
-            List<Item> itemList = itemRepository.findAllByOrderByCreatedAtDesc();
+            Page<Item> itemList = itemRepository.findAllItemOrderByCreatedAtDesc(pageable);
             List<ItemResponseDto> items = new ArrayList<>();
             for(Item item : itemList) {
-                if (item.getStatus() == 1 || item.getStatus() == 0) {
-                    List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                    int scrabCnt = 0;
-                    for (Scrab scrab : scrabs) {
-                        if (scrab.getScrab().equals(true)) {
-                            scrabCnt++;
-                        }
-                    }
-                    String distance;
-                    if(userDetails.equals(null)){
-                        distance = "null";
-                    }else {
-                        Long userId = userDetails.getUserId();
-                        distance = getDistance(userId, item.getAddress());
-                    }
+                    //구독 개수
+                    List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
+                    int scrabCnt = scrabs.size();
+                    // 거리 계산
+                    String distance = getDistance(userDetails, item);
                     ItemResponseDto itemResponseDto = new ItemResponseDto(
                             item.getId(),
                             item.getCategory(),
@@ -94,36 +89,24 @@ public class ItemService {
                             item.getViewCnt(),
                             item.getStatus());
                     items.add(itemResponseDto);
-                }
             }
             return items;
         }
-        List<Item> itemList = itemRepository.findAllByCategory(category);
+        Page<Item> itemList = itemRepository.findAllItemByCategoryOrderByCreatedAtDesc(category, pageable);
         List<ItemResponseDto> items = new ArrayList<>();
         Long userId = userDetails.getUserId();
         for(Item item : itemList) {
-            if (item.getStatus() == 0 || item.getStatus() == 1) {
-                boolean isScrab;
-                if (scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()) {
-                    isScrab = true;
-                } else {
-                    isScrab = false;
-                }
-                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                int scrabCnt = 0;
-                for (Scrab scrab1 : scrabs) {
-                    if (scrab1.getScrab().equals(true)) {
-                        scrabCnt++;
-                    }
-                }
-                String distance;
-                if(userDetails.equals(null)){
-                    distance = "null";
-                }else {
-                    distance = getDistance(userId, item.getAddress());
-                }
+//            if (item.getStatus() == 0 || item.getStatus() == 1) {
+                Long itemId = item.getId();
+                boolean isScrab = checkScrab(userId, itemId);
+
+                //구독 개수
+                List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
+                int scrabCnt = scrabs.size();
+                // 거리 계산
+                String distance = getDistance(userDetails, item);
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
-                        item.getId(),
+                        itemId,
                         item.getCategory(),
                         item.getTitle(),
                         item.getContents(),
@@ -131,15 +114,38 @@ public class ItemService {
                         distance,
                         scrabCnt,
                         item.getViewCnt(),
-                        item.getStatus(),
-                        isScrab);
+                        item.getStatus());
                 items.add(itemResponseDto);
 
             }
+            return items;
         }
-        return items;
+
+    // 이승재 / 페이징 처리
+    private Pageable getPageable(int pageNo) {
+        Sort.Direction direction = Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, "createdAt");
+        return PageRequest.of(pageNo, 10, sort);
     }
 
+    //이승재 / 구독정보 확인
+    private boolean checkScrab(Long userId, Long itemId){
+        if(scrabRepository.findByUserIdAndItemId(userId, itemId).isPresent()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    //이승재 / 거리 계산
+    private String getDistance(UserDetailsImpl userDetails, Item item){
+        String distance;
+        if(userDetails.equals(null)){
+            distance = "null";
+        }else{
+            distance = caculateDistance(userDetails.getUserId(), item.getAddress());
+        }
+        return distance;
+    }
 
     // 이승재 / 아이템 상세페이지
     @Transactional
@@ -166,13 +172,11 @@ public class ItemService {
         item.update(itemId, viewCnt);
 
         // 이승재 / 아이템 구독 정보 유저 정보를 통해 확인
-        Boolean isSrab = false;
+        boolean isSrab = false;
         Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userDetails.getUserId(), itemId);
         if(scrab.isPresent()){
             if(scrab.get().getScrab().equals(true)){
                 isSrab = true;
-            }else{
-                isSrab = false;
             }
         }
 
@@ -197,13 +201,7 @@ public class ItemService {
 
 
         // 거리 계산
-        String distance;
-        if(userDetails.equals(null)){
-            distance = "null";
-        }else {
-            Long userId = userDetails.getUserId();
-            distance = getDistance(userId, item.getAddress());
-        }
+        String distance = getDistance(userDetails, item);
 
         // 교환신청했는지 확인하기
         String traded = null;
@@ -251,7 +249,7 @@ public class ItemService {
     }
 
     // 이승재 / 위도 경도 거리계산하기
-    private String getDistance(Long userId, String address) {
+    private String caculateDistance(Long userId, String address) {
         if(userId == null){
             return "null";
         }else {
@@ -281,7 +279,6 @@ public class ItemService {
             }
         }
     }
-
     private double deg2rad(double deg){
         return (deg * Math.PI / 180.0);
     }

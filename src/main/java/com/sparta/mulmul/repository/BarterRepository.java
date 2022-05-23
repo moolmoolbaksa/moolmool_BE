@@ -22,4 +22,6 @@ public interface BarterRepository extends JpaRepository<Barter, Long> {
 
     Optional<Barter> findByBarter(String stringBarter);
     List<Barter> findAllByBuyerIdAndSellerId(Long buyerId, Long sellerId);
+
+    List<Barter> findAllBySellerId(Long sellerId);
 }

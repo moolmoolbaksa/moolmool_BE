@@ -31,7 +31,7 @@ public class ItemDetailResponseDto {
     private int scrabCnt;
     private String type;
     private String[] favored;
-    private Boolean isScrab;
+    private boolean isScrab;
     private String traded;
     private Long barterId;
 
@@ -55,7 +55,7 @@ public class ItemDetailResponseDto {
                            int scrabCnt,
                            String type,
                            String[] favored,
-                           Boolean isScrab,
+                           boolean isScrab,
                                  String traded,
                                  Long barterId) {
         this.userId = i;
