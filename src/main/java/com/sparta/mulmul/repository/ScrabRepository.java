@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface ScrabRepository extends JpaRepository<Scrab, Long> {
+public interface ScrabRepository extends JpaRepository<Scrab, Long>, ScrabQuerydsl {
 //    @Query(value = "select * from scrab p where p.userId = ?1 and p.itemId = ?2")
     Optional<Scrab> findByUserIdAndItemId(Long userId, Long itemId);
 

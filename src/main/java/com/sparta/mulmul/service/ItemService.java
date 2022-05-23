@@ -73,22 +73,40 @@ public class ItemService {
             Page<Item> itemList = itemRepository.findAllItemOrderByCreatedAtDesc(pageable);
             List<ItemResponseDto> items = new ArrayList<>();
             for(Item item : itemList) {
-                List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-                int scrabCnt = 0;
-                for (Scrab scrab : scrabs) {
-                    if (scrab.getScrab().equals(true)) {
-                        scrabCnt++;
-                    }
-                }
-                String distance;
-                if(userDetails.equals(null)){
-                    distance = "null";
-                }else {
-                    Long userId = userDetails.getUserId();
-                    distance = getDistance(userId, item.getAddress());
-                }
+                    //구독 개수
+                    List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
+                    int scrabCnt = scrabs.size();
+                    // 거리 계산
+                    String distance = getDistance(userDetails, item);
+                    ItemResponseDto itemResponseDto = new ItemResponseDto(
+                            item.getId(),
+                            item.getCategory(),
+                            item.getTitle(),
+                            item.getContents(),
+                            item.getItemImg().split(",")[0],
+                            distance,
+                            scrabCnt,
+                            item.getViewCnt(),
+                            item.getStatus());
+                    items.add(itemResponseDto);
+            }
+            return items;
+        }
+        Page<Item> itemList = itemRepository.findAllItemByCategoryOrderByCreatedAtDesc(category, pageable);
+        List<ItemResponseDto> items = new ArrayList<>();
+        Long userId = userDetails.getUserId();
+        for(Item item : itemList) {
+//            if (item.getStatus() == 0 || item.getStatus() == 1) {
+                Long itemId = item.getId();
+                boolean isScrab = checkScrab(userId, itemId);
+
+                //구독 개수
+                List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
+                int scrabCnt = scrabs.size();
+                // 거리 계산
+                String distance = getDistance(userDetails, item);
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
-                        item.getId(),
+                        itemId,
                         item.getCategory(),
                         item.getTitle(),
                         item.getContents(),
@@ -98,47 +116,10 @@ public class ItemService {
                         item.getViewCnt(),
                         item.getStatus());
                 items.add(itemResponseDto);
+
             }
             return items;
         }
-        Page<Item> itemList = itemRepository.findAllItemByCategoryOrderByCreatedAtDesc(category, pageable);
-        List<ItemResponseDto> items = new ArrayList<>();
-        Long userId = userDetails.getUserId();
-        for(Item item : itemList) {
-//            if (item.getStatus() == 0 || item.getStatus() == 1) {
-            Long itemId = item.getId();
-            boolean isScrab = checkScrab(userId, itemId);
-
-            List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
-            int scrabCnt = 0;
-            for (Scrab scrab1 : scrabs) {
-                if (scrab1.getScrab().equals(true)) {
-                    scrabCnt++;
-                }
-            }
-            String distance;
-            if(userDetails.equals(null)){
-                distance = "null";
-            }else {
-                distance = getDistance(userId, item.getAddress());
-            }
-            ItemResponseDto itemResponseDto = new ItemResponseDto(
-                    itemId,
-                    item.getCategory(),
-                    item.getTitle(),
-                    item.getContents(),
-                    item.getItemImg().split(",")[0],
-                    distance,
-                    scrabCnt,
-                    item.getViewCnt(),
-                    item.getStatus(),
-                    isScrab);
-            items.add(itemResponseDto);
-
-//            }
-        }
-        return items;
-    }
 
     // 이승재 / 페이징 처리
     private Pageable getPageable(int pageNo) {
@@ -154,6 +135,16 @@ public class ItemService {
         }else{
             return false;
         }
+    }
+    //이승재 / 거리 계산
+    private String getDistance(UserDetailsImpl userDetails, Item item){
+        String distance;
+        if(userDetails.equals(null)){
+            distance = "null";
+        }else{
+            distance = caculateDistance(userDetails.getUserId(), item.getAddress());
+        }
+        return distance;
     }
 
     // 이승재 / 아이템 상세페이지
@@ -181,13 +172,11 @@ public class ItemService {
         item.update(itemId, viewCnt);
 
         // 이승재 / 아이템 구독 정보 유저 정보를 통해 확인
-        Boolean isSrab = false;
+        boolean isSrab = false;
         Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userDetails.getUserId(), itemId);
         if(scrab.isPresent()){
             if(scrab.get().getScrab().equals(true)){
                 isSrab = true;
-            }else{
-                isSrab = false;
             }
         }
 
@@ -212,13 +201,7 @@ public class ItemService {
 
 
         // 거리 계산
-        String distance;
-        if(userDetails.equals(null)){
-            distance = "null";
-        }else {
-            Long userId = userDetails.getUserId();
-            distance = getDistance(userId, item.getAddress());
-        }
+        String distance = getDistance(userDetails, item);
 
         // 교환신청했는지 확인하기
         String traded = null;
@@ -266,7 +249,7 @@ public class ItemService {
     }
 
     // 이승재 / 위도 경도 거리계산하기
-    private String getDistance(Long userId, String address) {
+    private String caculateDistance(Long userId, String address) {
         if(userId == null){
             return "null";
         }else {
@@ -296,7 +279,6 @@ public class ItemService {
             }
         }
     }
-
     private double deg2rad(double deg){
         return (deg * Math.PI / 180.0);
     }
