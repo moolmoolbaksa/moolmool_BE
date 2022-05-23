@@ -41,6 +41,8 @@ dependencies {
 
     // 이미지 업로드
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'com.github.downgoon:marvin:1.5.5'
+    implementation 'com.github.downgoon:MarvinPlugins:1.5.5'
     // JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
     implementation 'commons-codec:commons-codec:1.5'
@@ -55,8 +57,8 @@ dependencies {
     // XSS 방어
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
     //querydsl 추가
-    implementation "com.querydsl:querydsl-apt:${queryDslVersion}" // 큰따옴표 반드시 지켜 써야함
-
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 }
 
 tasks.named('test') {
@@ -71,6 +73,7 @@ querydsl {
 }
 sourceSets { main.java.srcDir querydslDir }
 compileQuerydsl{ options.annotationProcessorPath = configurations.querydsl }
+
 configurations {
     compileOnly { extendsFrom annotationProcessor }
     querydsl.extendsFrom compileClasspath

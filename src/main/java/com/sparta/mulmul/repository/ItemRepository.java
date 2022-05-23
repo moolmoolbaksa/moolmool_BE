@@ -1,20 +1,18 @@
 package com.sparta.mulmul.repository;
 
 import com.sparta.mulmul.model.Item;
-import org.hibernate.annotations.Parent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.persistence.TypedQuery;
 import java.util.List;
 
-public interface ItemRepository extends JpaRepository<Item, Long> {
+public interface ItemRepository extends JpaRepository<Item, Long>, ItemQuerydsl {
     List<Item> findAllByCategory(String category);
 
     List<Item> findAllByBagId(Long bagId);
 
-    List<Item> findAllByOrderByCreatedAtDesc();
+
 
     // 성훈 - 내 아이템 찾기 (마이페이지)
     // 물품과 보따리는 bagId, 보따리와 유저는 userId로 이어준다.
