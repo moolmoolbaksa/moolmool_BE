@@ -1,9 +1,12 @@
 package com.sparta.mulmul.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.mulmul.dto.barter.BarterItemListDto;
+import com.sparta.mulmul.dto.barter.QBarterItemListDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.QBarter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.sparta.mulmul.model.QBarter.barter1;
 import static com.sparta.mulmul.model.QItem.item;
 import static com.sparta.mulmul.model.QScrab.scrab1;
 
@@ -80,6 +84,20 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
                 .orderBy(item.modifiedAt.desc())
                 .limit(3)
                 .fetch();
+    }
+
+    @Override
+    public BarterItemListDto findByBarterItems(Long itemId) {
+        return queryFactory
+                .select(new QBarterItemListDto(
+                        item.id,
+                        item.title,
+                        item.itemImg,
+                        item.contents
+                ))
+                .from(item)
+                .where(item.id.eq(itemId))
+                .fetchOne();
     }
 
 

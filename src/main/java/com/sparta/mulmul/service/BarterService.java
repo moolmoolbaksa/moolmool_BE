@@ -221,9 +221,9 @@ public class BarterService {
             // 바이어(유저)의 물품을 찾아서 정보를 넣기
             for (String buyerItemId : buyerItemIdList) {
                 Long itemId = Long.parseLong(buyerItemId);
-                Item buyerItem = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("buyerItem not found"));
+                BarterItemListDto buyerItem = itemRepository.findByBarterItems(itemId);
                 // 각 아이템의 정보를 리스트에 담기
-                OpponentBarterDto buyerItemList = getMyBarterDto(itemId, buyerItem);
+                OpponentBarterDto buyerItemList = getMyBarterDto(buyerItem);
                 //상대와 나의 바터리스트에 각각 아이템을 넣기
                 BarterCheckAddList(barters, userId, myBarterList, buyerItemList, barterList);
             }
@@ -231,9 +231,9 @@ public class BarterService {
             //셀러(유저)의 물품을 찾아서 정보를 넣기
             for (String sellerItemId : sellerItemIdList) {
                 Long itemId = Long.parseLong(sellerItemId);
-                Item sellerItem = itemRepository.findById(itemId).orElseThrow(() -> new IllegalArgumentException("sellerItem not found"));
+                BarterItemListDto sellerItem = itemRepository.findByBarterItems(itemId);
                 // 각 아이템의 정보를 리스트에 담기
-                OpponentBarterDto sellerItemList = getMyBarterDto(itemId, sellerItem);
+                OpponentBarterDto sellerItemList = getMyBarterDto(sellerItem);
                 //상대와 나의 바터리스트에 각각 아이템을 담기
                 BarterCheckAddList(barters, opponentId, myBarterList, sellerItemList, barterList);
             }
@@ -267,9 +267,9 @@ public class BarterService {
     }
 
     // 성훈 리팩토링 (거래리스트)
-    private OpponentBarterDto getMyBarterDto(Long itemId, Item Item) {
+    private OpponentBarterDto getMyBarterDto(BarterItemListDto Item) {
         return new OpponentBarterDto(
-                itemId,
+                Item.getItemId(),
                 Item.getTitle(),
                 Item.getItemImg().split(",")[0],
                 Item.getContents()
