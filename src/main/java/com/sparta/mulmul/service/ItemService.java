@@ -73,7 +73,6 @@ public class ItemService {
             Page<Item> itemList = itemRepository.findAllItemOrderByCreatedAtDesc(pageable);
             List<ItemResponseDto> items = new ArrayList<>();
             for(Item item : itemList) {
-
                     //구독 개수
                     List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
                     int scrabCnt = scrabs.size();
@@ -104,7 +103,6 @@ public class ItemService {
                 //구독 개수
                 List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
                 int scrabCnt = scrabs.size();
-
                 // 거리 계산
                 String distance = getDistance(userDetails, item);
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
@@ -116,14 +114,12 @@ public class ItemService {
                         distance,
                         scrabCnt,
                         item.getViewCnt(),
-                        item.getStatus(),
-                        isScrab);
+                        item.getStatus());
                 items.add(itemResponseDto);
 
-//            }
+            }
+            return items;
         }
-        return items;
-    }
 
     // 이승재 / 페이징 처리
     private Pageable getPageable(int pageNo) {

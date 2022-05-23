@@ -1,14 +1,12 @@
 package com.sparta.mulmul.repository;
-import static com.sparta.mulmul.model.QItem.*;
-import static com.sparta.mulmul.model.QScrab.*;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import com.sparta.mulmul.dto.barter.BarterItemListDto;
 import com.sparta.mulmul.dto.barter.QBarterItemListDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.QBarter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -16,15 +14,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.sparta.mulmul.model.QBarter.barter1;
+import static com.sparta.mulmul.model.QItem.item;
+import static com.sparta.mulmul.model.QScrab.scrab1;
 
 @Repository
-public class ItemQuerydslImpl implements ItemQuerydsl {
+public class ItemRepositoryImpl implements ItemQuerydsl {
 
     private final JPAQueryFactory queryFactory;
 
-    public ItemQuerydslImpl(JPAQueryFactory jpaQueryFactory){
-        this.queryFactory = jpaQueryFactory;
-    }
+    public ItemRepositoryImpl(JPAQueryFactory queryFactory) {this.queryFactory = queryFactory;}
 
     @Override
     public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable){
@@ -56,10 +55,10 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
 
         return queryFactory
                 .select(new QItemUserResponseDto(
-                        item.id,
-                        item.itemImg,
-                        item.status
-                ))
+                                item.id,
+                                item.itemImg,
+                                item.status
+                                ))
                 .from(item)
                 .where(
                         item.bag.userId.eq(userId),
@@ -100,5 +99,6 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .where(item.id.eq(itemId))
                 .fetchOne();
     }
+
 
 }
