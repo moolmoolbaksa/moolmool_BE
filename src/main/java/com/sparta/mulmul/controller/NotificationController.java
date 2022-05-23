@@ -26,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final ItemService itemService;
     private final ScoreService scoreService;
     private final ChatMessageService messageService;
     private final NotificationService notificationService;

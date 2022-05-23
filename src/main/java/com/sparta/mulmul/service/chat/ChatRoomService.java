@@ -46,14 +46,14 @@ public class ChatRoomService {
         }
         // 채팅 상대 찾아오기
         User acceptor = userRepository.findById(acceptorId)
-                .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다.")
+                .orElseThrow( () -> new CustomException(NOT_FOUND_USER)
                 );
         User requester = userRepository.findById(userDetails.getUserId())
-                .orElseThrow( () -> new NullPointerException("ChatRoomService: createRoom) 존재하지 않는 회원입니다.")
+                .orElseThrow( () -> new CustomException(NOT_FOUND_USER)
                 );
         // 채팅방 차단 회원인지 검색
         if (bannedRepository.existsByUsers(acceptor, requester)) {
-            throw new AccessDeniedException("ChatRoomService: 차단한 회원과는 채팅을 시도할 수 없습니다.");
+            throw new CustomException(BANNED_CHAT_USER);
         }
         // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장, 메시지를 전달할 때 상대 이미지와 프로필 사진을 같이 전달해 줘야 함.
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
@@ -77,11 +77,11 @@ public class ChatRoomService {
     public void exitRoom(Long id, UserDetailsImpl userDetails){
         // 회원 찾기
         User user = userRepository.findById(userDetails.getUserId())
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 해당 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
         // 채팅방 찾아오기
         ChatRoom chatRoom = roomRepository.findById(id)
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 해당 채팅방이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT)
                 );
         if ( chatRoom.getRequester() == user) { chatRoom.reqOut(true); }
         else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
@@ -98,7 +98,7 @@ public class ChatRoomService {
     public List<RoomResponseDto> getRooms(UserDetailsImpl userDetails){
         // 회원 찾기
         User user = userRepository.findById(userDetails.getUserId())
-                .orElseThrow( () -> new NullPointerException("ChatRoomService: getRooms) 존재하지 않는 회원입니다.")
+                .orElseThrow( () -> new CustomException(NOT_FOUND_USER)
                 );
         // 방 목록 찾기
         List<RoomDto> dtos = roomRepository.findAllWith(user);
@@ -112,7 +112,7 @@ public class ChatRoomService {
 
         // fetchJoin 필요
         ChatRoom chatRoom = roomRepository.findById(roomId)
-                .orElseThrow(() -> new NullPointerException("ChatRoomController: 해당 채팅방이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT)
                 );
         String flag;
         if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ){ flag = ACCEPTOR; }

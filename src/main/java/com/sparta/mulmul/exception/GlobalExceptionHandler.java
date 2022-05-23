@@ -1,6 +1,5 @@
 package com.sparta.mulmul.exception;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -11,10 +10,11 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = CustomException.class)
-    public Map<String, String> IllegalArgumentHandler(Exception e) {
-        Map<String, String> map = new HashMap<>();
-        map.put("errMsg", e.getMessage());
-        map.put("status", String.valueOf(HttpStatus.BAD_REQUEST));
+    public Map<String, Object> customExceptionHandler(CustomException e) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("ok", false);
+        map.put("code", e.getErrorCode());
+        map.put("message", e.getMessage());
         return map;
     }
 }
