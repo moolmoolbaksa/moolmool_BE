@@ -1,8 +1,9 @@
 package com.sparta.mulmul.service;
 
+import com.sparta.mulmul.dto.barter.BarterHotItemListDto;
+import com.sparta.mulmul.dto.barter.BarterItemListDto;
+import com.sparta.mulmul.dto.barter.HotBarterDto;
 import com.sparta.mulmul.dto.item.ItemStarDto;
-import com.sparta.mulmul.model.Barter;
-import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,34 +21,29 @@ public class ItemStarService {
 
     public List<ItemStarDto> hotItem() {
         int status = 1;
-        List<Barter> barterList = barterRepository.findAllByBarter(status);
+//        List<Barter> barterList = barterRepository.findAllByBarter(status);
+        List<HotBarterDto> barterDtoList = barterRepository.findByHotBarter(status);
         List<ItemStarDto> itemStarDtoList = new ArrayList<>();
-
         Map<String, Integer> map = new HashMap<>();
-        int cnt = 0;
-        searchSellerItem(barterList, map, cnt);
+        searchSellerItem(barterDtoList, map);
+
         List<String> listKeySet = new ArrayList<>(map.keySet());
         // 내림차순
         Collections.sort(listKeySet, (value1, value2) -> (map.get(value2).compareTo(map.get(value1))));
 
-        cnt = 0;
+        int cnt = 0;
         brackTopThree(itemStarDtoList, map, cnt, listKeySet);
         return itemStarDtoList;
     }
 
-    private void searchSellerItem(List<Barter> barterList, Map<String, Integer> map, int cnt) {
-        for (Barter eachBarter : barterList) {
+    private void searchSellerItem(List<HotBarterDto> barterList, Map<String, Integer> map) {
+        for (HotBarterDto eachBarter : barterList) {
             String sellerItem = eachBarter.getBarter().split(";")[1];
             Integer count = map.get(sellerItem);
             if (count == null) {
                 map.put(sellerItem, 1);
             } else {
                 map.put(sellerItem, count + 1);
-            }
-            cnt++;
-            // 1000번째에 정지 - 페이징처리 개선시 없엘 예정
-            if (cnt == 1000) {
-                break;
             }
         }
     }
@@ -56,17 +52,17 @@ public class ItemStarService {
         for (String key : listKeySet) {
             System.out.println("key : " + key + " , " + "value : " + map.get(key));
             Long sellerItemId = Long.parseLong(key);
-            Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
-                    () -> new IllegalArgumentException("아이템 정보가 없습니다."));
-
-            ItemStarDto itemStar = new ItemStarDto(
-                    sellerItem.getId(),
-                    sellerItem.getItemImg().split(",")[0],
-                    sellerItem.getTitle(),
-                    sellerItem.getContents()
-            );
-            itemStarDtoList.add(itemStar);
-            cnt++;
+            BarterHotItemListDto sellerItem = itemRepository.findByHotBarterItems(sellerItemId);
+            if (sellerItem.getStatus() == 0 || sellerItem.getStatus() == 1) {
+                ItemStarDto itemStar = new ItemStarDto(
+                        sellerItem.getItemId(),
+                        sellerItem.getItemImg().split(",")[0],
+                        sellerItem.getTitle(),
+                        sellerItem.getContents()
+                );
+                itemStarDtoList.add(itemStar);
+                cnt++;
+            }
             if (cnt == 3) {
                 break;
             }
