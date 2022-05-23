@@ -60,7 +60,7 @@ public class ChatRoomService {
                         .orElseGet( () -> {
                             ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
                             // 채팅방 개설 메시지 생성
-                            notificationRepository.save(Notification.createOf(c, requester)); // 알림 작성 및 전달
+                            notificationRepository.save(Notification.createOf(c, acceptor)); // 알림 작성 및 전달
                             messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
                                     MessageResponseDto.createFrom(
                                             messageRepository.save(ChatMessage.createInitOf(c.getId()))
