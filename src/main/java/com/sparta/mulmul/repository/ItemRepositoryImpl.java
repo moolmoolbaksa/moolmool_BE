@@ -6,7 +6,9 @@ import com.sparta.mulmul.dto.barter.QBarterItemListDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
 import com.sparta.mulmul.model.Item;
+import com.sparta.mulmul.model.QBag;
 import com.sparta.mulmul.model.QBarter;
+import com.sparta.mulmul.model.QScrab;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.sparta.mulmul.model.QBag.*;
 import static com.sparta.mulmul.model.QBarter.barter1;
 import static com.sparta.mulmul.model.QItem.item;
 import static com.sparta.mulmul.model.QScrab.scrab1;
@@ -77,11 +80,11 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
                         item.status
                 ))
                 .from(item)
-                .leftJoin(scrab1).on(item.bag.userId.eq(scrab1.userId))
+                .join(scrab1).on(scrab1.itemId.eq(item.id))
                 .fetchJoin()
                 .distinct()
-                .where(item.bag.userId.eq(userId), scrab1.scrab.eq(true))
-                .orderBy(item.modifiedAt.desc())
+                .where(scrab1.userId.eq(userId), scrab1.scrab.eq(true))
+                .orderBy(scrab1.modifiedAt.desc())
                 .limit(3)
                 .fetch();
     }
