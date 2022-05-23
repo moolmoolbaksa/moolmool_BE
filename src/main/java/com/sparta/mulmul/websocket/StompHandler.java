@@ -32,7 +32,7 @@ public class StompHandler implements ChannelInterceptor { // 이론상 웹소켓
 
         switch (Objects.requireNonNull(accessor.getCommand())){
             case CONNECT: accessor.setUser(checkVaild(accessor)); break; // User는 커넥트에서 한 번만 설정해 줍니다.
-            case SEND: checkVaild(accessor); break; // 메시지 전송에서도 사용자를 검증합니다.
+//            case SEND: checkVaild(accessor); break; // 메시지 전송에서도 사용자를 검증합니다.
             default: break;
         }
 
