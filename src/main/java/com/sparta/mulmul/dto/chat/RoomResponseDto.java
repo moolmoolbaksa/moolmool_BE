@@ -20,7 +20,7 @@ public class RoomResponseDto {
     private String message;
     private LocalDateTime date;
     private Boolean isRead;
-    private Boolean isBanned = false;
+    private Long isBanned;
     private long unreadCnt;
 
     public static RoomResponseDto createOf(String flag, RoomDto dto, long unreadCnt){
