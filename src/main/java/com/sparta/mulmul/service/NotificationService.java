@@ -17,6 +17,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.sparta.mulmul.dto.NotificationType.*;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @Service
@@ -34,7 +35,7 @@ public class NotificationService {
         List<NotificationDto> dtos = new ArrayList<>();
 
         for (Notification notification : notifications){
-            if ( notification.getType() == NotificationType.CHAT ) {
+            if ( notification.getType() == CHAT ) {
                 ChatRoom chatRoom = roomRepository.findByIdFetch(notification.getChangeId())
                         .orElseThrow( () -> new CustomException(NOT_FOUND_CHAT));
                 if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ) {

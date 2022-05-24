@@ -125,32 +125,19 @@ public class ChatRoomService {
 
         List<RoomResponseDto> prefix = new ArrayList<>();
         List<RoomResponseDto> suffix = new ArrayList<>();
-        List<Long> roomIds = new ArrayList<>();
-
-        for ( RoomDto roomDto : roomDtos ) { roomIds.add(roomDto.getRoomId()); }
-        List<UnreadCntDto> cntDtos = new ArrayList<>();
-
-        if ( roomIds.size() > 0 ) {
-            cntDtos = messageRepository.getUnreadCnts(roomIds, userId);
-        }
 
         for (RoomDto dto : roomDtos) {
-            long unreadCnt = 0;
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( dto.getAccId() == userId ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
-                    for ( UnreadCntDto cntDto : cntDtos ) {
-                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; } // 채팅 차단에 대한 정보도 함꼐 줘야 합니다.
-                    }
+                    int unreadCnt = messageRepository.countMsg(dto.getAccId(), dto.getRoomId());
                     Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());
                     if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                     else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                 }
             } else if ( dto.getReqId() == userId ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
-                    for ( UnreadCntDto cntDto : cntDtos ) {
-                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
-                    }
+                    int unreadCnt = messageRepository.countMsg(dto.getReqId(), dto.getRoomId());
                     Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());
                     if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt, isBanned)); }
                     else { suffix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt, isBanned)); }
