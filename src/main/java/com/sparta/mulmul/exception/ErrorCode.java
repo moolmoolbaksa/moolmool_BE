@@ -19,6 +19,10 @@ public enum ErrorCode {
     // FILE
     FILE_INVAILED(HttpStatus.BAD_REQUEST.value(), "F001", "잘못된 파일 형식입니다."),
 
+    //ITEM
+    NO_MORE_ITEM(HttpStatus.BAD_REQUEST.value(), "I001", "더이상 아이템을 등록할 수 없습니다."),
+    CANT_SCRAB_OWN_ITEM(HttpStatus.BAD_REQUEST.value(), "I002", "자신의 아이템은 구독할 수 없습니다."),
+
     // BARTER
     NOT_FOUND_BARTER(HttpStatus.NOT_FOUND.value(), "B001", "거래내역이 없습니다."),
     FINISH_BARTER(HttpStatus.BAD_REQUEST.value(), "B002", "완료된 거래입니다."),
