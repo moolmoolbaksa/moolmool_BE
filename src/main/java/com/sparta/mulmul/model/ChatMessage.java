@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static com.sparta.mulmul.dto.chat.MessageTypeEnum.*;
+
 @Getter @Entity
 @NoArgsConstructor
 public class ChatMessage extends CreationDate {
@@ -52,7 +54,7 @@ public class ChatMessage extends CreationDate {
         message.senderId = roomId;
         message.message = "채팅방이 개설되었습니다.";
         message.isRead = true;
-        message.type = MessageTypeEnum.STATUS;
+        message.type = STATUS;
 
         return message;
     }
@@ -65,7 +67,7 @@ public class ChatMessage extends CreationDate {
         message.senderId = roomId;
         message.message = user.getNickname() + "님이 채팅방을 나갔습니다.";
         message.isRead = true;
-        message.type = MessageTypeEnum.STATUS;
+        message.type = STATUS;
 
         return message;
     }

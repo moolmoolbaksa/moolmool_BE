@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.sparta.mulmul.dto.chat.MessageTypeEnum.*;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @Service
@@ -49,8 +50,8 @@ public class ChatMessageService {
         MessageTypeEnum type;
         int count = getUserCount(requestDto); // 현재 채팅방에 접속중인 유저의 수
 
-        if ( count == 2 ){ type = MessageTypeEnum.FULL; }
-        else { type = MessageTypeEnum.NORMAL; }
+        if ( count == 2 ){ type = FULL; }
+        else { type = NORMAL; }
 
         messagingTemplate.convertAndSend("/sub/chat/room/" + requestDto.getRoomId(),
                 RoomStatusDto.valueOf(type));
