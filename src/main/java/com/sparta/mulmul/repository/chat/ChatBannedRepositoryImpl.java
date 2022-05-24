@@ -39,11 +39,11 @@ public class ChatBannedRepositoryImpl implements BannedQuerydsl {
     }
 
     @Override // 헷갈리므로 리네임 필요합니다.
-    public Boolean existsByUser(User user, User bannedUser){
+    public Boolean existsByUser(Long userId, Long bannedUserId){
         Integer fetchOne = queryFactory
                 .selectOne()
                 .from(chatBanned)
-                .where(chatBanned.user.id.eq(user.getId()).or(chatBanned.bannedUser.id.eq(bannedUser.getId())),
+                .where(chatBanned.user.id.eq(userId).or(chatBanned.bannedUser.id.eq(bannedUserId)),
                         chatBanned.isBanned.eq(true))
                 .fetchFirst();
         return fetchOne != null;
