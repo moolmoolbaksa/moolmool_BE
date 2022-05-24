@@ -4,6 +4,8 @@ import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
 import com.sparta.mulmul.dto.item.ItemRequestDto;
 import com.sparta.mulmul.dto.item.ItemResponseDto;
 import com.sparta.mulmul.dto.item.ItemUpdateRequestDto;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -33,13 +35,16 @@ public class ItemService {
 
     // 이승재 / 보따리 아이템 등록하기
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
+        if(bagRepositroy.findByUserId(userDetails.getUserId()).getItemCnt()==9){
+             throw new CustomException(ErrorCode.NO_MORE_ITEM);
+        }
         List<String> imgUrlList = itemRequestDto.getImgUrl();
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
         String favored = String.join(",", favoredList);
 
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
         // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
@@ -96,12 +101,10 @@ public class ItemService {
         List<ItemResponseDto> items = new ArrayList<>();
         Long userId = userDetails.getUserId();
         for(Item item : itemList) {
-//            if (item.getStatus() == 0 || item.getStatus() == 1) {
                 Long itemId = item.getId();
-                boolean isScrab = checkScrab(userId, itemId);
 
                 //구독 개수
-                List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
+                List<Scrab> scrabs = scrabRepository.findAllItemById(itemId);
                 int scrabCnt = scrabs.size();
                 // 거리 계산
                 String distance = getDistance(userDetails, item);
@@ -147,54 +150,51 @@ public class ItemService {
         return distance;
     }
 
-    // 이승재 / 아이템 상세페이지
-    @Transactional
-    public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템이 없습니다.")
-        );
 
-
-        // 아이템에 해당하는 보따리에 담겨있는 모든 아이템 이미지 가져오기
+    private List<DetailPageBagDto> getBagInfos(Item item) {
         List<Item> userItemList = itemRepository.findAllByBagId(item.getBag().getId());
         List<DetailPageBagDto> bagInfos = new ArrayList<>();
-        for(Item item1 : userItemList){
-            if(item1.getId()!=itemId) {
+        for (Item item1 : userItemList) {
+            if (item1.getId() != item.getId()) {
                 String bagImg = item1.getItemImg().split(",")[0];
                 Long bagItemId = item1.getId();
                 DetailPageBagDto detailPageBagDto = new DetailPageBagDto(bagImg, bagItemId);
                 bagInfos.add(detailPageBagDto);
             }
         }
+        return bagInfos;
+    }
+    // 이승재 / 아이템 상세페이지
+    @Transactional
+    public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
+        Item item = itemRepository.findById(itemId).orElseThrow(
+                ()-> new IllegalArgumentException("아이템이 없습니다.")
+        );
+        // 아이템에 해당하는 보따리에 담겨있는 모든 아이템 이미지 가져오기
+
+        List<DetailPageBagDto> bagInfos = getBagInfos(item);
+
         // 이승재 / 아이템 조회수 계산
         int viewCnt = item.getViewCnt();
         viewCnt += 1;
         item.update(itemId, viewCnt);
 
         // 이승재 / 아이템 구독 정보 유저 정보를 통해 확인
-        boolean isSrab = false;
-        Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userDetails.getUserId(), itemId);
-        if(scrab.isPresent()){
-            if(scrab.get().getScrab().equals(true)){
-                isSrab = true;
-            }
-        }
+        Long userId = userDetails.getUserId();
+        boolean isScrab = checkScrab(userId, itemId);
 
         User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
-                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
         List<String> itemImgList = new ArrayList<>();
         for(int i = 0; i<item.getItemImg().split(",").length; i++){
             itemImgList.add(item.getItemImg().split(",")[i]);
         }
-        List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
-        int scrabCnt = 0;
-        for(Scrab scrab1 : scrabs){
-            if(scrab1.getScrab().equals(true)){
-                scrabCnt++;
-            }
-        }
+        
+        // 구독 개수 계산
+        List<Scrab> scrabs = scrabRepository.findAllItemById(itemId);
+        int scrabCnt = scrabs.size();
 
         item.scrabCntUpdate(itemId, scrabCnt);
         String[] favored = item.getFavored().split(",");
@@ -205,7 +205,7 @@ public class ItemService {
 
         // 교환신청했는지 확인하기
         String traded = null;
-        Long barterId = Long.valueOf(0);
+              Long barterId = Long.valueOf(0);
         Long buyerId = userDetails.getUserId();
         Long sellerId = user.getId();
         List<Barter> barterList = barterRepository.findAllByBuyerIdAndSellerId(buyerId, sellerId);
@@ -242,7 +242,7 @@ public class ItemService {
                 scrabCnt,
                 item.getType(),
                 favored,
-                isSrab,
+                isScrab,
                 traded,
                 barterId);
         return itemDetailResponseDto;
@@ -254,7 +254,7 @@ public class ItemService {
             return "null";
         }else {
             User user = userRepository.findById(userId).orElseThrow(
-                    () -> new IllegalArgumentException("유저 정보가 없습니다.")
+                    () -> new CustomException(ErrorCode.NOT_FOUND_USER)
             );
             String userAddress = user.getAddress().split(" ")[0]+" " +user.getAddress().split(" ")[1];
             String itemAddress = address.split(" ")[0] + " " + address.split(" ")[1];
@@ -306,12 +306,12 @@ public class ItemService {
             }
         }else{
             Item item = itemRepository.findById(itemId).orElseThrow(
-                    () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+                    () -> new CustomException(ErrorCode.NOT_FOUND_ITEM)
             );
             System.out.println(userDetails.getUserId());
             System.out.println(item.getBag().getUserId());
             if (userDetails.getUserId().equals(item.getBag().getUserId())) {
-                throw new IllegalArgumentException("본인 아이템입니다.");
+                throw new CustomException(ErrorCode.CANT_SCRAB_OWN_ITEM);
             }else {
 
                 Scrab newScrab = Scrab.builder()
@@ -328,7 +328,7 @@ public class ItemService {
     @Transactional
     public void updateItem(ItemUpdateRequestDto itemUpdateRequestDto, UserDetailsImpl userDetails, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
         );
         List<String> images = itemUpdateRequestDto.getImages();
         List<String> imagesUrl = itemUpdateRequestDto.getImagesUrl();
@@ -352,7 +352,7 @@ public class ItemService {
     @Transactional
     public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
         );
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
             item.setDeleted(itemId, 6);
@@ -370,7 +370,7 @@ public class ItemService {
         }else {
 
             Item item = itemRepository.findById(itemId).orElseThrow(
-                    () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+                    () -> new CustomException(ErrorCode.NOT_FOUND_ITEM)
             );
             int reportCnt = item.getReportCnt();
             item.reportCntUpdate(itemId, reportCnt + 1);
