@@ -2,6 +2,8 @@ package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.user.UserCheckResponseDto;
 import com.sparta.mulmul.dto.user.UserRequestDto;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.BagRepository;
@@ -13,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+
+import static com.sparta.mulmul.exception.ErrorCode.*;
 
 // 유저 서비스
 @Service
@@ -28,7 +32,7 @@ public class UserService {
         System.out.println(requestDto.getAddress());
         User user = userRepository.findById(userDetails
                         .getUserId())
-                .orElseThrow(() -> new UsernameNotFoundException("User's not found error"));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
         user.initProfile(requestDto.getAddress());
     }
@@ -36,10 +40,10 @@ public class UserService {
     // 로그인 체크하기
     public UserCheckResponseDto userCheck(UserDetailsImpl userDetails){
 
-        if ( userDetails.getUserId() == null ) { throw new NullPointerException("UserService: User's not found"); }
+        if ( userDetails.getUserId() == null ) { throw new CustomException(NOT_FOUND_USER); }
         return new UserCheckResponseDto(userRepository
                 .findById(userDetails.getUserId())
-                .orElseThrow(() -> new UsernameNotFoundException("User's not found error"))
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER))
         );
     }
 

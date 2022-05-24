@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.user.KakaoUserInfoDto;
 import com.sparta.mulmul.dto.TokenDto;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.model.User;
@@ -23,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
+import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.TOKEN_TYPE;
 
 @Service
@@ -57,7 +60,7 @@ public class KakaoUserService {
         body.add("grant_type", "authorization_code");
         body.add("client_id", "6c57a62de555a589bbaaabdc73a9e011");
         //https://moolmooldoctor.firebaseapp.com/auth/kakao/callback
-        body.add("redirect_uri", "https://moolmooldoctor.firebaseapp.com/auth/kakao/callback");
+        body.add("redirect_uri", "http://localhost:3000/auth/kakao/callback");
         body.add("code", code);
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
@@ -109,7 +112,7 @@ public class KakaoUserService {
                     Notification.createFrom(kakaoUser));
         } else {
             if ( kakaoUser.getIsBan() != null && kakaoUser.getIsBan() ){
-                throw new AccessDeniedException("KaKaoUserService: 신고가 누적 5회 이상되어 로그인이 허용되지 않습니다.");
+                throw new CustomException(BANNED_USER);
             }
         }
 

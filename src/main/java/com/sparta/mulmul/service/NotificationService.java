@@ -2,6 +2,8 @@ package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.NotificationType;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.ChatRoom;
 import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.repository.NotificationRepository;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +36,7 @@ public class NotificationService {
         for (Notification notification : notifications){
             if ( notification.getType() == NotificationType.CHAT ) {
                 ChatRoom chatRoom = roomRepository.findByIdFetch(notification.getChangeId())
-                        .orElseThrow( () -> new NullPointerException("NotificationService: 채팅방이 존재하지 않습니다."));
+                        .orElseThrow( () -> new CustomException(NOT_FOUND_CHAT));
                 if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ) {
                     dtos.add(NotificationDto.createOf(notification, chatRoom.getRequester()));
                 } else {
@@ -49,7 +53,7 @@ public class NotificationService {
     public void setRead(Long notificationId){
         Notification notification = notificationRepository
                 .findById(notificationId)
-                .orElseThrow( () -> new NullPointerException("NotificationService: " + notificationId + "번 알림이 존재하지 않습니다."));
+                .orElseThrow( () -> new CustomException(NOT_FOUND_NOTIFICATION));
 
         notification.setRead();
     }

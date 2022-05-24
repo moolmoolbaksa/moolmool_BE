@@ -26,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final ItemService itemService;
     private final ScoreService scoreService;
     private final ChatMessageService messageService;
     private final NotificationService notificationService;
@@ -79,6 +78,14 @@ public class NotificationController {
     public ResponseEntity<OkDto> deleteNotification(@PathVariable Long notificationId){
 
         notificationRepository.deleteById(notificationId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
+    // 회원 가입 메시지
+    @GetMapping("/notification/{notificationId}/signup") // 회원가입 축하 메시지에 대해 이 주소로 요청을 보내면 작동합니다.
+    public ResponseEntity<OkDto> signup(@PathVariable Long notificationId){
+
+        notificationService.setRead(notificationId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 }

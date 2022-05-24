@@ -2,6 +2,8 @@ package com.sparta.mulmul.service.chat;
 
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.chat.*;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.ChatMessage;
 import com.sparta.mulmul.model.ChatRoom;
 import com.sparta.mulmul.model.Notification;
@@ -21,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -97,7 +101,7 @@ public class ChatMessageService {
     public MessageResponseDto saveMessage(MessageRequestDto requestDto, WsUser wsUser) {
 
         ChatRoom chatRoom = roomRepository.findByIdFetch(requestDto.getRoomId())
-                .orElseThrow(() -> new NullPointerException("ChatController: 해당 채팅방이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT));
 
         // 비속어 필터링
         requestDto = filter.filtering(requestDto);
