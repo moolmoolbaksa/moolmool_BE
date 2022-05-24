@@ -142,7 +142,7 @@ public class ChatRoomService {
                     for ( UnreadCntDto cntDto : cntDtos ) {
                         if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; } // 채팅 차단에 대한 정보도 함꼐 줘야 합니다.
                     }
-                    Boolean isBanned = bannedRepository.existsByUser(dto.getAccId(), dto.getReqId());
+                    Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());
                     if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                     else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                 }
@@ -151,7 +151,7 @@ public class ChatRoomService {
                     for ( UnreadCntDto cntDto : cntDtos ) {
                         if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
                     }
-                    Boolean isBanned = bannedRepository.existsByUser(dto.getAccId(), dto.getReqId());
+                    Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());
                     if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt, isBanned)); }
                     else { suffix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt, isBanned)); }
                 }
