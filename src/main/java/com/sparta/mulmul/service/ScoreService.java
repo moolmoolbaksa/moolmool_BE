@@ -5,6 +5,7 @@ import com.sparta.mulmul.dto.barter.BarterStatusDto;
 import com.sparta.mulmul.dto.barter.MyBarterScorDto;
 import com.sparta.mulmul.dto.score.GradeScoreRequestDto;
 import com.sparta.mulmul.dto.score.OppentScoreResponseDto;
+import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Notification;
@@ -15,14 +16,14 @@ import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sparta.mulmul.exception.ErrorCode.*;
 
 // 성훈 - 평점 평가페이지 - 평점 보여주기
 @RequiredArgsConstructor
@@ -38,16 +39,12 @@ public class ScoreService {
 
     // 성훈 - 평가 페이지 보여주기
     public OppentScoreResponseDto showOppentScore(Long barterId, UserDetailsImpl userDetails) {
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                () -> new IllegalArgumentException("user not found")
-        );
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
         Long userId = userDetails.getUserId();
         // 내가 거래한 거래리스트를 대입한다.
         // barterId, buyerId, SellerId를 분리한다.
-        Barter mybarter = barterRepository.findById(barterId).orElseThrow(
-                () -> new IllegalArgumentException("barter not found")
-        );
+        Barter mybarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
         // 거래 물품리스트를 담을 Dto
         List<MyBarterScorDto> myBarterList = new ArrayList<>();
         List<MyBarterScorDto> barterList = new ArrayList<>();
@@ -58,9 +55,7 @@ public class ScoreService {
         String sellerItemIdList = barterIds[1];
         // 바이어(유저)의 물품을 찾아서 정보를 넣기
         Long itemIdB = Long.parseLong(buyerItemIdList);
-        Item buyerItem = itemRepository.findById(itemIdB).orElseThrow(
-                () -> new IllegalArgumentException("buyerItem not found")
-        );
+        Item buyerItem = itemRepository.findById(itemIdB).orElseThrow(() -> new CustomException(NOT_FOUND_BUYER_ITEM));
 
         MyBarterScorDto buyerItemList = getMyBarterScorDto(itemIdB, buyerItem);
         splitAddList(
@@ -72,9 +67,7 @@ public class ScoreService {
         );
         //셀러(유저)의 물품을 찾아서 정보를 넣기
         Long itemIdS = Long.parseLong(sellerItemIdList);
-        Item sellerItem = itemRepository.findById(itemIdS).orElseThrow(
-                () -> new IllegalArgumentException("sellerItem not found")
-        );
+        Item sellerItem = itemRepository.findById(itemIdS).orElseThrow(() -> new CustomException(NOT_FOUND_SELLER_ITEM));
         MyBarterScorDto sellerItemList = getMyBarterScorDto(itemIdS, sellerItem);
         splitAddList(
                 sellerItem,
@@ -86,9 +79,7 @@ public class ScoreService {
         // 거래내역을 조회
         Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
         // 바이어Id와 셀러Id에 유저아이디가 없을 경우
-        if (!myBarter.getBuyerId().equals(userId) && !myBarter.getSellerId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
-        }
+        if (!myBarter.getBuyerId().equals(userId) && !myBarter.getSellerId().equals(userId)) {throw new CustomException(NOT_FOUND_USER);}
         // 만약 바이어Id와 로그인 유저가 동일하면, 상대방의 아이디를 셀러Id로 식별
         if (myBarter.getBuyerId().equals(userId)) {
             Long oppenetId = myBarter.getSellerId();
@@ -104,7 +95,7 @@ public class ScoreService {
         } else {
             // 만약 바이어Id와 로그인 유저Id가 다르다면, 상대방의 아이디를 바이어Id로 식별
             Long oppenetId = myBarter.getBuyerId();
-            User oppentUser = userRepository.findById(oppenetId).orElseThrow(() -> new IllegalArgumentException("user not found"));
+            User oppentUser = userRepository.findById(oppenetId).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
             // 상대방의 정보를 조회
             return new OppentScoreResponseDto(
@@ -140,15 +131,13 @@ public class ScoreService {
     // 성훈 - 상대 평점주기
     @Transactional
     public BarterStatusDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                () -> new IllegalArgumentException("user not found")
-        );
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 상대 userId
         Long opponentUserId = gradeScoreRequestDto.getUserId();
         // 평가주기
         float gradeScore = gradeScoreRequestDto.getScore();
         // 상대찾기
-        User opponentUser = userRepository.findById(opponentUserId).orElseThrow(() -> new IllegalArgumentException("user not found"));
+        User opponentUser = userRepository.findById(opponentUserId).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 등급
         String userDegree;
         String opponentDegree;
@@ -162,17 +151,17 @@ public class ScoreService {
 
         // 거래내역 조회
         Long barterId = gradeScoreRequestDto.getBarterId();
-        Barter barter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
+        Barter barter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
 
         // 이미 평가를 완료한 경우
         if (barter.getStatus() != 3) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            throw new CustomException(FINISH_SCORE_BARTER);
             // 거래내역의 상대 Id와 Request로 전달받은 상대방의 정보와 다를 경우
         } else if ((!opponentUserId.equals(barter.getBuyerId())) && (!opponentUserId.equals(barter.getSellerId()))) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            throw new CustomException(NOT_FOUND_USER);
             // 자기 자신에게 점수를 줄 경우
         } else if (opponentUserId.equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "올바른 요청이 아닙니다");
+            throw new CustomException(NOT_SCORE_MY_BARTER);
         }
 
         String[] barterIdList = barter.getBarter().split(";");
@@ -190,13 +179,13 @@ public class ScoreService {
         if (barter.getBuyerId().equals(opponentUserId)) {
             myPosition = "seller";
             if (barter.getIsSellerScore()) {
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "이미 평가하였습니다");
+                throw new CustomException(FINISH_SCORE_BARTER);
             }
             // 바이어의 아이템 (여러개)
             for (String eachBuyer : buyerItemId) {
                 Long buyerId = Long.valueOf(eachBuyer);
                 Item buyerItem = itemRepository.findById(buyerId).orElseThrow(
-                        () -> new IllegalArgumentException("buyerItem not found"));
+                        () -> new CustomException(NOT_FOUND_SELLER_ITEM));
 
                 // 아이템 업데이트
                 buyerItem.statusUpdate(buyerItem.getId(), status);
@@ -222,12 +211,12 @@ public class ScoreService {
         } else {
             myPosition = "buyer";
             if (barter.getIsBuyerScore()) {
-                throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "이미 평가하였습니다");
+                throw new CustomException(FINISH_SCORE_BARTER);
             }
             //셀러(유저)의 물품을 찾아서 정보를 넣기
             Long sellerId = Long.parseLong(sellerItemId);
             Item sellerItem = itemRepository.findById(sellerId).orElseThrow(
-                    () -> new IllegalArgumentException("sellerItem not found")
+                    () -> new CustomException(NOT_FOUND_SELLER_ITEM)
             );
 
             sellerItem.statusUpdate(sellerItem.getId(), status);

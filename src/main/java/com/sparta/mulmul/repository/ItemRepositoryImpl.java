@@ -1,12 +1,13 @@
 package com.sparta.mulmul.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.mulmul.dto.barter.BarterHotItemListDto;
 import com.sparta.mulmul.dto.barter.BarterItemListDto;
+import com.sparta.mulmul.dto.barter.QBarterHotItemListDto;
 import com.sparta.mulmul.dto.barter.QBarterItemListDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
 import com.sparta.mulmul.model.Item;
-import com.sparta.mulmul.model.QBarter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.sparta.mulmul.model.QBarter.barter1;
 import static com.sparta.mulmul.model.QItem.item;
 import static com.sparta.mulmul.model.QScrab.scrab1;
 
@@ -23,10 +23,12 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
 
     private final JPAQueryFactory queryFactory;
 
-    public ItemRepositoryImpl(JPAQueryFactory queryFactory) {this.queryFactory = queryFactory;}
+    public ItemRepositoryImpl(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
+    }
 
     @Override
-    public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable){
+    public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable) {
         List<Item> results = queryFactory
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)))
@@ -38,7 +40,7 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
     }
 
     @Override
-    public Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable){
+    public Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable) {
         List<Item> results = queryFactory
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)).and(item.category.eq(category)))
@@ -55,10 +57,10 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
 
         return queryFactory
                 .select(new QItemUserResponseDto(
-                                item.id,
-                                item.itemImg,
-                                item.status
-                                ))
+                        item.id,
+                        item.itemImg,
+                        item.status
+                ))
                 .from(item)
                 .where(
                         item.bag.userId.eq(userId),
@@ -77,11 +79,11 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
                         item.status
                 ))
                 .from(item)
-                .leftJoin(scrab1).on(item.bag.userId.eq(scrab1.userId))
+                .join(scrab1).on(scrab1.itemId.eq(item.id))
                 .fetchJoin()
                 .distinct()
-                .where(item.bag.userId.eq(userId), scrab1.scrab.eq(true))
-                .orderBy(item.modifiedAt.desc())
+                .where(scrab1.userId.eq(userId), scrab1.scrab.eq(true))
+                .orderBy(scrab1.modifiedAt.desc())
                 .limit(3)
                 .fetch();
     }
@@ -100,5 +102,23 @@ public class ItemRepositoryImpl implements ItemQuerydsl {
                 .fetchOne();
     }
 
-
+    @Override
+    public BarterHotItemListDto findByHotBarterItems(Long itemId) {
+        return queryFactory
+                .select(new QBarterHotItemListDto(
+                        item.id,
+                        item.title,
+                        item.itemImg,
+                        item.contents,
+                        item.status
+                ))
+                .from(item)
+                .where(item.id.eq(itemId))
+                .fetchOne();
+    }
 }
+
+
+
+
+
