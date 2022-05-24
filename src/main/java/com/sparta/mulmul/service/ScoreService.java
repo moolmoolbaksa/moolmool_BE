@@ -79,7 +79,9 @@ public class ScoreService {
         // 거래내역을 조회
         Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new IllegalArgumentException("barter not found"));
         // 바이어Id와 셀러Id에 유저아이디가 없을 경우
-        if (!myBarter.getBuyerId().equals(userId) && !myBarter.getSellerId().equals(userId)) {throw new CustomException(NOT_FOUND_USER);}
+        if (!myBarter.getBuyerId().equals(userId) && !myBarter.getSellerId().equals(userId)) {
+            throw new CustomException(NOT_FOUND_USER);
+        }
         // 만약 바이어Id와 로그인 유저가 동일하면, 상대방의 아이디를 셀러Id로 식별
         if (myBarter.getBuyerId().equals(userId)) {
             Long oppenetId = myBarter.getSellerId();
@@ -106,6 +108,7 @@ public class ScoreService {
             );
         }
     }
+
     // 리스트에 넣기
     private void splitAddList(Item buyerItem,
                               Long userId,
@@ -118,6 +121,7 @@ public class ScoreService {
             barterList.add(ItemList);
         }
     }
+
     // 아이디와 이미지를 넣어준다.
     private MyBarterScorDto getMyBarterScorDto(Long itemId, Item Item) {
         MyBarterScorDto buyerItemList = new MyBarterScorDto(
@@ -267,22 +271,22 @@ public class ScoreService {
 
         // 보너스 정산 //
 //        if (myPosition.equals("buyer")) {
-            // 좋은 물품 보너스 //
-            // 완료된 거래내역의 조회수나 찜하기가 많으면 보너스
+        // 좋은 물품 보너스 //
+        // 완료된 거래내역의 조회수나 찜하기가 많으면 보너스
 //            if (viewBonusCntB >= 1 || scrabBonusCntB >= 1) {
 //                userTotalGrade = userTotalGrade + 1.0f * (viewBonusCntB + scrabBonusCntB);
 //            }
 //            if (viewBonusCntS >= 1 || scrabBonusCntS >= 1) {
 //                opponentUserTotalGrade = opponentUserTotalGrade + 1.0f * (viewBonusCntS + scrabBonusCntS);
 //            }
-            // 10분 이내 응답했을 때의 보너스 -> 상데가 셀러이므로
+        // 10분 이내 응답했을 때의 보너스 -> 상데가 셀러이므로
 //            if (!barter.getIsSellerScore()) {
 //                if (chatTime) {
 //                    opponentUserTotalGrade = opponentUserTotalGrade + 1.0f;
 //                }
 //            }
 
-            //내 포지션에 셀러일 경우 / 상대는 바이어
+        //내 포지션에 셀러일 경우 / 상대는 바이어
 //        } else {
 //            if (viewBonusCntB >= 1 || scrabBonusCntB >= 1) {
 //                opponentUserTotalGrade = opponentUserTotalGrade + 1.0f * (viewBonusCntB + scrabBonusCntB);
@@ -290,7 +294,7 @@ public class ScoreService {
 //            if (viewBonusCntS >= 1 || scrabBonusCntS >= 1) {
 //                userTotalGrade = userTotalGrade + 1.0f * (viewBonusCntS + scrabBonusCntS);
 //            }
-            // 10분 이내 응답했을 때의 보너스 / 셀러에게 보너스
+        // 10분 이내 응답했을 때의 보너스 / 셀러에게 보너스
 //            if (chatTime) {
 //                // 상대가 응답을 안했을 경우 -> 응답 보너스의 중목을 막기위함
 //                if (!barter.getIsBuyerScore()) {
@@ -353,7 +357,7 @@ public class ScoreService {
 
     // 메시지 보내기
     private void sendScoreMessage(Barter barter, String myPosition, Notification notification) {
-        if (myPosition.equals("buyer")){
+        if (myPosition.equals("buyer")) {
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + barter.getSellerId(), NotificationDto.createFrom(notification)
             );
