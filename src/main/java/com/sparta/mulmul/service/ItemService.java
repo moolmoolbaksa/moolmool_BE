@@ -382,7 +382,10 @@ public class ItemService {
             reportRepository.save(report);
             if (item.getReportCnt() == 5) {
                 item.statusUpdate(itemId, 5);
-
+                List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
+                for(Scrab scrab : scrabs){
+                    scrab.update(scrab.getId(), false);
+                }
             }
             return "true";
         }
