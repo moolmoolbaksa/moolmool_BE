@@ -35,9 +35,9 @@ public class ItemService {
 
     // 이승재 / 보따리 아이템 등록하기
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
-        if(bagRepositroy.findByUserId(userDetails.getUserId()).getItemCnt()==9){
-             throw new CustomException(ErrorCode.NO_MORE_ITEM);
-        }
+//        Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
+//        List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
+//        if(itemList.size())
         List<String> imgUrlList = itemRequestDto.getImgUrl();
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
@@ -382,6 +382,7 @@ public class ItemService {
             reportRepository.save(report);
             if (item.getReportCnt() == 5) {
                 item.statusUpdate(itemId, 5);
+
             }
             return "true";
         }
