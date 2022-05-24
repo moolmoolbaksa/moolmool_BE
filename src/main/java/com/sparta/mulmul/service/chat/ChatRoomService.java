@@ -128,7 +128,11 @@ public class ChatRoomService {
         List<Long> roomIds = new ArrayList<>();
 
         for ( RoomDto roomDto : roomDtos ) { roomIds.add(roomDto.getRoomId()); }
-        List<UnreadCntDto> cntDtos = messageRepository.getUnreadCnts(roomIds, userId);
+        List<UnreadCntDto> cntDtos = new ArrayList<>();
+
+        if ( roomIds.size() > 0 ) {
+            cntDtos = messageRepository.getUnreadCnts(roomIds, userId);
+        }
 
         for (RoomDto dto : roomDtos) {
             long unreadCnt = 0;
@@ -136,18 +140,20 @@ public class ChatRoomService {
             if ( dto.getAccId() == userId ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
                     for ( UnreadCntDto cntDto : cntDtos ) {
-                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
+                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; } // 채팅 차단에 대한 정보도 함꼐 줘야 합니다.
                     }
-                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt)); }
-                    else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt)); }
+                    Boolean isBanned = bannedRepository.existsByUser(dto.getAccId(), dto.getReqId());
+                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
+                    else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                 }
             } else if ( dto.getReqId() == userId ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
                     for ( UnreadCntDto cntDto : cntDtos ) {
                         if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
                     }
-                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt)); }
-                    else { suffix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt)); }
+                    Boolean isBanned = bannedRepository.existsByUser(dto.getAccId(), dto.getReqId());
+                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt, isBanned)); }
+                    else { suffix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt, isBanned)); }
                 }
             }
         }
@@ -167,7 +173,7 @@ public class ChatRoomService {
                 .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단이 요청된 회원이 존재하지 않습니다.")
                 );
 
-        if ( bannedRepository.existsByUser(user, bannedUser) ) {
+        if ( bannedRepository.existsByUser(user.getId(), bannedUser.getId()) ) {
             throw new AccessDeniedException("ChatRoomService: 이미 차단한 회원입니다.");
         } else {
             bannedRepository.save(ChatBanned.createOf(user, bannedUser));

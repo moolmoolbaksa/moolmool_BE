@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.sparta.mulmul.dto.chat.MessageTypeEnum.*;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @Service
@@ -49,8 +50,8 @@ public class ChatMessageService {
         MessageTypeEnum type;
         int count = getUserCount(requestDto); // 현재 채팅방에 접속중인 유저의 수
 
-        if ( count == 2 ){ type = MessageTypeEnum.FULL; }
-        else { type = MessageTypeEnum.NORMAL; }
+        if ( count == 2 ){ type = FULL; }
+        else { type = NORMAL; }
 
         messagingTemplate.convertAndSend("/sub/chat/room/" + requestDto.getRoomId(),
                 RoomStatusDto.valueOf(type));
@@ -63,8 +64,8 @@ public class ChatMessageService {
         Long roomId = requestDto.getRoomId(); // roomId에 대한 예외처리가 필요합니다.
 
         switch (requestDto.getType()){
-            case IN: num = 1; break;
-            case OUT: num = -1; break;
+            case "IN": num = 1; break;
+            case "OUT": num = -1; break;
             default: throw new IllegalArgumentException("ChatMessageService: 검증메시지 IN과 OUT만 허용됩니다.");
         }
         // 해시맵에 키가 존재한다면 접속중인 사람의 수를 계산합니다.
