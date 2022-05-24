@@ -1,7 +1,6 @@
 package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.barter.BarterHotItemListDto;
-import com.sparta.mulmul.dto.barter.BarterItemListDto;
 import com.sparta.mulmul.dto.barter.HotBarterDto;
 import com.sparta.mulmul.dto.item.ItemStarDto;
 import com.sparta.mulmul.repository.BarterRepository;
@@ -50,7 +49,7 @@ public class ItemStarService {
 
     private void brackTopThree(List<ItemStarDto> itemStarDtoList, Map<String, Integer> map, int cnt, List<String> listKeySet) {
         for (String key : listKeySet) {
-            System.out.println("key : " + key + " , " + "value : " + map.get(key));
+//            System.out.println("key : " + key + " , " + "value : " + map.get(key));
             Long sellerItemId = Long.parseLong(key);
             BarterHotItemListDto sellerItem = itemRepository.findByHotBarterItems(sellerItemId);
             if (sellerItem.getStatus() == 0 || sellerItem.getStatus() == 1) {
