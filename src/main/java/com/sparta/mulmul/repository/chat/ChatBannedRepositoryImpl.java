@@ -43,7 +43,7 @@ public class ChatBannedRepositoryImpl implements BannedQuerydsl {
         Integer fetchOne = queryFactory
                 .selectOne()
                 .from(chatBanned)
-                .where(chatBanned.user.id.eq(userId).or(chatBanned.bannedUser.id.eq(bannedUserId)),
+                .where(chatBanned.user.id.eq(userId).or(chatBanned.bannedUser.id.eq(bannedUserId)), // 조건문을 바꿔줘야 합니다.
                         chatBanned.isBanned.eq(true))
                 .fetchFirst();
         return fetchOne != null;
@@ -58,6 +58,21 @@ public class ChatBannedRepositoryImpl implements BannedQuerydsl {
                         chatBanned.user.eq(user),
                         chatBanned.bannedUser.eq(bannedUser))
                 .fetchOne());
+    }
+
+    @Override
+    public Boolean existsBy(Long userId, Long bannedUserId){
+        Integer fetchOne = queryFactory
+                .selectOne()
+                .from(chatBanned)
+                .where(
+                        chatBanned.user.id.eq(userId).and(chatBanned.bannedUser.id.eq(bannedUserId))
+                                .or(
+                                        chatBanned.user.id.eq(bannedUserId).and(chatBanned.bannedUser.id.eq(userId))
+                                ).and(chatBanned.isBanned.isTrue())
+                )
+                .fetchFirst();
+        return fetchOne != null;
     }
 
 }
