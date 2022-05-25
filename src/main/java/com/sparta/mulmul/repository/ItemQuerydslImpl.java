@@ -37,7 +37,12 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-        return new PageImpl<>(results, pageable, results.size());
+
+        List<Item> total = queryFactory
+                .selectFrom(item)
+                .where(item.status.eq(0).or(item.status.eq(1)))
+                .fetch();
+        return new PageImpl<>(results, pageable, total.size());
     }
 
     @Override
