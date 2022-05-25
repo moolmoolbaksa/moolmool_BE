@@ -1,5 +1,6 @@
 package com.sparta.mulmul.security.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.exception.CustomException;
@@ -57,12 +58,11 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
             response.setStatus(HttpServletResponse.SC_OK);
 
             ObjectMapper mapper = new ObjectMapper();
-            String result = mapper.writeValueAsString(ResponseError
-                    .createFrom(INVALID_LENGTH_TOKEN)
+            String result = mapper.writeValueAsString(OkDto.valueOf("false")
             );
             response.getWriter().write(result);
-
             return null;
+
         } else if (tokenPayload == null) {
             jwtToken = new JwtPreProcessingToken("null");
         } else {
@@ -116,5 +116,17 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
                 response,
                 failed
         );
+    }
+
+    private void setResponseError(HttpServletResponse response, ErrorCode error) throws IOException {
+
+        response.setContentType("application/json;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String result = mapper.writeValueAsString(ResponseError
+                .createFrom(error)
+        );
+        response.getWriter().write(result);
     }
 }

@@ -23,7 +23,7 @@ public class RestFailureHandler implements AuthenticationFailureHandler {
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
         ObjectMapper mapper = new ObjectMapper();
-        String result = mapper.writeValueAsString(ResponseError.createFrom(LOGIN_FAILED));
+        String result = mapper.writeValueAsString(OkDto.valueOf("false"));
         httpServletResponse.getWriter().write(result);
     }
 }
