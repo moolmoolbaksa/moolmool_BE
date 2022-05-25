@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static com.sparta.mulmul.dto.NotificationType.*;
+
 @Getter @Entity
 @NoArgsConstructor
 public class Notification extends CreationDate {
@@ -39,7 +41,7 @@ public class Notification extends CreationDate {
         notification.changeId = kakaoUser.getId();
         notification.nickname = kakaoUser.getNickname();
         notification.isRead = false;
-        notification.type = NotificationType.ETC;
+        notification.type = ETC;
 
         return  notification;
     }
@@ -52,7 +54,7 @@ public class Notification extends CreationDate {
         notification.changeId = barter.getId();
         notification.nickname = nickname;
         notification.isRead = false;
-        notification.type = NotificationType.BARTER;
+        notification.type = BARTER;
 
         return  notification;
     }
@@ -69,9 +71,9 @@ public class Notification extends CreationDate {
         notification.nickname = nickname;
         notification.isRead = false;
         if (type.equals("Barter")){
-            notification.type = NotificationType.FINISH;
+            notification.type = FINISH;
         } else if (type.equals("Score")) {
-            notification.type = NotificationType.SCORE;
+            notification.type = SCORE;
         }
 
 
@@ -92,7 +94,7 @@ public class Notification extends CreationDate {
         }
 
         notification.isRead = false;
-        notification.type = NotificationType.CHAT;
+        notification.type = CHAT;
 
         return notification;
     }
