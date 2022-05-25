@@ -24,7 +24,4 @@ public interface ItemQuerydsl {
 
      BarterHotItemListDto findByHotBarterItems(Long itemId);
 
-
-
-
 }

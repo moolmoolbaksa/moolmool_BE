@@ -1,12 +1,9 @@
 package com.sparta.mulmul.repository;
-import static com.sparta.mulmul.model.QItem.*;
-import static com.sparta.mulmul.model.QScrab.*;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import com.sparta.mulmul.dto.barter.BarterHotItemListDto;
 import com.sparta.mulmul.dto.barter.BarterItemListDto;
-import com.sparta.mulmul.dto.barter.QBarterHotItemListDto;
 import com.sparta.mulmul.dto.barter.QBarterItemListDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
@@ -16,20 +13,28 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
+
+import static com.sparta.mulmul.model.QItem.item;
+import static com.sparta.mulmul.model.QScrab.scrab1;
 
 
 @Repository
 public class ItemQuerydslImpl implements ItemQuerydsl {
 
+    @PersistenceContext
+    EntityManager em;
+
     private final JPAQueryFactory queryFactory;
 
-    public ItemQuerydslImpl(JPAQueryFactory jpaQueryFactory){
+    public ItemQuerydslImpl(JPAQueryFactory jpaQueryFactory) {
         this.queryFactory = jpaQueryFactory;
     }
 
     @Override
-    public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable){
+    public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable) {
         List<Item> results = queryFactory
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)))
@@ -41,7 +46,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
     }
 
     @Override
-    public Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable){
+    public Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable) {
         List<Item> results = queryFactory
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)).and(item.category.eq(category)))
@@ -89,6 +94,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .fetch();
     }
 
+//     개래내역보기
     @Override
     public BarterItemListDto findByBarterItems(Long itemId) {
         return queryFactory
@@ -106,7 +112,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
     @Override
     public BarterHotItemListDto findByHotBarterItems(Long itemId) {
         return queryFactory
-                .select(new QBarterHotItemListDto(
+                .select(Projections.fields(BarterHotItemListDto.class,
                         item.id,
                         item.title,
                         item.itemImg,
