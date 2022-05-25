@@ -39,6 +39,11 @@ public class ItemService {
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
         String favored = String.join(",", favoredList);
+        System.out.println(imgUrl);
+//        Item existItem = itemRepository.existsByItemImg(imgUrl).ifPresent(new CustomException(ErrorCode.EXISTED_ITEM));
+//        if(existItem.isPresent()){
+//             throw new CustomException(ErrorCode.EXISTED_ITEM);
+//        }
 
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 ()-> new CustomException(ErrorCode.NOT_FOUND_USER)
