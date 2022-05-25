@@ -151,6 +151,28 @@ public class BarterService {
 
             // 아이템 & 거래내역 업데이트
             updateStatus(myBarter, buyerItemId, sellerItemId);
+            Long sellerId = myBarter.getSellerId();
+
+            List<Barter> sellerBarterList = barterRepository.findAllBySellerId(sellerId);
+            for (Barter eachBarter : sellerBarterList){
+
+                Long eachBarterId = eachBarter.getId();
+                String[] eachBarterIdList = eachBarter.getBarter().split(";");
+                String[] eachBuyerItemId = eachBarterIdList[0].split(",");
+                String eachSellerItemId = eachBarterIdList[1];
+
+                // 해당 거래내역이 아닌, 동일한 셀러아이템일 경우
+                if (!eachBarterId.equals(barterId) && eachSellerItemId.equals(sellerItemId)){
+                    for (String eachBuyerItem : eachBuyerItemId){
+                        Long buyerItemIds = Long.parseLong(eachBuyerItem);
+                        Item eachBuyerItems = itemRepository.findById(buyerItemIds).orElseThrow(() -> new CustomException(NOT_FOUND_BUYER_ITEM));
+                        // 다른 바이어 아이템들을 0으로 초기화해준다.
+                        eachBuyerItems.statusUpdate(buyerItemIds, 0);
+                        // 거래내역을 삭제한다.
+                        barterRepository.delete(eachBarter);
+                    }
+                }
+            }
 
             // 내게 거래완료 메시지 보내기
             sendMyMessage(barterId, myBarter, myPosition);

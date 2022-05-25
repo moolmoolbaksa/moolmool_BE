@@ -1,9 +1,6 @@
 package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
-import com.sparta.mulmul.dto.item.ItemDetailResponseDto;
-import com.sparta.mulmul.dto.item.ItemRequestDto;
-import com.sparta.mulmul.dto.item.ItemResponseDto;
-import com.sparta.mulmul.dto.item.ItemUpdateRequestDto;
+import com.sparta.mulmul.dto.item.*;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.*;
@@ -35,9 +32,9 @@ public class ItemService {
 
     // 이승재 / 보따리 아이템 등록하기
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
-        if(bagRepositroy.findByUserId(userDetails.getUserId()).getItemCnt()==9){
-             throw new CustomException(ErrorCode.NO_MORE_ITEM);
-        }
+//        Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
+//        List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
+//        if(itemList.size())
         List<String> imgUrlList = itemRequestDto.getImgUrl();
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
@@ -72,11 +69,12 @@ public class ItemService {
         return item.getId();
     }
     //이승재 / 전체 아이템 조회(카테고리별)
-    public List<ItemResponseDto> getItems(int pageNo, String category, UserDetailsImpl userDetails) {
+    public ItemMainResponseDto getItems(int pageNo, String category, UserDetailsImpl userDetails) {
         Pageable pageable = getPageable(pageNo);
         if(category.isEmpty()){
             Page<Item> itemList = itemRepository.findAllItemOrderByCreatedAtDesc(pageable);
             List<ItemResponseDto> items = new ArrayList<>();
+            Long totalCnt = itemList.getTotalElements();
             for(Item item : itemList) {
                     //구독 개수
                     List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
@@ -95,11 +93,12 @@ public class ItemService {
                             item.getStatus());
                     items.add(itemResponseDto);
             }
-            return items;
+            ItemMainResponseDto itemMainResponseDto = new ItemMainResponseDto(totalCnt, items);
+            return itemMainResponseDto;
         }
         Page<Item> itemList = itemRepository.findAllItemByCategoryOrderByCreatedAtDesc(category, pageable);
+        Long totalCnt = itemList.getTotalElements();
         List<ItemResponseDto> items = new ArrayList<>();
-        Long userId = userDetails.getUserId();
         for(Item item : itemList) {
                 Long itemId = item.getId();
 
@@ -121,7 +120,8 @@ public class ItemService {
                 items.add(itemResponseDto);
 
             }
-            return items;
+        ItemMainResponseDto itemMainResponseDto = new ItemMainResponseDto(totalCnt, items);
+            return itemMainResponseDto;
         }
 
     // 이승재 / 페이징 처리
@@ -382,6 +382,10 @@ public class ItemService {
             reportRepository.save(report);
             if (item.getReportCnt() == 5) {
                 item.statusUpdate(itemId, 5);
+                List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
+                for(Scrab scrab : scrabs){
+                    scrab.update(scrab.getId(), false);
+                }
             }
             return "true";
         }

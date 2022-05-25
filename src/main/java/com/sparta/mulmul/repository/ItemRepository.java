@@ -8,8 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long>, ItemQuerydsl {
-    List<Item> findAllByCategory(String category);
-
     List<Item> findAllByBagId(Long bagId);
 
 

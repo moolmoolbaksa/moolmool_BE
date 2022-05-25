@@ -23,6 +23,11 @@ public enum ErrorCode {
     NO_MORE_ITEM(HttpStatus.BAD_REQUEST.value(), "I001", "더이상 아이템을 등록할 수 없습니다."),
     CANT_SCRAB_OWN_ITEM(HttpStatus.BAD_REQUEST.value(), "I002", "자신의 아이템은 구독할 수 없습니다."),
 
+    //IMAGE
+    FAILIED_UPLOAD_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "M001", "파일 업로드에 실패하였습니다"),
+    FAILIED_RESIZE_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "M002", "파일 리사이즈에 실패하였습니다"),
+    WRONG_TYPE_IMAGE(HttpStatus.BAD_REQUEST.value(), "M003", "잘못된 형식의 파일입니다"),
+
     // BARTER
     NOT_FOUND_BARTER(HttpStatus.NOT_FOUND.value(), "B001", "거래내역이 없습니다."),
     FINISH_BARTER(HttpStatus.BAD_REQUEST.value(), "B002", "완료된 거래입니다."),

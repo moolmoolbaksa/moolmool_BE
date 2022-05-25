@@ -181,15 +181,6 @@ public class MyUserService {
     }
 
 
-    // DTO에 아이템정보 넣기
-    private ItemUserResponseDto getItemUserDto(Item scrabItem) {
-        ItemUserResponseDto scrabitemDto = new ItemUserResponseDto(
-                scrabItem.getId(),
-                scrabItem.getItemImg().split(",")[0],
-                scrabItem.getStatus()
-        );
-        return scrabitemDto;
-    }
 
 
     // 유저 정보 수정

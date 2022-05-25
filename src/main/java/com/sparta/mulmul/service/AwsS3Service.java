@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.Image;
 import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.ImageRepository;
@@ -59,7 +61,7 @@ public class AwsS3Service {
                     amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                             .withCannedAcl(CannedAccessControlList.PublicRead));
                 } catch (IOException e) {
-                    throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+                    throw new CustomException(ErrorCode.FAILIED_UPLOAD_IMAGE);
                 }
                 String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
                 Image image = new Image(fileName, imgUrl);
@@ -87,14 +89,11 @@ public class AwsS3Service {
             baos.flush();
             return new MockMultipartFile(fileName, baos.toByteArray());
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 리사이즈에 실패했습니다.");
+            throw new CustomException(ErrorCode.FAILIED_RESIZE_IMAGE);
         }
     }
 
 
-    public void deleteFile(String fileName) {
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
-    }
 
     private String createFileName(String fileName) { // 먼저 파일 업로드 시, 파일명을 난수화하기 위해 random으로 돌립니다.
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
@@ -104,58 +103,11 @@ public class AwsS3Service {
         try {
             return fileName.substring(fileName.lastIndexOf("."));
         } catch (StringIndexOutOfBoundsException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일(" + fileName + ") 입니다.");
+            throw new CustomException(ErrorCode.WRONG_TYPE_IMAGE);
         }
     }
 
-
-//     성훈 - user 프로필 수정하기기
-//   public List<String> uploadFile(List<MultipartFile> multipartFile, UserDetailsImpl userDetails) {
-//        List<String> imageUrlList = new ArrayList<>();
-////        User user = userDetails.getUser;
-//
-//        // forEach 구문을 통해 multipartFile로 넘어온 파일들 하나씩 fileNameList에 추가
-//        multipartFile.forEach(file -> {
-//            String fileName = createFileName(file.getOriginalFilename());
-//            ObjectMetadata objectMetadata = new ObjectMetadata();
-//            objectMetadata.setContentLength(file.getSize());
-//            objectMetadata.setContentType(file.getContentType());
-//
-//            // 이미지에 대한 url
-//            String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
-//
-//            // 기존 ImageRepository에서 삭제
-//            Long userId = userDetails.getUserId();
-//            User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("user not found"));;
-//
-//            String userImgUrl = user.getProfile();
-//
-//           if (!userImgUrl.equals("http://kaihuastudio.com/common/img/default_profile.png")) {
-//                Image nowImage = imageRepository.findByImgUrl(userImgUrl);
-//                String nowFileName = nowImage.getFileName();
-//                Long nowImgeId = nowImage.getId();
-//                amazonS3.deleteObject(new DeleteObjectRequest(bucket, nowFileName));
-//                imageRepository.deleteById(nowImgeId);
-//            }
-//
-//            try(InputStream inputStream = file.getInputStream()) {
-//                amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-//                        .withCannedAcl(CannedAccessControlList.PublicRead));
-//            } catch(IOException e) {
-//                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
-//            }
-//
-//            Image image = new Image(fileName, imgUrl);
-//            imageRepository.save(image);
-//            imageUrlList.add(imgUrl);
-//        });
-//
-//
-//        return imageUrlList;
-//    }
-
-
-
+    // 이승재 / 마이페이지 이미지 등록
     public String mypageUpdate(MultipartFile multipartFile, UserDetailsImpl userDetails) {
         if (multipartFile == null) {
             return "empty";
@@ -175,7 +127,7 @@ public class AwsS3Service {
 
             Long userId = userDetails.getUserId();
             User user = userRepository.findById(userId).orElseThrow(
-                    () -> new IllegalArgumentException("user not found")
+                    () -> new CustomException(ErrorCode.NOT_FOUND_USER)
             );
 
             String userImgUrl = user.getProfile();
@@ -192,7 +144,7 @@ public class AwsS3Service {
                 amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
             } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+                throw new CustomException(ErrorCode.FAILIED_UPLOAD_IMAGE);
             }
 
             Image image = new Image(fileName, imgUrl);
