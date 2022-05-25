@@ -16,7 +16,7 @@ public class MessageResponseDto {
     private String message;
     private LocalDateTime date;
     private Boolean isRead = false;
-    private String type;
+    private MessageTypeEnum type;
 
     public static MessageResponseDto createOf(ChatMessage message, Long userId){
 

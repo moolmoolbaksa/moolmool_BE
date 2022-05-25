@@ -26,7 +26,6 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final ChatRoomRepository roomRepository;
-    private final SimpMessageSendingOperations messagingTemplate;
 
     // 알림 전체 목록
     public List<NotificationDto> getNotification(UserDetailsImpl userDetails){

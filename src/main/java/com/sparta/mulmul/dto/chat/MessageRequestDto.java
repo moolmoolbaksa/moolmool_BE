@@ -8,6 +8,6 @@ public class MessageRequestDto {
     // 메시지 타입 : 입장, 채팅
     private Long roomId;
     private String message;
-    private String type;
+    private MessageTypeEnum type;
     private Boolean isRead;
 }
