@@ -64,10 +64,10 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
         return new PageImpl<>(results, pageable, total.size());
     }
 
-    @Override
-    public List<Item> searchByKeyword(String keyword){
-
-    }
+//    @Override
+//    public List<Item> searchByKeyword(String keyword){
+//
+//    }
 
     // 성훈 - 마이페이지 0-2상태의 아이템정보를 dto에 담는다
     @Override
