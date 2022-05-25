@@ -1,6 +1,5 @@
 package com.sparta.mulmul.config;
 
-import com.sparta.mulmul.exception.JwtExeption;
 import com.sparta.mulmul.security.FilterSkipMatcher;
 import com.sparta.mulmul.security.RestFailureHandler;
 import com.sparta.mulmul.security.RestLoginSuccessHandler;

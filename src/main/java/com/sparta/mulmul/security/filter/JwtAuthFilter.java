@@ -1,7 +1,11 @@
 package com.sparta.mulmul.security.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.OkDto;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.exception.ErrorCode;
+import com.sparta.mulmul.exception.ResponseError;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtPreProcessingToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +20,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static com.sparta.mulmul.exception.ErrorCode.*;
 
 /**
  * Token 을 내려주는 Filter 가 아닌  client 에서 받아지는 Token 을 서버 사이드에서 검증하는 클레스 SecurityContextHolder 보관소에 해당
@@ -46,24 +52,22 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
         String tokenPayload = request.getHeader("Authorization");
         String method = request.getMethod();
 
-        System.out.println("< 받아온 토큰의 내용 >");
-        System.out.println("JwtAuthFilter: " + tokenPayload);
+        if (tokenPayload == null && !method.equals("GET")) {
 
-        if ( tokenPayload == null && !method.equals("GET") ) {
-
-            System.out.println("JwtAuthFilter: 토큰값이 없어 NullPointException 발생했습니다.");
             response.setContentType("application/json;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_OK);
 
             ObjectMapper mapper = new ObjectMapper();
-            String result = mapper.writeValueAsString(OkDto.valueOf("false"));
+            String result = mapper.writeValueAsString(OkDto.valueOf("false")
+            );
             response.getWriter().write(result);
-
             return null;
-        }
-        else if ( tokenPayload == null ) { jwtToken = new JwtPreProcessingToken("null"); }
-        else { jwtToken = new JwtPreProcessingToken(
-                extractor.extract(tokenPayload, request));
+
+        } else if (tokenPayload == null) {
+            jwtToken = new JwtPreProcessingToken("null");
+        } else {
+            jwtToken = new JwtPreProcessingToken(
+                    extractor.extract(tokenPayload, request));
         }
 
         return super
@@ -112,5 +116,17 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
                 response,
                 failed
         );
+    }
+
+    private void setResponseError(HttpServletResponse response, ErrorCode error) throws IOException {
+
+        response.setContentType("application/json;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String result = mapper.writeValueAsString(ResponseError
+                .createFrom(error)
+        );
+        response.getWriter().write(result);
     }
 }

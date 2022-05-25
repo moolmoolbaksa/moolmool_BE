@@ -47,7 +47,13 @@ public enum ErrorCode {
     NOT_TRADE_COMPLETE_BARTER(HttpStatus.BAD_REQUEST.value(), "B002", "완료된 거래가 아닙니다."),
 
     // NOTIFICATION
-    NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND.value(), "N001", "알림이 없습니다.");
+    NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND.value(), "N001", "알림이 없습니다."),
+
+    // LOGIN
+    LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "L001", "로그인에 실패했습니다."),
+    INVALID_LENGTH_TOKEN(HttpStatus.BAD_REQUEST.value(), "L002", "유효하지 않은 토큰입니다. 토큰의 길이를 확인해 주세요."),
+    INVALID_CONTENTS_TOKEN(HttpStatus.BAD_REQUEST.value(), "L003", "유효하지 않은 토큰입니다. 토큰 디코딩에 실패했습니다."),
+    EXPIRATION_TOKEN(HttpStatus.BAD_REQUEST.value(), "L004", "만료된 토큰입니다.");
 
     private final int httpStatus;
     private final String code;
