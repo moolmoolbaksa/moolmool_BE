@@ -357,17 +357,24 @@ public class ItemService {
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
             item.setDeleted(itemId, 6);
         }
-//        List<Barter> sellerBarterList = barterRepository.findAllBySellerId(userDetails.getUserId());
-//        for(Barter eachBarter : sellerBarterList){
-//            Long eachBarterId = eachBarter.getId();
-//            String[] eachBarterIdList = eachBarter.getBarter().split(";");
-//            String[] eachBuyerItemIds = eachBarterIdList[0].split(",");
-//            String eachSellerItemId = eachBarterIdList[1];
-//
-//            if(eachSellerItemId.equals(itemId)){
-//
-//            }
-//        }
+
+        // 아이템 이 삭제 되면 연관된 거래내역 삭제 및 아이템 상태 0으로 변환
+        List<Barter> sellerBarterList = barterRepository.findAllBySellerId(userDetails.getUserId());
+        for(Barter eachBarter : sellerBarterList){
+            String[] eachBarterIdList = eachBarter.getBarter().split(";");
+            String[] eachBuyerItemIds = eachBarterIdList[0].split(",");
+            String eachSellerItemId = eachBarterIdList[1];
+
+            if(eachSellerItemId.equals(itemId)){
+                for(String eachBuyerItemId : eachBuyerItemIds){
+                    Long buyerItemId = Long.parseLong(eachBuyerItemId);
+                    Item eachBuyerItem = itemRepository.findById(buyerItemId).orElseThrow(()->new CustomException(ErrorCode.NOT_FOUND_ITEM));
+                    eachBuyerItem.statusUpdate(buyerItemId, 0);
+
+                    barterRepository.delete(eachBarter);
+                }
+            }
+        }
         // 아이템이 삭제되었다면, 거래중인 아이템 거래내역 전원이 삭제되어야 합니다.
         // 혹시 알림에 있었다면 삭제되어야 합니다.
     }
