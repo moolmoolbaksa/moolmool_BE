@@ -29,7 +29,6 @@ public class Notification extends CreationDate {
     private Boolean isRead;
 
     @Column(nullable = false)
-    @Enumerated(value = EnumType.STRING)
     private NotificationType type;
 
 
