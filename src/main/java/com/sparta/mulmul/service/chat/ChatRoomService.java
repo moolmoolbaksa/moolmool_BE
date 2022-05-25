@@ -159,10 +159,12 @@ public class ChatRoomService {
                 .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
 
-        if ( bannedRepository.existsByUser(user.getId(), bannedUser.getId()) ) {
-            throw new CustomException(ALREADY_BANNED);
-        } else {
+        ChatBanned banned = bannedRepository.findByUserAndBannedUser(user, bannedUser).orElse(null);
+
+        if ( banned == null ) {
             bannedRepository.save(ChatBanned.createOf(user, bannedUser));
+        } else {
+            throw new CustomException(ALREADY_BANNED);
         }
     }
 

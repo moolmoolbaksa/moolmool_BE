@@ -3,6 +3,7 @@ package com.sparta.mulmul.repository.chat;
 import com.sparta.mulmul.model.ChatBanned;
 import com.sparta.mulmul.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
