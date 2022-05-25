@@ -50,17 +50,6 @@ public class ChatBannedRepositoryImpl implements BannedQuerydsl {
     }
 
     @Override
-    public Optional<ChatBanned> findByUsers(User user, User bannedUser){
-
-        return Optional.ofNullable(queryFactory
-                .selectFrom(chatBanned)
-                .where(
-                        chatBanned.user.eq(user),
-                        chatBanned.bannedUser.eq(bannedUser))
-                .fetchOne());
-    }
-
-    @Override
     public Boolean existsBy(Long userId, Long bannedUserId){
         Integer fetchOne = queryFactory
                 .selectOne()

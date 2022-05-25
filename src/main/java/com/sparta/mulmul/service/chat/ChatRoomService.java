@@ -15,7 +15,6 @@ import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -53,7 +52,7 @@ public class ChatRoomService {
                 );
         // 채팅방 차단 회원인지 검색
         if (bannedRepository.existsByUsers(acceptor, requester)) {
-            throw new CustomException(BANNED_CHAT_USER);
+            throw new CustomException(CHAT_USER_BANNED);
         }
         // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장, 메시지를 전달할 때 상대 이미지와 프로필 사진을 같이 전달해 줘야 함.
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
@@ -85,7 +84,7 @@ public class ChatRoomService {
                 );
         if ( chatRoom.getRequester() == user) { chatRoom.reqOut(true); }
         else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
-        else { throw new AccessDeniedException("ChatRoomService: '나가기'는 채팅방에 존재하는 회원만 접근 가능한 서비스입니다."); }
+        else { throw new CustomException(EXIT_INVAILED); }
         // 채팅방 종료 메시지 전달 및 저장
         messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(),
                 MessageResponseDto.createFrom(
@@ -153,15 +152,15 @@ public class ChatRoomService {
 
         User user = userRepository
                 .findById(userDetails.getUserId())
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단을 요청한 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_REQUESTER)
                 );
         User bannedUser = userRepository
                 .findById(bannedId)
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단이 요청된 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
 
         if ( bannedRepository.existsByUser(user.getId(), bannedUser.getId()) ) {
-            throw new AccessDeniedException("ChatRoomService: 이미 차단한 회원입니다.");
+            throw new CustomException(ALREADY_BANNED);
         } else {
             bannedRepository.save(ChatBanned.createOf(user, bannedUser));
         }
@@ -185,17 +184,19 @@ public class ChatRoomService {
     @Transactional
     public void releaseBanned(UserDetailsImpl userDetails, Long bannedId){
 
+        System.out.println(userDetails.getUserId() + bannedId);
+
         User user = userRepository
                 .findById(userDetails.getUserId())
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단을 요청한 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_REQUESTER)
                 );
         User bannedUser = userRepository
                 .findById(bannedId)
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단이 요청된 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
 
-        ChatBanned banned = bannedRepository.findByUsers(user, bannedUser)
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단목록이 존재하지 않습니다."));
+        ChatBanned banned = bannedRepository.findByUserAndBannedUser(user, bannedUser)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_BANNED));
 
         banned.releaseBanned();
     }
