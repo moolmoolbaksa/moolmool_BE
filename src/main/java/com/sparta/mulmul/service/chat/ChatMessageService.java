@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.sparta.mulmul.dto.chat.MessageTypeEnum.*;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @Service
@@ -49,8 +50,8 @@ public class ChatMessageService {
         MessageTypeEnum type;
         int count = getUserCount(requestDto); // 현재 채팅방에 접속중인 유저의 수
 
-        if ( count == 2 ){ type = MessageTypeEnum.FULL; }
-        else { type = MessageTypeEnum.NORMAL; }
+        if ( count == 2 ){ type = FULL; }
+        else { type = NORMAL; }
 
         messagingTemplate.convertAndSend("/sub/chat/room/" + requestDto.getRoomId(),
                 RoomStatusDto.valueOf(type));
@@ -98,7 +99,7 @@ public class ChatMessageService {
 
     // 채팅 메시지 및 알림 저장하기
     @Transactional
-    public MessageResponseDto saveMessage(MessageRequestDto requestDto, WsUser wsUser) {
+    public MessageResponseDto saveMessage(MessageRequestDto requestDto, Long userId) {
 
         ChatRoom chatRoom = roomRepository.findByIdFetch(requestDto.getRoomId())
                 .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT));
@@ -106,7 +107,7 @@ public class ChatMessageService {
         // 비속어 필터링
         requestDto = filter.filtering(requestDto);
 
-        ChatMessage message = messageRepository.save(ChatMessage.createOf(requestDto, wsUser.getUserId()));
+        ChatMessage message = messageRepository.save(ChatMessage.createOf(requestDto, userId));
 
         if (chatRoom.getAccOut()){
             // 채팅 알림 저장 및 전달하기
@@ -125,13 +126,13 @@ public class ChatMessageService {
             );
             chatRoom.reqOut(false);
         }
-        return MessageResponseDto.createOf(message, wsUser);
+        return MessageResponseDto.createOf(message, userId);
     }
 
     // 채팅 메시지 발송하기
-    public void sendMessage(MessageRequestDto requestDto, WsUser user, MessageResponseDto responseDto){
+    public void sendMessage(MessageRequestDto requestDto, Long userId, MessageResponseDto responseDto){
         RoomMsgUpdateDto msgUpdateDto = RoomMsgUpdateDto.createFrom(requestDto);
-        messagingTemplate.convertAndSend("/sub/chat/rooms/" + user.getUserId(), msgUpdateDto); // 개별 채팅 목록 보기 업데이트
+        messagingTemplate.convertAndSend("/sub/chat/rooms/" + userId, msgUpdateDto); // 개별 채팅 목록 보기 업데이트
         messagingTemplate.convertAndSend("/sub/chat/room/" + requestDto.getRoomId(), responseDto); // 채팅방 내부로 메시지 전송
         System.out.println("/sub/chat/room/" + requestDto.getRoomId() + " 로 메시지를 전송하였습니다.");
     }

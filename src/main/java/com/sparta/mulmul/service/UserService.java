@@ -32,7 +32,7 @@ public class UserService {
         System.out.println(requestDto.getAddress());
         User user = userRepository.findById(userDetails
                         .getUserId())
-                .orElseThrow(() -> new UsernameNotFoundException("User's not found error"));
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 
         user.initProfile(requestDto.getAddress());
     }

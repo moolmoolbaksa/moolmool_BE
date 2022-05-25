@@ -31,35 +31,27 @@ public class StompHandler implements ChannelInterceptor { // 이론상 웹소켓
         assert accessor != null;
 
         switch (Objects.requireNonNull(accessor.getCommand())){
-            case CONNECT: accessor.setUser(checkVaild(accessor)); break; // User는 커넥트에서 한 번만 설정해 줍니다.
-            case SEND: checkVaild(accessor); break; // 메시지 전송에서도 사용자를 검증합니다.
+            case CONNECT:
+            case SUBSCRIBE:
+            case SEND:
+                checkVaild(accessor); break; // 유효성 검증
             default: break;
         }
 
         return message;
     }
 
-    private WsUser checkVaild(StompHeaderAccessor accessor){
-
-        WsUser wsUser;
+    private void checkVaild(StompHeaderAccessor accessor){
 
         try {
             String token = extractor.extract(accessor.getFirstNativeHeader("Authorization"));
             Long userId = jwtDecoder.decodeTokenByUserId(token);
             String nickname = jwtDecoder.decodeTokenByNickname(token);
-            wsUser = WsUser.createFrom(WsUserDto
-                    .builder()
-                    .userId(userId)
-                    .nickname(nickname)
-                    .name(UUID.randomUUID().toString())
-                    .build()
-            );
 
         } catch (Exception e) {
             throw new AccessDeniedException("StompHandler: 유효하지 않은 토큰입니다.");
         }
 
-        return wsUser;
     }
 }
 

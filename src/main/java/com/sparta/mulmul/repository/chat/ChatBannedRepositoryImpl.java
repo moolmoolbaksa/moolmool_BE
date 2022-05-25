@@ -39,25 +39,29 @@ public class ChatBannedRepositoryImpl implements BannedQuerydsl {
     }
 
     @Override // 헷갈리므로 리네임 필요합니다.
-    public Boolean existsByUser(User user, User bannedUser){
+    public Boolean existsByUser(Long userId, Long bannedUserId){
         Integer fetchOne = queryFactory
                 .selectOne()
                 .from(chatBanned)
-                .where(chatBanned.user.id.eq(user.getId()).or(chatBanned.bannedUser.id.eq(bannedUser.getId())),
+                .where(chatBanned.user.id.eq(userId).or(chatBanned.bannedUser.id.eq(bannedUserId)), // 조건문을 바꿔줘야 합니다.
                         chatBanned.isBanned.eq(true))
                 .fetchFirst();
         return fetchOne != null;
     }
 
     @Override
-    public Optional<ChatBanned> findByUsers(User user, User bannedUser){
-
-        return Optional.ofNullable(queryFactory
-                .selectFrom(chatBanned)
+    public Boolean existsBy(Long userId, Long bannedUserId){
+        Integer fetchOne = queryFactory
+                .selectOne()
+                .from(chatBanned)
                 .where(
-                        chatBanned.user.eq(user),
-                        chatBanned.bannedUser.eq(bannedUser))
-                .fetchOne());
+                        chatBanned.user.id.eq(userId).and(chatBanned.bannedUser.id.eq(bannedUserId))
+                                .or(
+                                        chatBanned.user.id.eq(bannedUserId).and(chatBanned.bannedUser.id.eq(userId))
+                                ).and(chatBanned.isBanned.isTrue())
+                )
+                .fetchFirst();
+        return fetchOne != null;
     }
 
 }

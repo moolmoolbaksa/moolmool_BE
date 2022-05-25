@@ -1,6 +1,7 @@
 package com.sparta.mulmul.service;
 
 import com.sparta.mulmul.dto.NotificationDto;
+import com.sparta.mulmul.dto.NotificationType;
 import com.sparta.mulmul.dto.barter.*;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.model.Barter;
@@ -21,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sparta.mulmul.dto.NotificationType.BARTER;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
@@ -89,7 +89,7 @@ public class BarterService {
             updateStatus(buyerItemId, sellerItemId);
             // 거래내역 삭제
             barterRepository.deleteById(barterId);
-            notificationRepository.deleteByChangeIdAndType(barterId, BARTER);
+            notificationRepository.deleteByChangeIdAndType(barterId, NotificationType.BARTER);
         } else {
             throw new CustomException(NOT_FOUND_BARTER);
         }

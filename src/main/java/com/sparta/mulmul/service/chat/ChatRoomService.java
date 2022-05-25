@@ -15,7 +15,6 @@ import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -53,7 +52,7 @@ public class ChatRoomService {
                 );
         // 채팅방 차단 회원인지 검색
         if (bannedRepository.existsByUsers(acceptor, requester)) {
-            throw new CustomException(BANNED_CHAT_USER);
+            throw new CustomException(CHAT_USER_BANNED);
         }
         // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장, 메시지를 전달할 때 상대 이미지와 프로필 사진을 같이 전달해 줘야 함.
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
@@ -85,13 +84,18 @@ public class ChatRoomService {
                 );
         if ( chatRoom.getRequester() == user) { chatRoom.reqOut(true); }
         else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
-        else { throw new AccessDeniedException("ChatRoomService: '나가기'는 채팅방에 존재하는 회원만 접근 가능한 서비스입니다."); }
-        // 채팅방 종료 메시지 전달 및 저장
-        messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(),
-                MessageResponseDto.createFrom(
-                        messageRepository.save(ChatMessage.createOutOf(id, user))
-                )
-        );
+        else { throw new CustomException(EXIT_INVAILED); }
+
+        if ( chatRoom.getAccOut() && chatRoom.getReqOut()) {
+            roomRepository.deleteById(chatRoom.getId()); // 둘 다 나간 상태라면 방 삭제
+        } else {
+            // 채팅방 종료 메시지 전달 및 저장
+            messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(),
+                    MessageResponseDto.createFrom(
+                            messageRepository.save(ChatMessage.createOutOf(id, user))
+                    )
+            );
+        }
     }
 
     // 사용자별 채팅방 전체 목록 가져오기
@@ -125,29 +129,22 @@ public class ChatRoomService {
 
         List<RoomResponseDto> prefix = new ArrayList<>();
         List<RoomResponseDto> suffix = new ArrayList<>();
-        List<Long> roomIds = new ArrayList<>();
-
-        for ( RoomDto roomDto : roomDtos ) { roomIds.add(roomDto.getRoomId()); }
-        List<UnreadCntDto> cntDtos = messageRepository.getUnreadCnts(roomIds, userId);
 
         for (RoomDto dto : roomDtos) {
-            long unreadCnt = 0;
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
             if ( dto.getAccId() == userId ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
-                    for ( UnreadCntDto cntDto : cntDtos ) {
-                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
-                    }
-                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt)); }
-                    else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt)); }
+                    int unreadCnt = messageRepository.countMsg(dto.getReqId(), dto.getRoomId());
+                    Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());
+                    if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
+                    else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                 }
             } else if ( dto.getReqId() == userId ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
-                    for ( UnreadCntDto cntDto : cntDtos ) {
-                        if (cntDto.getRoomId() == dto.getRoomId() ){ unreadCnt = cntDto.getUnreadCnt(); break; }
-                    }
-                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt)); }
-                    else { suffix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt)); }
+                    int unreadCnt = messageRepository.countMsg(dto.getAccId(), dto.getRoomId());
+                    Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());
+                    if (dto.getReqFixed()){ prefix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt, isBanned)); }
+                    else { suffix.add(RoomResponseDto.createOf(REQUESTER, dto, unreadCnt, isBanned)); }
                 }
             }
         }
@@ -160,17 +157,19 @@ public class ChatRoomService {
 
         User user = userRepository
                 .findById(userDetails.getUserId())
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단을 요청한 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_REQUESTER)
                 );
         User bannedUser = userRepository
                 .findById(bannedId)
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단이 요청된 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
 
-        if ( bannedRepository.existsByUser(user, bannedUser) ) {
-            throw new AccessDeniedException("ChatRoomService: 이미 차단한 회원입니다.");
-        } else {
+        ChatBanned banned = bannedRepository.findByUserAndBannedUser(user, bannedUser).orElse(null);
+
+        if ( banned == null ) {
             bannedRepository.save(ChatBanned.createOf(user, bannedUser));
+        } else {
+            throw new CustomException(ALREADY_BANNED);
         }
     }
 
@@ -194,15 +193,15 @@ public class ChatRoomService {
 
         User user = userRepository
                 .findById(userDetails.getUserId())
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단을 요청한 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_REQUESTER)
                 );
         User bannedUser = userRepository
                 .findById(bannedId)
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단이 요청된 회원이 존재하지 않습니다.")
+                .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
 
-        ChatBanned banned = bannedRepository.findByUsers(user, bannedUser)
-                .orElseThrow(() -> new NullPointerException("ChatRoomService: 차단목록이 존재하지 않습니다."));
+        ChatBanned banned = bannedRepository.findByUserAndBannedUser(user, bannedUser)
+                .orElseThrow(() -> new CustomException(NOT_FOUND_BANNED));
 
         banned.releaseBanned();
     }

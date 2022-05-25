@@ -1,5 +1,6 @@
 package com.sparta.mulmul.exception;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -10,11 +11,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = CustomException.class)
-    public Map<String, Object> customExceptionHandler(CustomException e) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("ok", false);
-        map.put("code", e.getErrorCode());
-        map.put("message", e.getMessage());
-        return map;
+    public ResponseEntity<ResponseError> customExceptionHandler(CustomException e) {
+        return ResponseError.createFrom(e.getErrorCode());
     }
 }

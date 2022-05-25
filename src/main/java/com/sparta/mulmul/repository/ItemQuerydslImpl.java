@@ -38,11 +38,16 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
         List<Item> results = queryFactory
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)))
-                .orderBy(item.createdAt.desc())
+                .orderBy(item.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-        return new PageImpl<>(results, pageable, results.size());
+
+        List<Item> total = queryFactory
+                .selectFrom(item)
+                .where(item.status.eq(0).or(item.status.eq(1)))
+                .fetch();
+        return new PageImpl<>(results, pageable, total.size());
     }
 
     @Override
@@ -50,7 +55,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
         List<Item> results = queryFactory
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)).and(item.category.eq(category)))
-                .orderBy(item.createdAt.desc())
+                .orderBy(item.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -85,11 +90,11 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                         item.status
                 ))
                 .from(item)
-                .leftJoin(scrab1).on(item.bag.userId.eq(scrab1.userId))
+                .join(scrab1).on(scrab1.itemId.eq(item.id))
                 .fetchJoin()
                 .distinct()
-                .where(item.bag.userId.eq(userId), scrab1.scrab.eq(true))
-                .orderBy(item.modifiedAt.desc())
+                .where(scrab1.userId.eq(userId), scrab1.scrab.eq(true))
+                .orderBy(scrab1.modifiedAt.desc())
                 .limit(3)
                 .fetch();
     }

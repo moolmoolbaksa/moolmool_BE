@@ -20,10 +20,10 @@ public class RoomResponseDto {
     private String message;
     private LocalDateTime date;
     private Boolean isRead;
-    private Long isBanned;
-    private long unreadCnt;
+    private Boolean isBanned;
+    private int unreadCnt;
 
-    public static RoomResponseDto createOf(String flag, RoomDto dto, long unreadCnt){
+    public static RoomResponseDto createOf(String flag, RoomDto dto, int unreadCnt, Boolean isBanned){
 
         RoomResponseDto responseDto = new RoomResponseDto();
 
@@ -31,7 +31,7 @@ public class RoomResponseDto {
         responseDto.message = dto.getMessage();
         responseDto.date = dto.getDate();
         responseDto.isRead = dto.getIsRead();
-        responseDto.isBanned = dto.getIsBanned();
+        responseDto.isBanned = isBanned;
         responseDto.unreadCnt = unreadCnt;
 
         switch ( flag ) {

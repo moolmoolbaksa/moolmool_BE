@@ -20,13 +20,12 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Query(value =
             "SELECT DISTINCT r.room_id AS roomId, r.acc_out AS accOut, r.req_out AS reqOut, r.acc_fixed AS accFixed, r.req_fixed AS reqFixed, " +
                     "u1.id AS accId, u1.nickname AS accNickname, u1.profile AS accProfile, u2.id AS reqId, u2.nickname AS reqNickname, u2.profile AS reqProfile, " +
-                    "msg.message AS message, msg.created_at AS date, CASE WHEN ban.is_banned = true THEN 1 ELSE 0 END AS isBanned " +
+                    "msg.message AS message, msg.created_at AS date " +
             "FROM chat_room r " +
                     "INNER JOIN user u1 ON r.acceptor_id = u1.id " +
                     "INNER JOIN user u2 ON r.requester_id = u2.id " +
                     "INNER JOIN chat_message msg ON (msg.room_id, msg.message_id) " +
                         "IN (SELECT room_id, MAX(message_id) FROM chat_message GROUP BY room_id) AND r.room_id = msg.room_id " +
-                    "LEFT JOIN chat_banned ban ON r.acceptor_id = ban.user_id OR r.requester_id = ban.banned_user_id " + // 하나의 결과만 가져와야함
             "WHERE (r.acceptor_id = :user OR r.requester_id = :user) " +
             "ORDER BY r.modified_at DESC",
             nativeQuery = true)

@@ -18,11 +18,11 @@ public class MessageResponseDto {
     private Boolean isRead = false;
     private MessageTypeEnum type;
 
-    public static MessageResponseDto createOf(ChatMessage message, WsUser user){
+    public static MessageResponseDto createOf(ChatMessage message, Long userId){
 
         MessageResponseDto responseDto = new MessageResponseDto();
 
-        responseDto.senderId = user.getUserId();
+        responseDto.senderId = userId;
         responseDto.messageId = message.getId();
         responseDto.message = message.getMessage();
         responseDto.date = message.getCreatedAt();
