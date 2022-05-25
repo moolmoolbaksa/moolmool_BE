@@ -64,8 +64,8 @@ public class ChatMessageService {
         Long roomId = requestDto.getRoomId(); // roomId에 대한 예외처리가 필요합니다.
 
         switch (requestDto.getType()){
-            case "IN": num = 1; break;
-            case "OUT": num = -1; break;
+            case IN: num = 1; break;
+            case OUT: num = -1; break;
             default: throw new IllegalArgumentException("ChatMessageService: 검증메시지 IN과 OUT만 허용됩니다.");
         }
         // 해시맵에 키가 존재한다면 접속중인 사람의 수를 계산합니다.
