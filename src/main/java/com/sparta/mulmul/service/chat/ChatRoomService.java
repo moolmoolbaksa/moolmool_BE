@@ -15,7 +15,6 @@ import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -185,6 +184,8 @@ public class ChatRoomService {
     @Transactional
     public void releaseBanned(UserDetailsImpl userDetails, Long bannedId){
 
+        System.out.println(userDetails.getUserId() + bannedId);
+
         User user = userRepository
                 .findById(userDetails.getUserId())
                 .orElseThrow(() -> new CustomException(NOT_FOUND_REQUESTER)
@@ -194,7 +195,7 @@ public class ChatRoomService {
                 .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
 
-        ChatBanned banned = bannedRepository.findByUsers(user, bannedUser)
+        ChatBanned banned = bannedRepository.findByUserAndBannedUser(user, bannedUser)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_BANNED));
 
         banned.releaseBanned();

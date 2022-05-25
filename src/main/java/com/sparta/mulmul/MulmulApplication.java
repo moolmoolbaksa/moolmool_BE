@@ -16,6 +16,11 @@ import java.util.TimeZone;
 @SpringBootApplication
 public class MulmulApplication {
 
+    @PostConstruct
+    public void started(){
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+    }
+
     public static void main(String[] args) {
         new SpringApplicationBuilder(MulmulApplication.class)
                 .run(args);
@@ -24,11 +29,6 @@ public class MulmulApplication {
     @Bean
     public PageableHandlerMethodArgumentResolverCustomizer customize() {
         return p -> p.setOneIndexedParameters(true);
-    }
-
-    @PostConstruct
-    public void started(){
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
     }
 
     @PersistenceContext

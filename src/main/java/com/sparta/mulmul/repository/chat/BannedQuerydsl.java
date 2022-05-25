@@ -10,6 +10,5 @@ public interface BannedQuerydsl {
     Boolean existsByUsers(User user, User bannedUser);
     List<User> findAllMyBannedByUser(User user);
     Boolean existsByUser(Long userId, Long bannedUserId);
-    Optional<ChatBanned> findByUsers(User user, User bannedUser);
     Boolean existsBy(Long userId, Long bannedUserId);
 }
