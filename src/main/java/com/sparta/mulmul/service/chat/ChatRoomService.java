@@ -85,12 +85,17 @@ public class ChatRoomService {
         if ( chatRoom.getRequester() == user) { chatRoom.reqOut(true); }
         else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
         else { throw new CustomException(EXIT_INVAILED); }
-        // 채팅방 종료 메시지 전달 및 저장
-        messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(),
-                MessageResponseDto.createFrom(
-                        messageRepository.save(ChatMessage.createOutOf(id, user))
-                )
-        );
+
+        if ( chatRoom.getAccOut() && chatRoom.getReqOut()) {
+            roomRepository.deleteById(chatRoom.getId()); // 둘 다 나간 상태라면 방 삭제
+        } else {
+            // 채팅방 종료 메시지 전달 및 저장
+            messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(),
+                    MessageResponseDto.createFrom(
+                            messageRepository.save(ChatMessage.createOutOf(id, user))
+                    )
+            );
+        }
     }
 
     // 사용자별 채팅방 전체 목록 가져오기
@@ -185,8 +190,6 @@ public class ChatRoomService {
     // 회원 차단 풀기
     @Transactional
     public void releaseBanned(UserDetailsImpl userDetails, Long bannedId){
-
-        System.out.println(userDetails.getUserId() + bannedId);
 
         User user = userRepository
                 .findById(userDetails.getUserId())
