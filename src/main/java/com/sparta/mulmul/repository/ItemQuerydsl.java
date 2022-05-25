@@ -16,6 +16,8 @@ public interface ItemQuerydsl {
 
      Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable);
 
+//     List<Item> searchByKeyword (String keyword);
+
      List<ItemUserResponseDto> findByMyPageItems(Long userId);
 
      List<ItemUserResponseDto> findByMyScrabItems(Long userId);
