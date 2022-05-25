@@ -2,6 +2,7 @@ package com.sparta.mulmul.exception;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Getter
@@ -14,7 +15,7 @@ public class ResponseError {
 
     public static ResponseEntity<ResponseError> createFrom(ErrorCode errorCode) {
         return ResponseEntity
-                .status(errorCode.getHttpStatus())
+                .status(HttpStatus.OK)
                 .body(ResponseError.builder()
                         .ok(false)
                         .status(errorCode.getHttpStatus())
@@ -22,5 +23,13 @@ public class ResponseError {
                         .message(errorCode.getMessage())
                         .build()
                 );
+    }
+    public static ResponseError creatFrom(ErrorCode errorCode){
+        return ResponseError.builder()
+                .ok(false)
+                .status(errorCode.getHttpStatus())
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build();
     }
 }
