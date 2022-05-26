@@ -7,6 +7,8 @@ import com.sparta.mulmul.dto.trade.RequestTradeDto;
 import com.sparta.mulmul.dto.trade.TradeDecisionDto;
 import com.sparta.mulmul.dto.trade.TradeInfoDto;
 import com.sparta.mulmul.dto.trade.TradeInfoImagesDto;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.model.Item;
 import com.sparta.mulmul.model.Notification;
@@ -38,14 +40,14 @@ public class TradeService {
         Long myBadId = bagRepository.findByUserId(userDetails.getUserId()).getId();
 
         User user = userRepository.findById(userId).orElseThrow(
-                ()-> new IllegalArgumentException("유저 정보가 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
         String sellerNickName = user.getNickname();
 
         List<Item> myItemList = itemRepository.findAllByBagId(myBadId);
 
         Item item = itemRepository.findById(itemid).orElseThrow(
-                () -> new IllegalArgumentException("아이템이 없습니다.")
+                () -> new CustomException(ErrorCode.NOT_FOUND_ITEM)
         );
 
 
@@ -68,12 +70,12 @@ public class TradeService {
     public String  requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
-                ()-> new IllegalArgumentException("아이템이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
         );
         sellerItem.statusUpdate(sellerItem.getId(), 1);
         for(Long buyerItemIds : requestTradeDto.getMyItemIds()) {
             Item buyerItem =  itemRepository.findById(buyerItemIds).orElseThrow(
-                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+                    ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
             );
             buyerItem.statusUpdate(buyerItemIds, 2);
         }
@@ -105,7 +107,7 @@ public class TradeService {
                     .build();
             barterRepository.save(barter);
             // 알림 내역 저장 후 상대방에게 전송
-            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new NullPointerException("해당 회원이 존재하지 않습니다."));
+            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
             Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
             // 리팩토링 필요
             messagingTemplate.convertAndSend(
@@ -119,13 +121,13 @@ public class TradeService {
     // 이승재 교환신청 확인 페이지
     public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
         Barter barter = barterRepository.findById(baterId).orElseThrow(
-                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_BARTER)
         );
         User buyer = userRepository.findById(barter.getBuyerId()).orElseThrow(
-                ()-> new IllegalArgumentException("유저정보가 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
         User seller = userRepository.findById(barter.getSellerId()).orElseThrow(
-                ()-> new IllegalArgumentException("유저정보가 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
         // 판매자의  닉네임 & degree
@@ -135,7 +137,7 @@ public class TradeService {
         // 판매자 아이템 이미지 & 제목 & 내용
         Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
         Item item = itemRepository.findById(sellerItemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
         );
         String image = item.getItemImg().split(",")[0];
         String title = item.getTitle();
@@ -150,7 +152,7 @@ public class TradeService {
         List<TradeInfoImagesDto> barterItem = new ArrayList<>();
         for(Long id : buyerItemId){
             Item item1 = itemRepository.findById(id).orElseThrow(
-                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+                    ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
             );
             String buyerItemImage = item1.getItemImg().split(",")[0];
             Long itemId = item1.getId();
@@ -174,7 +176,7 @@ public class TradeService {
     @Transactional
     public BarterStatusDto acceptTrade(Long baterId) {
         Barter barter = barterRepository.findById(baterId).orElseThrow(
-                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_BARTER)
         );
         // 거래내역 상태 업데이트
         barter.updateBarter(2);
@@ -182,7 +184,7 @@ public class TradeService {
         //아이템 상태 업데이트
         Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
         Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
         );
         sellerItem.statusUpdate(sellerItemId, 2);
         String buyerItem = barter.getBarter().split(";")[0];
@@ -192,7 +194,7 @@ public class TradeService {
         }
         for(Long id : buyerItemId){
             Item item = itemRepository.findById(id).orElseThrow(
-                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+                    ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
             );
             item.statusUpdate(id,2);
         }
@@ -209,11 +211,11 @@ public class TradeService {
     public void deleteTrade(Long baterId) {
         //아이템 상태 업데이트
         Barter barter = barterRepository.findById(baterId).orElseThrow(
-                ()-> new IllegalArgumentException("거래내역이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_BARTER)
         );
         Long sellerItemId = Long.valueOf(barter.getBarter().split(";")[1]);
         Item sellerItem = itemRepository.findById(sellerItemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템이 없습니다.")
+                ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
         );
         sellerItem.statusUpdate(sellerItemId,0);
         String buyerItem = barter.getBarter().split(";")[0];
@@ -223,7 +225,7 @@ public class TradeService {
         }
         for(Long id : buyerItemId){
             Item item = itemRepository.findById(id).orElseThrow(
-                    ()-> new IllegalArgumentException("아이템이 없습니다.")
+                    ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
             );
             item.statusUpdate(id,0);
         }

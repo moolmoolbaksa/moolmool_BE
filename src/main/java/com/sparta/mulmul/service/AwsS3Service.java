@@ -80,10 +80,16 @@ public class AwsS3Service {
         try {
             // MultipartFile -> BufferedImage Convert
             BufferedImage inputImage = ImageIO.read(originalImage.getInputStream());
+            int originWidth = inputImage.getWidth();
+            int originHeigth = inputImage.getHeight();
+            if(originWidth < targetWidth )
+                return originalImage;
+
             BufferedImage outputImage = new BufferedImage(targetWidth, targetWidth, inputImage.getType());
             Graphics2D graphics2D = outputImage.createGraphics();
             graphics2D.drawImage(inputImage, 0, 0, targetWidth, targetWidth, null);
             graphics2D.dispose();
+
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(outputImage, fileFormatName, baos);
             baos.flush();

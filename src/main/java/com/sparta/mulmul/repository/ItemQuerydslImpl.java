@@ -47,6 +47,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .selectFrom(item)
                 .where(item.status.eq(0).or(item.status.eq(1)))
                 .fetch();
+
         return new PageImpl<>(results, pageable, total.size());
     }
 
@@ -59,7 +60,22 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-        return new PageImpl<>(results, pageable, results.size());
+
+        List<Item> total = queryFactory
+                .selectFrom(item)
+                .where(item.status.eq(0).or(item.status.eq(1)).and(item.category.eq(category)))
+                .fetch();
+
+        return new PageImpl<>(results, pageable, total.size());
+    }
+
+    @Override
+    public List<Item> searchByKeyword(String keyword){
+        return  queryFactory
+                .selectFrom(item)
+                .where(item.title.contains(keyword))
+                .orderBy(item.id.desc())
+                .fetch();
     }
 
     // 성훈 - 마이페이지 0-2상태의 아이템정보를 dto에 담는다
