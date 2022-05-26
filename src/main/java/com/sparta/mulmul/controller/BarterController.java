@@ -4,7 +4,8 @@ import com.sparta.mulmul.dto.barter.BarterDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
 import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.barter.BarterTradeCheckDto;
-import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.dto.barter.EditRequestDto;
+import com.sparta.mulmul.dto.item.ItemRequestDto;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -14,9 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -47,6 +46,17 @@ public class BarterController {
     //엄성훈 - 교환완료
     @PutMapping("/api/myhistory/handshake")
     public BarterStatusDto OkayItem(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return barterService.OkayBarter(barterId, userDetails);
+        return barterService.okayBarter(barterId, userDetails);
+    }
+
+    //엄성훈 - 교환수정
+    @PutMapping("/api/myhistory/edit")
+    public ResponseEntity<OkDto> editBarter(@RequestParam Long barterId,
+                                            @RequestParam List<Long> itemId,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        EditRequestDto editRequestDto = new EditRequestDto(barterId, itemId);
+        barterService.editBarter(editRequestDto, userDetails);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
 }

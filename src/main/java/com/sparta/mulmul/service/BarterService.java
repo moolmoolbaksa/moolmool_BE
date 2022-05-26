@@ -15,6 +15,7 @@ import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.support.IdTimestampMessageHeaderInitializer;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -67,7 +68,6 @@ public class BarterService {
     }
 
 
-
     // 교환신청 취소 물건상태 2(교환중) -> 0(물품등록한 상태), 거래내역 삭제
     @Transactional
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {
@@ -94,9 +94,10 @@ public class BarterService {
             throw new CustomException(NOT_FOUND_BARTER);
         }
     }
+
     // 성훈 - 거래 완료
     @Transactional
-    public BarterStatusDto OkayBarter(Long barterId, UserDetailsImpl userDetails) {
+    public BarterStatusDto okayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 거래내역을 조회한다.
         Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
@@ -127,19 +128,50 @@ public class BarterService {
             myPosition = "seller";
         }
 
-//        List<Barter> atherBarter = barterRepository.findAllBySellerId(myBarter.getSellerId());
-//        if (atherBarter) {
-//            for (Barter eachBarter : atherBarter){
-//
-//            }
-//        }
-
         Boolean buyerTrade = myBarter.getIsBuyerTrade();
         Boolean sellerTrade = myBarter.getIsSellerTrade();
 
         // 바이어와 셀러 모두 거래완료이면 (거래내역과 아이템)의 상태를 거래완료(status : 3)으로 변경
         return checkIsTrade(barterId, user, myBarter, opponentTrade, myPosition, buyerTrade, sellerTrade);
     }
+
+
+    // 거래내역 수정하기
+    @Transactional
+    public void editBarter(EditRequestDto editRequestDto, UserDetailsImpl userDetails) {
+        // 수정할 거래내역 찾기
+        Barter barter = barterRepository.findById(editRequestDto.getBarterId()).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
+        // 유저
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
+
+        String barterItems = barter.getBarter();
+        String[] buyerItemList = barterItems.split(";")[0].split(",");
+        String sellerItem = barterItems.split(";")[1];
+
+        // 수정하기 전 아이템의 buyer의 아이템 상태를 0으로 초기화 해준다.
+        for (String eachItem : buyerItemList) {
+            Long eachItemId = Long.parseLong(eachItem);
+            Item eachItems = itemRepository.findById(eachItemId).orElseThrow(() -> new CustomException(NOT_FOUND_ITEM));
+            eachItems.statusUpdate(eachItemId, 0);
+        }
+
+        String editItemIds = null;
+        // 수정할 아이템의 아이템 상태를 거래중 (2)로 만들어준다.
+        for (Long eachEditItemId : editRequestDto.getItemId()) {
+            Item editItems = itemRepository.findById(eachEditItemId).orElseThrow(() -> new CustomException(NOT_FOUND_ITEM));
+            editItems.statusUpdate(eachEditItemId, 2);
+            // 아이템의 아이디를 String형태로 변환하여 edit
+            if (editItemIds != null) {
+                editItemIds = editItemIds + "," + eachEditItemId;
+            } else {
+                editItemIds = String.valueOf(eachEditItemId);
+            }
+        }
+        // 수정된 거래사항을 업데이트합니다.
+        String editBarter = editItemIds + ";" + sellerItem;
+        barter.editBarter(editBarter);
+    }
+
 
     // 한명이 거래완료를 하였는지, 두명 다 거래를 완료했는지 판단
     private BarterStatusDto checkIsTrade(Long barterId, User user, Barter myBarter, boolean opponentTrade, String myPosition, Boolean buyerTrade, Boolean sellerTrade) {
@@ -154,7 +186,7 @@ public class BarterService {
             Long sellerId = myBarter.getSellerId();
 
             List<Barter> sellerBarterList = barterRepository.findAllBySellerId(sellerId);
-            for (Barter eachBarter : sellerBarterList){
+            for (Barter eachBarter : sellerBarterList) {
 
                 Long eachBarterId = eachBarter.getId();
                 String[] eachBarterIdList = eachBarter.getBarter().split(";");
@@ -162,8 +194,8 @@ public class BarterService {
                 String eachSellerItemId = eachBarterIdList[1];
 
                 // 해당 거래내역이 아닌, 동일한 셀러아이템일 경우
-                if (!eachBarterId.equals(barterId) && eachSellerItemId.equals(sellerItemId)){
-                    for (String eachBuyerItem : eachBuyerItemId){
+                if (!eachBarterId.equals(barterId) && eachSellerItemId.equals(sellerItemId)) {
+                    for (String eachBuyerItem : eachBuyerItemId) {
                         Long buyerItemIds = Long.parseLong(eachBuyerItem);
                         Item eachBuyerItems = itemRepository.findById(buyerItemIds).orElseThrow(() -> new CustomException(NOT_FOUND_BUYER_ITEM));
                         // 다른 바이어 아이템들을 0으로 초기화해준다.
@@ -273,6 +305,7 @@ public class BarterService {
         }
         return totalList;
     }
+
     // 성훈 - 상대와 나의 바터리스트에 각각 아이템 정보를 넣기
     private void BarterCheckAddList(Barter barters, Long userId, List<OpponentBarterDto> myBarterList, OpponentBarterDto ItemList, List<OpponentBarterDto> barterList) {
         if (barters.getBuyerId().equals(userId)) {
@@ -372,6 +405,7 @@ public class BarterService {
             );
         }
     }
+
     // 아이템 상태 업데이트
     private void updateStatus(String[] buyerItemId, String sellerItemId) {
         int setStatus = 0;
