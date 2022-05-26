@@ -41,7 +41,7 @@ public class SocialLoginController {
                 .body(tokenDto);
     }
 
-    @GetMapping("/user/naver/redirect")
+    @GetMapping("/user/naver")
     public ResponseEntity<TokenDto> naverLogin(@RequestParam String code,
                                                @RequestParam String state) throws JsonProcessingException {
 
