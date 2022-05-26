@@ -153,14 +153,10 @@ public class ItemService {
     private String getDistance(UserDetailsImpl userDetails, Item item){
         String distance;
         if(userDetails == null){
-            distance = "null";
+             distance = "null";
+             return distance;
         }else{
-            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                    ()-> new CustomException(NOT_FOUND_USER)
-            );
-            if(user.getAddress()==null){
-                return "null";
-            }
+
             distance = caculateDistance(userDetails.getUserId(), item.getAddress());
         }
         return distance;
@@ -266,34 +262,39 @@ public class ItemService {
 
     // 이승재 / 위도 경도 거리계산하기
     private String caculateDistance(Long userId, String address) {
+
         if(userId == null){
             return "null";
         }else {
             User user = userRepository.findById(userId).orElseThrow(
                     () -> new CustomException(NOT_FOUND_USER)
             );
-            String userAddress = user.getAddress().split(" ")[0]+" " +user.getAddress().split(" ")[1];
-            String itemAddress = address.split(" ")[0] + " " + address.split(" ")[1];
-            Location userLocation = locationRepository.findByArea(userAddress);
-            Location itemLocation = locationRepository.findByArea(itemAddress);
-            double userLat = userLocation.getLatitude();
-            double userLon = userLocation.getLongitude();
-            double itemLat = itemLocation.getLatitude();
-            double itemLon = itemLocation.getLongitude();
-
-            if (userLat== itemLat && userLon== itemLon) {
-                return "인근";
+            if (user.getAddress() == null) {
+                return "null";
             } else {
-                double theta = userLon - itemLon;
-                double dist = Math.sin(deg2rad(userLat)) * Math.sin(deg2rad(itemLat)) + Math.cos(deg2rad(userLat)) * Math.cos(deg2rad(itemLat)) * Math.cos(deg2rad(theta));
+                String userAddress = user.getAddress().split(" ")[0] + " " + user.getAddress().split(" ")[1];
+                String itemAddress = address.split(" ")[0] + " " + address.split(" ")[1];
+                Location userLocation = locationRepository.findByArea(userAddress);
+                Location itemLocation = locationRepository.findByArea(itemAddress);
+                double userLat = userLocation.getLatitude();
+                double userLon = userLocation.getLongitude();
+                double itemLat = itemLocation.getLatitude();
+                double itemLon = itemLocation.getLongitude();
 
-                dist = Math.acos(dist);
-                dist = rad2deg(dist);
-                dist = dist * 60 * 1.1515;
-                dist = dist * 1.609344;
-                double dist1 = Math.round(dist*10)/10.0;
-                String distance = Double.toString(dist1);
-                return "약 " + distance + "km";
+                if (userLat == itemLat && userLon == itemLon) {
+                    return "인근";
+                } else {
+                    double theta = userLon - itemLon;
+                    double dist = Math.sin(deg2rad(userLat)) * Math.sin(deg2rad(itemLat)) + Math.cos(deg2rad(userLat)) * Math.cos(deg2rad(itemLat)) * Math.cos(deg2rad(theta));
+
+                    dist = Math.acos(dist);
+                    dist = rad2deg(dist);
+                    dist = dist * 60 * 1.1515;
+                    dist = dist * 1.609344;
+                    double dist1 = Math.round(dist * 10) / 10.0;
+                    String distance = Double.toString(dist1);
+                    return "약 " + distance + "km";
+                }
             }
         }
     }

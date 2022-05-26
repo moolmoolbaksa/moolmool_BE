@@ -14,7 +14,7 @@ import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
 
 @RestController
 @RequiredArgsConstructor
-public class KakaoUserController {
+public class SocialLoginController {
 
     private final KakaoUserService kakaoUserService;
 
