@@ -111,7 +111,7 @@ public class KakaoUserService {
             notificationRepository.save(
                     Notification.createFrom(kakaoUser));
         } else {
-            if ( kakaoUser.getIsBan() != null && kakaoUser.getIsBan() ){
+            if ( kakaoUser.getReportCnt() >= 5 ){
                 throw new CustomException(BANNED_USER);
             }
         }

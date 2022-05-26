@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface ItemRepository extends JpaRepository<Item, Long>, ItemQuerydsl {
     List<Item> findAllByBagId(Long bagId);
 
-   Optional<Item> existsByItemImg(String imgUrl);
+   Optional<Item> findByTitleAndContents(String title, String contents);
 }
