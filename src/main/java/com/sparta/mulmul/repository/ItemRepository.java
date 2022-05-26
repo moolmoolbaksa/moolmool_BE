@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface ItemRepository extends JpaRepository<Item, Long>, ItemQuerydsl {
     List<Item> findAllByBagId(Long bagId);
 
+   Optional<Item> findByTitleAndContents(String title, String contents);
 
     @Query(value = "select * from item p where p.title like %:keyword% order by p.modified_at desc", nativeQuery = true)
     List<Item> searchByKeyword(@Param("keyword")String keyword);

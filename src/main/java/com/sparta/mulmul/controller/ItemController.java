@@ -2,10 +2,6 @@ package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.dto.item.*;
-import com.sparta.mulmul.dto.trade.RequestTradeDto;
-import com.sparta.mulmul.dto.trade.TradeDecisionDto;
-import com.sparta.mulmul.dto.trade.TradeInfoDto;
-import com.sparta.mulmul.dto.user.UserStoreResponseDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.*;
 import lombok.RequiredArgsConstructor;

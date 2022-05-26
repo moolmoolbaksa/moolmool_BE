@@ -1,4 +1,5 @@
 package com.sparta.mulmul.service;
+import com.sparta.mulmul.dto.NotificationType;
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import com.sparta.mulmul.dto.item.*;
 import com.sparta.mulmul.exception.CustomException;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.sparta.mulmul.exception.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 public class ItemService {
@@ -29,6 +32,7 @@ public class ItemService {
     private final LocationRepository locationRepository;
     private final ReportRepository reportRepository;
     private final BarterRepository barterRepository;
+    private final NotificationRepository notificationRepository;
 
     // 이승재 / 보따리 아이템 등록하기
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
@@ -39,39 +43,40 @@ public class ItemService {
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
         String favored = String.join(",", favoredList);
-        System.out.println(imgUrl);
-//        Item existItem = itemRepository.existsByItemImg(imgUrl).ifPresent(new CustomException(ErrorCode.EXISTED_ITEM));
-//        if(existItem.isPresent()){
-//             throw new CustomException(ErrorCode.EXISTED_ITEM);
-//        }
+        Optional<Item> existItem = itemRepository.findByTitleAndContents(itemRequestDto.getTitle(), itemRequestDto.getContents());
+        if(existItem.isPresent()){
+             return 1L;
+        }else {
 
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                ()-> new CustomException(ErrorCode.NOT_FOUND_USER)
-        );
+            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                    () -> new CustomException(NOT_FOUND_USER)
+            );
 
-        // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
-        Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
-        bag.update(bag.getItemCnt()+1);
+            // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
+            Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
+            bag.update(bag.getItemCnt() + 1);
 
 
-        Item item = Item.builder()
-                .title(itemRequestDto.getTitle())
-                .contents(itemRequestDto.getContents())
-                .address(user.getAddress())  //유저 정보에서 가져오기
-                .category(itemRequestDto.getCategory())
-                .scrabCnt(0)
-                .commentCnt(0) // 사용할지 안할지 확정안됨
-                .viewCnt(0)
-                .reportCnt(0)
-                .status(0)
-                .itemImg(imgUrl)
-                .type(itemRequestDto.getType())
-                .favored(favored)
-                .bag(bag)
-                .build();
+            Item item = Item.builder()
+                    .title(itemRequestDto.getTitle())
+                    .contents(itemRequestDto.getContents())
+                    .address(user.getAddress())  //유저 정보에서 가져오기
+                    .category(itemRequestDto.getCategory())
+                    .scrabCnt(0)
+                    .commentCnt(0) // 사용할지 안할지 확정안됨
+                    .viewCnt(0)
+                    .reportCnt(0)
+                    .status(0)
+                    .itemImg(imgUrl)
+                    .type(itemRequestDto.getType())
+                    .favored(favored)
+                    .bag(bag)
+                    .build();
 
-         item = itemRepository.save(item);
-        return item.getId();
+            item = itemRepository.save(item);
+            return item.getId();
+        }
+
     }
     //이승재 / 전체 아이템 조회(카테고리별)
     public ItemMainResponseDto getItems(int pageNo, String category, UserDetailsImpl userDetails) {
@@ -147,9 +152,15 @@ public class ItemService {
     //이승재 / 거리 계산
     private String getDistance(UserDetailsImpl userDetails, Item item){
         String distance;
-        if(userDetails.equals(null)){
+        if(userDetails == null){
             distance = "null";
         }else{
+            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                    ()-> new CustomException(NOT_FOUND_USER)
+            );
+            if(user.getAddress()==null){
+                return "null";
+            }
             distance = caculateDistance(userDetails.getUserId(), item.getAddress());
         }
         return distance;
@@ -189,7 +200,7 @@ public class ItemService {
         boolean isScrab = checkScrab(userId, itemId);
 
         User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
-                ()-> new CustomException(ErrorCode.NOT_FOUND_USER)
+                ()-> new CustomException(NOT_FOUND_USER)
         );
 
         List<String> itemImgList = new ArrayList<>();
@@ -259,7 +270,7 @@ public class ItemService {
             return "null";
         }else {
             User user = userRepository.findById(userId).orElseThrow(
-                    () -> new CustomException(ErrorCode.NOT_FOUND_USER)
+                    () -> new CustomException(NOT_FOUND_USER)
             );
             String userAddress = user.getAddress().split(" ")[0]+" " +user.getAddress().split(" ")[1];
             String itemAddress = address.split(" ")[0] + " " + address.split(" ")[1];
@@ -282,7 +293,7 @@ public class ItemService {
                 dist = dist * 1.609344;
                 double dist1 = Math.round(dist*10)/10.0;
                 String distance = Double.toString(dist1);
-                return distance + "km";
+                return "약 " + distance + "km";
             }
         }
     }
@@ -311,12 +322,12 @@ public class ItemService {
             }
         }else{
             Item item = itemRepository.findById(itemId).orElseThrow(
-                    () -> new CustomException(ErrorCode.NOT_FOUND_ITEM)
+                    () -> new CustomException(NOT_FOUND_ITEM)
             );
             System.out.println(userDetails.getUserId());
             System.out.println(item.getBag().getUserId());
             if (userDetails.getUserId().equals(item.getBag().getUserId())) {
-                throw new CustomException(ErrorCode.CANT_SCRAB_OWN_ITEM);
+                throw new CustomException(CANT_SCRAB_OWN_ITEM);
             }else {
 
                 Scrab newScrab = Scrab.builder()
@@ -333,7 +344,7 @@ public class ItemService {
     @Transactional
     public void updateItem(ItemUpdateRequestDto itemUpdateRequestDto, UserDetailsImpl userDetails, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
+                ()-> new CustomException(NOT_FOUND_ITEM)
         );
         List<String> images = itemUpdateRequestDto.getImages();
         List<String> imagesUrl = itemUpdateRequestDto.getImagesUrl();
@@ -357,7 +368,7 @@ public class ItemService {
     @Transactional
     public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new CustomException(ErrorCode.NOT_FOUND_ITEM)
+                ()-> new CustomException(NOT_FOUND_ITEM)
         );
         if(item.getBag().getUserId().equals(userDetails.getUserId())){
             item.setDeleted(itemId, 6);
@@ -369,14 +380,15 @@ public class ItemService {
             String[] eachBarterIdList = eachBarter.getBarter().split(";");
             String[] eachBuyerItemIds = eachBarterIdList[0].split(",");
             String eachSellerItemId = eachBarterIdList[1];
-
-            if(eachSellerItemId.equals(itemId)){
+            Long sellerItemId =  Long.parseLong(eachSellerItemId);
+            if(sellerItemId.equals(itemId)){
                 for(String eachBuyerItemId : eachBuyerItemIds){
                     Long buyerItemId = Long.parseLong(eachBuyerItemId);
-                    Item eachBuyerItem = itemRepository.findById(buyerItemId).orElseThrow(()->new CustomException(ErrorCode.NOT_FOUND_ITEM));
+                    Item eachBuyerItem = itemRepository.findById(buyerItemId).orElseThrow(()->new CustomException(NOT_FOUND_ITEM));
                     eachBuyerItem.statusUpdate(buyerItemId, 0);
 
                     barterRepository.delete(eachBarter);
+                    notificationRepository.deleteByChangeIdAndType(eachBarter.getId(), NotificationType.BARTER);
                 }
             }
         }
@@ -393,7 +405,7 @@ public class ItemService {
         }else {
 
             Item item = itemRepository.findById(itemId).orElseThrow(
-                    () -> new CustomException(ErrorCode.NOT_FOUND_ITEM)
+                    () -> new CustomException(NOT_FOUND_ITEM)
             );
             int reportCnt = item.getReportCnt();
             item.reportCntUpdate(itemId, reportCnt + 1);
