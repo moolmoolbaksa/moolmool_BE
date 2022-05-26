@@ -1,9 +1,7 @@
 package com.sparta.mulmul.model;
 
-import com.sparta.mulmul.dto.item.ItemRequestDto;
 import com.sparta.mulmul.dto.item.ItemUpdateRequestDto;
 import lombok.*;
-import org.checkerframework.checker.units.qual.N;
 
 import javax.persistence.*;
 

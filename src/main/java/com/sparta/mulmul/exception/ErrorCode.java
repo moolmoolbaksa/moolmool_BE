@@ -39,13 +39,12 @@ public enum ErrorCode {
     NOT_FOUND_SELLER_ITEM(HttpStatus.NOT_FOUND.value(), "B003", "판매자의 상품이 없습니다."),
     NOT_FOUND_BUYER_ITEM(HttpStatus.NOT_FOUND.value(), "B004", "구매자의 상품이 없습니다."),
     NOT_FOUND_ITEM(HttpStatus.NOT_FOUND.value(), "B005", "상품이 없습니다."),
-    NOT_SCRAB_MY_ITEM(HttpStatus.BAD_REQUEST.value(), "B005", "자신의 상품은 찜할 수 없습니다."),
-    NOT_FOUND_SCRAB(HttpStatus.NOT_FOUND.value(), "B005", "찜한 상품이 없습니다."),
-    // 성훈 추가
-    FINISH_SCORE_BARTER(HttpStatus.BAD_REQUEST.value(), "B002", "완료된 평가입니다."),
-    NOT_SCORE_MY_BARTER(HttpStatus.BAD_REQUEST.value(), "B005", "자신에게 평가는 할 수 없습니다."),
-    NOT_TRADE_BARTER(HttpStatus.BAD_REQUEST.value(), "B002", "거래중인 상태가 아닙니다."),
-    NOT_TRADE_COMPLETE_BARTER(HttpStatus.BAD_REQUEST.value(), "B002", "완료된 거래가 아닙니다."),
+    NOT_SCRAB_MY_ITEM(HttpStatus.BAD_REQUEST.value(), "B006", "자신의 상품은 찜할 수 없습니다."),
+    NOT_FOUND_SCRAB(HttpStatus.NOT_FOUND.value(), "B007", "찜한 상품이 없습니다."),
+    FINISH_SCORE_BARTER(HttpStatus.BAD_REQUEST.value(), "B008", "완료된 평가입니다."),
+    NOT_SCORE_MY_BARTER(HttpStatus.BAD_REQUEST.value(), "B009", "자신에게 평가는 할 수 없습니다."),
+    NOT_TRADE_BARTER(HttpStatus.BAD_REQUEST.value(), "B010", "거래중인 상태가 아닙니다."),
+    NOT_TRADE_COMPLETE_BARTER(HttpStatus.BAD_REQUEST.value(), "B011", "완료된 거래가 아닙니다."),
 
     // NOTIFICATION
     NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND.value(), "N001", "알림이 없습니다."),

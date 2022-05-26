@@ -1,6 +1,5 @@
 package com.sparta.mulmul.dto.item;
 
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

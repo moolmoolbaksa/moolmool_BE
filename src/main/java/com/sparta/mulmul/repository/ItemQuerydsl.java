@@ -2,6 +2,7 @@ package com.sparta.mulmul.repository;
 
 import com.sparta.mulmul.dto.barter.BarterHotItemListDto;
 import com.sparta.mulmul.dto.barter.BarterItemListDto;
+import com.sparta.mulmul.dto.barter.OpponentBarterDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.model.Item;
 import org.springframework.data.domain.Page;

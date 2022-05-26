@@ -4,6 +4,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.mulmul.dto.barter.BarterHotItemListDto;
 import com.sparta.mulmul.dto.barter.BarterItemListDto;
+import com.sparta.mulmul.dto.barter.OpponentBarterDto;
 import com.sparta.mulmul.dto.barter.QBarterItemListDto;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
@@ -130,6 +131,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .fetchOne();
     }
 
+    // 떠로으는 거래
     @Override
     public BarterHotItemListDto findByHotBarterItems(Long itemId) {
         return queryFactory

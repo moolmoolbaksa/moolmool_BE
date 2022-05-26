@@ -56,6 +56,10 @@ public class Barter extends Timestamped {
         this.status = status;
     }
 
+    public void editBarter(String barter) {
+        this.barter = barter;
+    }
+
     public void updateTradeBarter(int status, LocalDateTime tradeTime) {
         this.status = status;
         this.tradeTime = tradeTime;

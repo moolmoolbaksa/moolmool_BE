@@ -9,5 +9,4 @@ public interface BarterQuerydsl {
 
     List<HotBarterDto> findByHotBarter (int status);
 
-//    List<BarterIAlltemListDto> findBybarterItem (Long barterId, Long userId);
 }
