@@ -81,7 +81,6 @@ public class AwsS3Service {
             // MultipartFile -> BufferedImage Convert
             BufferedImage inputImage = ImageIO.read(originalImage.getInputStream());
             int originWidth = inputImage.getWidth();
-            int originHeigth = inputImage.getHeight();
             if(originWidth < targetWidth )
                 return originalImage;
 
