@@ -10,17 +10,19 @@ import lombok.Setter;
 public class TokenDto {
 
     private Boolean ok;
-    private String token;
+    private String accessToken;
+    private String refreshToken;
     private Boolean isFirst;
 
-    public static TokenDto createOf(String token, User user){
+    public static TokenDto createOf(String accessToken, String refreshToken,User user){
 
         TokenDto tokenDto = new TokenDto();
 
         tokenDto.ok = true;
         if ( user.getAddress() == null ){ tokenDto.isFirst = true; }
         else { tokenDto.isFirst = false;}
-        tokenDto.token = token;
+        tokenDto.accessToken = accessToken;
+        tokenDto.refreshToken = refreshToken;
 
         return tokenDto;
     }

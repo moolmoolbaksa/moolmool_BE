@@ -1,6 +1,7 @@
 package com.sparta.mulmul.model;
 
 import com.sparta.mulmul.dto.user.KakaoUserInfoDto;
+import com.sparta.mulmul.dto.user.NaverUserInfoDto;
 import com.sparta.mulmul.dto.user.UserRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,9 @@ public class User {
 
     @Column(unique = true)
     private Long kakaoId;
+
+    @Column(unique = true)
+    private Long naverId;
 
     private String address;
     private String profile = "http://kaihuastudio.com/common/img/default_profile.png";
@@ -64,6 +68,18 @@ public class User {
         user.nickname = kakaoUserInfo.getNickname();
         user.profile = kakaoUserInfo.getProfile();
         user.kakaoId = kakaoUserInfo.getId();
+        user.password = password;
+
+        return user;
+    }
+
+    public static User fromNaverUserWithPassword(NaverUserInfoDto naverUserInfo, String password){
+
+        User user = new User();
+        user.username = naverUserInfo.getEmail();
+        user.nickname = naverUserInfo.getNickname();
+        user.profile = naverUserInfo.getProfile();
+        user.kakaoId = naverUserInfo.getId();
         user.password = password;
 
         return user;

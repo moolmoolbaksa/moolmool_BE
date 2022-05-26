@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
+import static com.sparta.mulmul.security.RestLoginSuccessHandler.REFRESH_HEADER;
 
 @Configuration
 @EnableWebSecurity
@@ -155,9 +156,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://kapi.kakao.com/v2/user/me");
         configuration.addAllowedOrigin("https://kapi.kakao.com/v2/user/me");
+        configuration.addAllowedOrigin("http://openapi.naver.com/v1/nid/me");
+        configuration.addAllowedOrigin("https://openapi.naver.com/v1/nid/me");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.addExposedHeader(AUTH_HEADER);
+        configuration.addExposedHeader(REFRESH_HEADER);
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
