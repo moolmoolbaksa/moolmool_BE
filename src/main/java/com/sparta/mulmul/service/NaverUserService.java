@@ -3,7 +3,6 @@ package com.sparta.mulmul.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.TokenDto;
-import com.sparta.mulmul.dto.user.KakaoUserInfoDto;
 import com.sparta.mulmul.dto.user.NaverUserInfoDto;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.model.Bag;
@@ -28,7 +27,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.UUID;
 
 import static com.sparta.mulmul.exception.ErrorCode.BANNED_USER;
-import static com.sparta.mulmul.exception.ErrorCode.REDUNDUNT_EMAIL;
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.TOKEN_TYPE;
 import static com.sparta.mulmul.security.jwt.JwtTokenUtils.*;
 
@@ -53,7 +51,11 @@ public class NaverUserService {
     public TokenDto naverLogin(String code, String state) throws JsonProcessingException {
 
         // 네이버 서버로 액세스스 토큰 요청
+        System.out.println("code: " + code + " state: " + state);
+        System.out.println("naver: 검증 시작");
         String accessToken = getAccessToken(code, state);
+        System.out.println("accessToken: " + accessToken);
+        System.out.println("naver: 토큰 검증 완료");
         // 토큰으로 네이버 API 호출
         NaverUserInfoDto naverUserInfo = getNaverUserInfo(accessToken);
         // 회원가입과 로그인 처리 및 유저 정보 받아오기
@@ -110,31 +112,38 @@ public class NaverUserService {
 
     private User registerUserIfNeeded(NaverUserInfoDto naverUserInfo) {
 
-        if ( userRepository.findByUsername(naverUserInfo.getEmail()).isPresent() ){
-            throw new CustomException(REDUNDUNT_EMAIL);
-        }
-        // DB 에 중복된 Naver Id 가 있는지 확인
-        Long naverId = naverUserInfo.getId();
-        User naverUser = userRepository.findByNaverId(naverId)
+        User signupUser = userRepository.findByUsername(naverUserInfo.getEmail())
                 .orElse(null);
+        // 기존에 있는 이메일로 연결되게 구성합니다.
+        if ( signupUser == null ){
+            // DB 에 중복된 Naver Id 가 있는지 확인
+            Long naverId = naverUserInfo.getId();
+            User naverUser = userRepository.findByNaverId(naverId)
+                    .orElse(null);
 
-        if (naverUser == null) {
-            String password = passwordEncoder.encode(UUID.randomUUID().toString());
+            if (naverUser == null) {
+                String password = passwordEncoder.encode(UUID.randomUUID().toString());
 
-            naverUser = userRepository.save(
-                    User.fromNaverUserWithPassword(naverUserInfo, password)
-            );
-            bagRepository.save(new Bag(naverUser));
-            // 회원가입 알림 메시지 저장
-            notificationRepository.save(
-                    Notification.createFrom(naverUser));
+                naverUser = userRepository.save(
+                        User.fromNaverUserWithPassword(naverUserInfo, password)
+                );
+                bagRepository.save(new Bag(naverUser));
+                // 회원가입 알림 메시지 저장
+                notificationRepository.save(
+                        Notification.createFrom(naverUser));
+            } else {
+                if ( naverUser.getReportCnt() >= 5 ){ // 신고 누적시 처리 진행
+                    throw new CustomException(BANNED_USER);
+                }
+            }
+            return naverUser;
         } else {
-            if ( naverUser.getReportCnt() >= 5 ){ // 신고 누적시 처리 진행
+            if ( signupUser.getReportCnt() >= 5 ){ // 신고 누적시 처리 진행
                 throw new CustomException(BANNED_USER);
             }
+            return signupUser;
         }
 
-        return naverUser;
     }
     // JWT 토큰 추출
     private String getJwtToken(User kakaoUser, String tokenType){

@@ -97,31 +97,37 @@ public class KakaoUserService {
 
     private User registerUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
 
-        if ( userRepository.findByUsername(kakaoUserInfo.getEmail()).isPresent() ){
-            throw new CustomException(REDUNDUNT_EMAIL);
-        }
-        // DB 에 중복된 Kakao Id 가 있는지 확인
-        Long kakaoId = kakaoUserInfo.getId();
-        User kakaoUser = userRepository.findByKakaoId(kakaoId)
+        User signupUser = userRepository.findByUsername(kakaoUserInfo.getEmail())
                 .orElse(null);
+        if ( signupUser == null ){
+            // DB 에 중복된 Kakao Id 가 있는지 확인
+            Long kakaoId = kakaoUserInfo.getId();
+            User kakaoUser = userRepository.findByKakaoId(kakaoId)
+                    .orElse(null);
 
-        if (kakaoUser == null) {
-            String password = passwordEncoder.encode(UUID.randomUUID().toString());
+            if (kakaoUser == null) {
+                String password = passwordEncoder.encode(UUID.randomUUID().toString());
 
-            kakaoUser = userRepository.save(
-                    User.fromKakaoUserWithPassword(kakaoUserInfo, password)
-            );
-            bagRepository.save(new Bag(kakaoUser));
-            // 회원가입 알림 메시지 저장
-            notificationRepository.save(
-                    Notification.createFrom(kakaoUser));
+                kakaoUser = userRepository.save(
+                        User.fromKakaoUserWithPassword(kakaoUserInfo, password)
+                );
+                bagRepository.save(new Bag(kakaoUser));
+                // 회원가입 알림 메시지 저장
+                notificationRepository.save(
+                        Notification.createFrom(kakaoUser));
+            } else {
+                if ( kakaoUser.getReportCnt() >= 5 ){ // 신고 누적시 처리 진행
+                    throw new CustomException(BANNED_USER);
+                }
+            }
+            return kakaoUser;
         } else {
-            if ( kakaoUser.getReportCnt() >= 5 ){ // 신고 누적시 처리 진행
+            if ( signupUser.getReportCnt() >= 5 ){ // 신고 누적시 처리 진행
                 throw new CustomException(BANNED_USER);
             }
+            return signupUser;
         }
 
-        return kakaoUser;
     }
     // JWT 토큰 추출
     private String getJwtToken(User kakaoUser, String tokenType){

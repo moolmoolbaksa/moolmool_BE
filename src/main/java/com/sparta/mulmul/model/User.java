@@ -79,7 +79,7 @@ public class User {
         user.username = naverUserInfo.getEmail();
         user.nickname = naverUserInfo.getNickname();
         user.profile = naverUserInfo.getProfile();
-        user.kakaoId = naverUserInfo.getId();
+        user.naverId = naverUserInfo.getId();
         user.password = password;
 
         return user;
