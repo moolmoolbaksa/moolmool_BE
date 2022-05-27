@@ -51,6 +51,8 @@ public class Barter extends Timestamped {
 
     private LocalDateTime tradeTime;
 
+    @Version
+    private Long version;
 
     public void updateBarter(int status) {
         this.status = status;

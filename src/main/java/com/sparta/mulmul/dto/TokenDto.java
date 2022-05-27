@@ -9,7 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TokenDto {
 
-    private Boolean ok;
     private String accessToken;
     private String refreshToken;
     private Boolean isFirst;
@@ -18,7 +17,6 @@ public class TokenDto {
 
         TokenDto tokenDto = new TokenDto();
 
-        tokenDto.ok = true;
         if ( user.getAddress() == null ){ tokenDto.isFirst = true; }
         else { tokenDto.isFirst = false;}
         tokenDto.accessToken = accessToken;

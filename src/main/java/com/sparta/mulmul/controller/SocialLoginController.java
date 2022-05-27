@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.REFRESH_HEADER;
 
@@ -22,34 +25,37 @@ public class SocialLoginController {
     private final NaverUserService naverUserService;
 
     @GetMapping("/user/kakao")
-    public ResponseEntity<TokenDto> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
+    public ResponseEntity<Map<String, Boolean>> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
 
         TokenDto tokenDto = kakaoUserService.kakaoLogin(code);
         String token = tokenDto.getAccessToken();
-        tokenDto.setAccessToken(null);
-        // 토큰 추가 처리 필요
 
+        Map<String, Boolean> map = new HashMap<>();
+        map.put("ok", true);
+        map.put("isFirst", tokenDto.getIsFirst());
+
+        // 토큰 추가 처리 필요
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTH_HEADER, token);
         headers.add(REFRESH_HEADER, token);
 
-        System.out.println(token);
-
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .body(tokenDto);
+                .body(map);
     }
 
     @GetMapping("/user/naver")
-    public ResponseEntity<TokenDto> naverLogin(@RequestParam String code,
+    public ResponseEntity<Map<String, Boolean>> naverLogin(@RequestParam String code,
                                                @RequestParam String state) throws JsonProcessingException {
 
         TokenDto tokenDto = naverUserService.naverLogin(code, state);
         String token = tokenDto.getAccessToken();
-        tokenDto.setAccessToken(null);
-        // 토큰 추가 처리 필요
 
+        Map<String, Boolean> map = new HashMap<>();
+        map.put("ok", true);
+        map.put("isFirst", tokenDto.getIsFirst());
+        // 토큰 추가 처리 필요
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTH_HEADER, token);
         headers.add(REFRESH_HEADER, token);
@@ -57,7 +63,7 @@ public class SocialLoginController {
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .body(tokenDto);
+                .body(map);
     }
 
 }

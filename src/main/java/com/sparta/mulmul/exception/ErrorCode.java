@@ -55,8 +55,7 @@ public enum ErrorCode {
     INVALID_LENGTH_TOKEN(HttpStatus.BAD_REQUEST.value(), "L002", "유효하지 않은 토큰입니다. 토큰의 길이를 확인해 주세요."),
     DECODING_FAILED_TOKEN(HttpStatus.BAD_REQUEST.value(), "L003", "유효하지 않은 토큰입니다. 토큰 디코딩에 실패했습니다."),
     EXPIRATION_TOKEN(HttpStatus.BAD_REQUEST.value(), "L004", "만료된 토큰입니다."),
-    INVAILD_CONTENTS_TOKEN(HttpStatus.BAD_REQUEST.value(), "L005", "유효하지 않은 형식의 토큰입니다."),
-    REDUNDUNT_EMAIL(HttpStatus.BAD_REQUEST.value(), "L006", "이메일이 중복됩니다.");
+    INVAILD_CONTENTS_TOKEN(HttpStatus.BAD_REQUEST.value(), "L005", "유효하지 않은 형식의 토큰입니다.");
 
     private final int httpStatus;
     private final String code;

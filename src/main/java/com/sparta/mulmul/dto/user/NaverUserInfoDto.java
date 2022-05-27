@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class NaverUserInfoDto {
-    private Long id;
+    private String id;
     private String email;
     private String nickname;
     private String profile;
@@ -17,7 +17,7 @@ public class NaverUserInfoDto {
 
         NaverUserInfoDto naverUserInfoDto = new NaverUserInfoDto();
 
-        naverUserInfoDto.id = jsonNode.get("response").get("id").asLong();
+        naverUserInfoDto.id = jsonNode.get("response").get("id").asText();
         naverUserInfoDto.nickname = jsonNode.get("response").get("nickname").asText();
         try{
             naverUserInfoDto.profile = jsonNode.get("response").get("profile_image").asText();

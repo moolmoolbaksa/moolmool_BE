@@ -30,7 +30,7 @@ public class User {
     private Long kakaoId;
 
     @Column(unique = true)
-    private Long naverId;
+    private String naverId;
 
     private String address;
     private String profile = "http://kaihuastudio.com/common/img/default_profile.png";

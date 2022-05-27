@@ -117,7 +117,7 @@ public class NaverUserService {
         // 기존에 있는 이메일로 연결되게 구성합니다.
         if ( signupUser == null ){
             // DB 에 중복된 Naver Id 가 있는지 확인
-            Long naverId = naverUserInfo.getId();
+            String naverId = naverUserInfo.getId();
             User naverUser = userRepository.findByNaverId(naverId)
                     .orElse(null);
 
