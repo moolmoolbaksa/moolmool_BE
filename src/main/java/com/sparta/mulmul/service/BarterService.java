@@ -14,8 +14,9 @@ import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.support.IdTimestampMessageHeaderInitializer;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static com.sparta.mulmul.exception.ErrorCode.*;
 
+@CacheConfig
 @RequiredArgsConstructor
 @Service
 public class BarterService {
@@ -36,6 +38,7 @@ public class BarterService {
 
 
     // 성훈 - 거래내역서 보기
+    @Cacheable(cacheNames = "barterMyInfo", key = "#userDetails.userId")
     public List<BarterDto> showMyBarter(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new CustomException(NOT_FOUND_USER)

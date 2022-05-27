@@ -1,11 +1,10 @@
 package com.sparta.mulmul.controller;
 
+import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.barter.BarterDto;
 import com.sparta.mulmul.dto.barter.BarterStatusDto;
-import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.barter.BarterTradeCheckDto;
 import com.sparta.mulmul.dto.barter.EditRequestDto;
-import com.sparta.mulmul.dto.item.ItemRequestDto;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;

@@ -6,6 +6,7 @@ import com.sparta.mulmul.dto.item.ItemStarDto;
 import com.sparta.mulmul.repository.BarterRepository;
 import com.sparta.mulmul.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,6 +19,7 @@ public class ItemStarService {
     private final BarterRepository barterRepository;
 
 
+    @Cacheable(cacheNames = "hotItemInfo")
     public List<ItemStarDto> hotItem() {
         int status = 1;
 //        List<Barter> barterList = barterRepository.findAllByBarter(status);

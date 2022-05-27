@@ -16,6 +16,7 @@ import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class ScoreService {
 
 
     // 성훈 - 평가 페이지 보여주기
+    @Cacheable(cacheNames = "userScore", key = "#userDetails.userId")
     public OppentScoreResponseDto showOppentScore(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
 

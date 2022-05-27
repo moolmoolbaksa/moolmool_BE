@@ -14,6 +14,7 @@ import com.sparta.mulmul.repository.chat.ChatMessageRepository;
 import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -99,6 +100,7 @@ public class ChatRoomService {
     }
 
     // 사용자별 채팅방 전체 목록 가져오기
+    @Cacheable(cacheNames = "chatListInfo", key = "#userDetails.userId")
     public List<RoomResponseDto> getRooms(UserDetailsImpl userDetails){
         // 회원 찾기
         User user = userRepository.findById(userDetails.getUserId())
@@ -174,6 +176,7 @@ public class ChatRoomService {
     }
 
     // 차단 회원 불러오기
+    @Cacheable(cacheNames = "userBan")
     public List<BannedUserDto> getBanned(UserDetailsImpl userDetails){
         User user = userRepository
                 .findById(userDetails.getUserId())

@@ -59,6 +59,9 @@ dependencies {
     //querydsl 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+    //Caffeine
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 }
 
 tasks.named('test') {
@@ -72,7 +75,7 @@ querydsl {
     querydslSourcesDir = querydslDir
 }
 sourceSets { main.java.srcDir querydslDir }
-compileQuerydsl{ options.annotationProcessorPath = configurations.querydsl }
+compileQuerydsl { options.annotationProcessorPath = configurations.querydsl }
 
 configurations {
     compileOnly { extendsFrom annotationProcessor }

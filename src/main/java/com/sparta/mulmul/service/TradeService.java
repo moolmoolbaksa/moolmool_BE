@@ -16,6 +16,7 @@ import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,7 @@ public class TradeService {
     private final SimpMessageSendingOperations messagingTemplate;
 
     // 이승재 / 교환신청하기 전 정보
+    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId")
     public TradeInfoDto showTradeInfo(Long itemid, Long userId, UserDetailsImpl userDetails) {
         Long myBadId = bagRepository.findByUserId(userDetails.getUserId()).getId();
 
@@ -119,6 +121,7 @@ public class TradeService {
 
 
     // 이승재 교환신청 확인 페이지
+    @Cacheable(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId")
     public TradeDecisionDto tradeDecision(Long baterId, UserDetailsImpl userDetails) {
         Barter barter = barterRepository.findById(baterId).orElseThrow(
                 ()-> new CustomException(ErrorCode.NOT_FOUND_BARTER)

@@ -1,9 +1,12 @@
 package com.sparta.mulmul.controller;
 
-import com.sparta.mulmul.dto.*;
+import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.dto.item.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
-import com.sparta.mulmul.service.*;
+import com.sparta.mulmul.service.AwsS3Service;
+import com.sparta.mulmul.service.ItemService;
+import com.sparta.mulmul.service.ItemStarService;
+import com.sparta.mulmul.service.MyUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -110,7 +113,7 @@ public class ItemController {
 
     // 이승재 교환신청 확인 페이지
     @GetMapping("/api/items/star")
-    private List<ItemStarDto> hotItem(){
+    public List<ItemStarDto> hotItem(){
         return  itemStarService.hotItem();
     }
 }

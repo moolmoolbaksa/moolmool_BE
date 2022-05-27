@@ -2,10 +2,7 @@ package com.sparta.mulmul.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.mulmul.dto.barter.BarterHotItemListDto;
-import com.sparta.mulmul.dto.barter.BarterItemListDto;
-import com.sparta.mulmul.dto.barter.OpponentBarterDto;
-import com.sparta.mulmul.dto.barter.QBarterItemListDto;
+import com.sparta.mulmul.dto.barter.*;
 import com.sparta.mulmul.dto.item.ItemUserResponseDto;
 import com.sparta.mulmul.dto.item.QItemUserResponseDto;
 import com.sparta.mulmul.model.Item;
@@ -130,12 +127,11 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .where(item.id.eq(itemId))
                 .fetchOne();
     }
-
     // 떠로으는 거래
     @Override
     public BarterHotItemListDto findByHotBarterItems(Long itemId) {
         return queryFactory
-                .select(Projections.fields(BarterHotItemListDto.class,
+                .select(new QBarterHotItemListDto(
                         item.id,
                         item.title,
                         item.itemImg,

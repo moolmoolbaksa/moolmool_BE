@@ -8,6 +8,7 @@ import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -79,6 +80,7 @@ public class ItemService {
 
     }
     //이승재 / 전체 아이템 조회(카테고리별)
+    @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")
     public ItemMainResponseDto getItems(int pageNo, String category, UserDetailsImpl userDetails) {
         Pageable pageable = getPageable(pageNo);
         if(category.isEmpty()){
@@ -182,6 +184,7 @@ public class ItemService {
     }
     // 이승재 / 아이템 상세페이지
     @Transactional
+    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId")
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new IllegalArgumentException("아이템이 없습니다.")
@@ -428,6 +431,7 @@ public class ItemService {
 
 
     // 이승재 / 아이템 검색
+    @Cacheable(cacheNames = "itemSearchInfo", key = "#userDetails.userId")
     public List<ItemResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
         List<Item> itemList = itemRepository.searchByKeyword(keyword);
         List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
