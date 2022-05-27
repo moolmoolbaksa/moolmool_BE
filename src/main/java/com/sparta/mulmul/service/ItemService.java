@@ -36,9 +36,17 @@ public class ItemService {
 
     // 이승재 / 보따리 아이템 등록하기
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
-//        Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
-//        List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
-//        if(itemList.size())
+        Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
+        List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
+        int itemCnt = 0;
+        for(Item item : itemList){
+            if(item.getStatus() == 0 || item.getStatus() == 1 || item.getStatus() ==2){
+                itemCnt++;
+            }
+        }
+        if(itemCnt>=9){
+            return 0L;
+        }
         List<String> imgUrlList = itemRequestDto.getImgUrl();
         List<String> favoredList = itemRequestDto.getFavored();
         String imgUrl = String.join(",", imgUrlList);
@@ -52,8 +60,7 @@ public class ItemService {
                     () -> new CustomException(NOT_FOUND_USER)
             );
 
-            // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +1
-            Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
+            // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +
             bag.update(bag.getItemCnt() + 1);
 
 
@@ -91,8 +98,14 @@ public class ItemService {
                     int scrabCnt = scrabs.size();
                     // 거리 계산
                     String distance = getDistance(userDetails, item);
+
+                    User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
+                            () -> new CustomException(NOT_FOUND_USER)
+                    );
+                    String nickname = user.getNickname();
                     ItemResponseDto itemResponseDto = new ItemResponseDto(
                             item.getId(),
+                            nickname,
                             item.getCategory(),
                             item.getTitle(),
                             item.getContents(),
@@ -117,8 +130,14 @@ public class ItemService {
                 int scrabCnt = scrabs.size();
                 // 거리 계산
                 String distance = getDistance(userDetails, item);
+
+                User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
+                     () -> new CustomException(NOT_FOUND_USER)
+                );
+                 String nickname = user.getNickname();
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
                         itemId,
+                        nickname,
                         item.getCategory(),
                         item.getTitle(),
                         item.getContents(),
@@ -163,19 +182,19 @@ public class ItemService {
     }
 
 
-    private List<DetailPageBagDto> getBagInfos(Item item) {
-        List<Item> userItemList = itemRepository.findAllByBagId(item.getBag().getId());
-        List<DetailPageBagDto> bagInfos = new ArrayList<>();
-        for (Item item1 : userItemList) {
-            if (item1.getId() != item.getId()) {
-                String bagImg = item1.getItemImg().split(",")[0];
-                Long bagItemId = item1.getId();
-                DetailPageBagDto detailPageBagDto = new DetailPageBagDto(bagImg, bagItemId);
-                bagInfos.add(detailPageBagDto);
-            }
-        }
-        return bagInfos;
-    }
+//    private List<DetailPageBagDto> getBagInfos(Item item) {
+//        List<Item> userItemList = itemRepository.findAllByBagId(item.getBag().getId());
+//        List<DetailPageBagDto> bagInfos = new ArrayList<>();
+//        for (Item item1 : userItemList) {
+//            if (item1.getId() != item.getId()) {
+//                String bagImg = item1.getItemImg().split(",")[0];
+//                Long bagItemId = item1.getId();
+//                DetailPageBagDto detailPageBagDto = new DetailPageBagDto(bagImg, bagItemId);
+//                bagInfos.add(detailPageBagDto);
+//            }
+//        }
+//        return bagInfos;
+//    }
     // 이승재 / 아이템 상세페이지
     @Transactional
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
@@ -184,7 +203,7 @@ public class ItemService {
         );
         // 아이템에 해당하는 보따리에 담겨있는 모든 아이템 이미지 가져오기
 
-        List<DetailPageBagDto> bagInfos = getBagInfos(item);
+//        List<DetailPageBagDto> bagInfos = getBagInfos(item);
 
         // 이승재 / 아이템 조회수 계산
         int viewCnt = item.getViewCnt();
@@ -245,7 +264,6 @@ public class ItemService {
                 item.getStatus(),
                 item.getCategory(),
                 itemImgList,
-                bagInfos,
                 item.getTitle(),
                 item.getContents(),
                 distance,
@@ -429,9 +447,9 @@ public class ItemService {
 
 
     // 이승재 / 아이템 검색
-    public List<ItemResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
+    public List<ItemSearchResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
         List<Item> itemList = itemRepository.searchByKeyword(keyword);
-        List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
+        List<ItemSearchResponseDto> itemResponseDtos = new ArrayList<>();
         Long userId = userDetails.getUserId();
         for(Item item : itemList){
             if(item.getStatus() ==1 || item.getStatus() == 0){
@@ -448,7 +466,7 @@ public class ItemService {
                         scrabCnt++;
                     }
                 }
-                ItemResponseDto itemResponseDto = new ItemResponseDto(
+                ItemSearchResponseDto itemSearchResponseDto = new ItemSearchResponseDto(
                         item.getId(),
                         item.getCategory(),
                         item.getTitle(),
@@ -459,7 +477,7 @@ public class ItemService {
                         item.getViewCnt(),
                         item.getStatus(),
                         isScrab);
-                itemResponseDtos.add(itemResponseDto);
+                itemResponseDtos.add(itemSearchResponseDto);
             }
         }
         return itemResponseDtos;

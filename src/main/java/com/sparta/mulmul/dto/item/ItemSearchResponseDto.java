@@ -2,13 +2,10 @@ package com.sparta.mulmul.dto.item;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class ItemResponseDto {
+public class ItemSearchResponseDto {
     private Long itemId;
     private String nickname;
     private String categroy;
@@ -21,10 +18,8 @@ public class ItemResponseDto {
     private int status;
     private boolean isScrab;
 
-
-    // 이승재 / 전체 아이템 조회(카테고리별)
-    public ItemResponseDto(Long itemId,
-                           String nickname,
+    // 이승재 / 아이템 검색
+    public ItemSearchResponseDto(Long itemId,
                            String categroy,
                            String title,
                            String contents,
@@ -32,10 +27,9 @@ public class ItemResponseDto {
                            String address,
                            int scrabCnt,
                            int viewCnt,
-                           int status
-) {
+                           int status,
+                           boolean isScrab) {
         this.itemId = itemId;
-        this.nickname = nickname;
         this.categroy = categroy;
         this.title = title;
         this.contents = contents;
@@ -44,9 +38,6 @@ public class ItemResponseDto {
         this.scrabCnt = scrabCnt;
         this.viewCnt = viewCnt;
         this.status = status;
+        this.isScrab = isScrab;
     }
-
-
 }
-
-

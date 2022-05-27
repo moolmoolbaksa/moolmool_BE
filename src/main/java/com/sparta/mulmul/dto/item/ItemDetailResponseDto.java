@@ -22,7 +22,6 @@ public class ItemDetailResponseDto {
     private int status;
     private String category;
     private List<String> images;
-    private List<DetailPageBagDto> bagInfos;
     private String  title;
     private String contents;
     private String address;
@@ -46,7 +45,6 @@ public class ItemDetailResponseDto {
                            int status,
                            String category,
                            List<String> itemImgList,
-                           List<DetailPageBagDto> bagInfos,
                            String title,
                            String contents,
                            String address,
@@ -67,7 +65,6 @@ public class ItemDetailResponseDto {
         this.status = status;
         this.category = category;
         this.images = itemImgList;
-        this.bagInfos = bagInfos;
         this.title = title;
         this.contents = contents;
         this.address =address;

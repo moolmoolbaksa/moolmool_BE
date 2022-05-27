@@ -104,7 +104,7 @@ public class ItemController {
 
     // 이승재 아이템 검색하기
     @GetMapping("/api/item/search")
-    private List<ItemResponseDto> searchItem(@RequestParam String keyword, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    private List<ItemSearchResponseDto> searchItem(@RequestParam String keyword, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return itemService.searchItem(keyword, userDetails);
     }
 
