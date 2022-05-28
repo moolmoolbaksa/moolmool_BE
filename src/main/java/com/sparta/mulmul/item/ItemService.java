@@ -204,7 +204,7 @@ public class ItemService {
 
     // 이승재 / 아이템 상세페이지
     @Transactional
-//    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId")
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_ITEM)
