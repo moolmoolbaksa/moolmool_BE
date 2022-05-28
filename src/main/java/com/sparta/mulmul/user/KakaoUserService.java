@@ -43,8 +43,7 @@ public class KakaoUserService {
         User kakaoUser = registerUserIfNeeded(kakaoUserInfo);
         // 토큰 Dto 만들기
         return TokenDto.createOf(
-                getJwtToken(kakaoUser, ACCESS_TOKEN),
-                getJwtToken(kakaoUser, REFRESH_TOKEN),
+                getJwtToken(kakaoUser),
                 kakaoUser
         );
     }
@@ -126,9 +125,9 @@ public class KakaoUserService {
 
     }
     // JWT 토큰 추출
-    private String getJwtToken(User kakaoUser, String tokenType){
+    private String getJwtToken(User kakaoUser){
         return TOKEN_TYPE + " " + generateJwtToken(
-                UserDetailsImpl.fromUser(kakaoUser), tokenType
+                UserDetailsImpl.fromUser(kakaoUser)
         );
     }
 }

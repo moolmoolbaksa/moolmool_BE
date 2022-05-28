@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
-import static com.sparta.mulmul.security.RestLoginSuccessHandler.REFRESH_HEADER;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class SocialLoginController {
     public ResponseEntity<Map<String, Boolean>> kakaoLogin(@RequestParam String code) throws JsonProcessingException {
 
         TokenDto tokenDto = kakaoUserService.kakaoLogin(code);
-        String token = tokenDto.getAccessToken();
+        String token = tokenDto.getToken();
 
         Map<String, Boolean> map = new HashMap<>();
         map.put("ok", true);
@@ -34,7 +33,6 @@ public class SocialLoginController {
         // 토큰 추가 처리 필요
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTH_HEADER, token);
-        headers.add(REFRESH_HEADER, token);
 
         return ResponseEntity
                 .ok()

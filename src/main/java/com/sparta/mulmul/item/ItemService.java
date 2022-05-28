@@ -1,6 +1,6 @@
 package com.sparta.mulmul.item;
-import com.sparta.mulmul.barter.Barter;
 import com.sparta.mulmul.barter.BarterRepository;
+import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.itemDto.*;
