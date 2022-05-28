@@ -51,6 +51,8 @@ public class Barter extends Timestamped {
 
     private LocalDateTime tradeTime;
 
+    @Version
+    private Long version;
 
     @Version // 추가
     private Long version;

@@ -24,14 +24,14 @@ public class JwtDecoder {
         DecodedJWT decodedJWT = isValidToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유효한 토큰이 아닙니다."));
 
-        Date expiredDate = decodedJWT
-                .getClaim(CLAIM_EXPIRED_DATE)
-                .asDate();
-
-        Date now = new Date();
-        if (expiredDate.before(now)) {
-            throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
-        }
+//        Date expiredDate = decodedJWT
+//                .getClaim(CLAIM_EXPIRED_DATE)
+//                .asDate();
+//
+//        Date now = new Date();
+//        if (expiredDate.before(now)) {
+//            throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
+//        }
 
         return decodedJWT
                 .getClaim(CLAIM_NICK_NAME)
@@ -43,14 +43,14 @@ public class JwtDecoder {
         DecodedJWT decodedJWT = isValidToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유효한 토큰이 아닙니다."));
 
-        Date expiredDate = decodedJWT
-                .getClaim(CLAIM_EXPIRED_DATE)
-                .asDate();
-
-        Date now = new Date();
-        if (expiredDate.before(now)) {
-            throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
-        }
+//        Date expiredDate = decodedJWT
+//                .getClaim(CLAIM_EXPIRED_DATE)
+//                .asDate();
+//
+//        Date now = new Date();
+//        if (expiredDate.before(now)) {
+//            throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
+//        }
 
         return decodedJWT
                 .getClaim(CLAIM_USER_ID)
@@ -73,5 +73,21 @@ public class JwtDecoder {
         }
 
         return Optional.ofNullable(jwt);
+    }
+
+    public void expirationCheck(String token) {
+
+        DecodedJWT decodedJWT = isValidToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유효한 토큰이 아닙니다."));
+
+        Date expiredDate = decodedJWT
+                .getClaim(CLAIM_EXPIRED_DATE)
+                .asDate();
+
+        Date now = new Date();
+        if (expiredDate.before(now)) {
+            throw new IllegalArgumentException("유효한 토큰이 아닙니다.");
+        }
+
     }
 }
