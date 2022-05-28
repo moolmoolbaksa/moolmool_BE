@@ -3,15 +3,10 @@ package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.user.UserCheckResponseDto;
 import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.exception.CustomException;
-import com.sparta.mulmul.exception.ErrorCode;
-import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.User;
-import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

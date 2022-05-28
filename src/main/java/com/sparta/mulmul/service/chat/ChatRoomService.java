@@ -41,7 +41,7 @@ public class ChatRoomService {
         // 유효성 검사
         Long acceptorId = requestDto.getUserId();
         if ( userDetails.getUserId() == acceptorId ) {
-            throw new IllegalArgumentException("ChatRoomService: createRoom) 채팅 대상은 자기자신이 될 수 없습니다.");
+            throw new CustomException(CANNOT_CHAT_WITH_ME);
         }
         // 채팅 상대 찾아오기
         User acceptor = userRepository.findById(acceptorId)

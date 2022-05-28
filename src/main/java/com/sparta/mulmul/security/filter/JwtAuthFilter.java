@@ -1,7 +1,6 @@
 package com.sparta.mulmul.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.exception.ResponseError;

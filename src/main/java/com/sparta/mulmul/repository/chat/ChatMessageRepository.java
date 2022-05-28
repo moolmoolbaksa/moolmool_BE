@@ -1,33 +1,17 @@
 package com.sparta.mulmul.repository.chat;
 
 import com.sparta.mulmul.model.ChatMessage;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.util.List;
 
-import java.util.Optional;
 
-public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>, MessageQuerydsl {
+public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
     List<ChatMessage> findAllByRoomIdOrderByIdDesc(Long roomId);
-
-    Slice<ChatMessage> findAllByRoomIdOrderByIdDesc(Long roomId, Pageable page);
-
-    // 그룹에서 가장 최근의 메시지를 찾아오는 쿼리문을 작성해 보도록 합니다.
-    Optional<ChatMessage> findFirstByRoomIdOrderByIdDesc(Long roomID);
-
-    // 내가 요청받은 채팅방
-    @Query("SELECT cm FROM ChatMessage cm WHERE cm.senderId =:userId AND cm.roomId =:roomId")
-    List<ChatMessage> findMyChatMessage(@Param("userId") Long userId, @Param("roomId") Long roomId);
-
-    // 내가 요청받은 채팅방
-    Optional<ChatMessage> findFirstBySenderIdAndRoomId(Long userId, Long roomID);
 
     // 메시지 안읽은 갯수 카운트 쿼리
     @Query("SELECT count(msg) FROM ChatMessage msg WHERE msg.senderId =:userId AND msg.roomId =:roomId AND msg.isRead = false")
@@ -39,12 +23,4 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>,
     @Query("UPDATE ChatMessage msg SET msg.isRead = true WHERE msg.roomId = :roomId AND msg.senderId <> :userId AND msg.isRead = false")
     void updateChatMessage(Long roomId, Long userId);
 
-    // 최근 메시지 가져오기
-    @Query(value =
-            "SELECT * FROM chat_message " +
-                    "WHERE (room_id, message_id) IN (SELECT room_id, MAX(message_id) FROM chat_message " +
-            "GROUP BY room_id " +
-            "HAVING room_id IN :roomIds)",
-            nativeQuery = true)
-    List<ChatMessage> findFirstByRoomIds(@Param("roomIds") List<Long> roomIds);
 }

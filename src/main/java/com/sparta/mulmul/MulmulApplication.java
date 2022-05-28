@@ -31,9 +31,6 @@ public class MulmulApplication {
         return p -> p.setOneIndexedParameters(true);
     }
 
-    @PersistenceContext
-    EntityManager em;
-
     static { System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true"); }
 
 }

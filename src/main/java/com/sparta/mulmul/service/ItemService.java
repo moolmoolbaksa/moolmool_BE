@@ -3,7 +3,6 @@ import com.sparta.mulmul.dto.NotificationType;
 import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import com.sparta.mulmul.dto.item.*;
 import com.sparta.mulmul.exception.CustomException;
-import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;

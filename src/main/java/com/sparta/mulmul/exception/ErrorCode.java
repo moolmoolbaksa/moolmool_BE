@@ -19,6 +19,7 @@ public enum ErrorCode {
     ALREADY_BANNED(HttpStatus.BAD_REQUEST.value(), "C004", "이미 차단한 회원입니다."),
     NOT_FOUND_REQUESTER(HttpStatus.NOT_FOUND.value(), "C005", "차단을 요청한 회원을 찾을 수 없습니다."),
     EXIT_INVAILED(HttpStatus.BAD_REQUEST.value(), "C006", "'나가기'는 채팅방에 존재하는 회원만 접근 가능한 서비스입니다."),
+    CANNOT_CHAT_WITH_ME(HttpStatus.BAD_REQUEST.value(), "C006", "나 자신은 채팅의 대상이 될 수 없습니다."),
 
     // FILE
     FILE_INVAILED(HttpStatus.BAD_REQUEST.value(), "F001", "잘못된 파일 형식입니다."),
