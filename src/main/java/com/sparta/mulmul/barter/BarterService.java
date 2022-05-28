@@ -2,19 +2,17 @@ package com.sparta.mulmul.barter;
 
 import com.sparta.mulmul.barter.barterDto.*;
 import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
-import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.Item;
 import com.sparta.mulmul.websocket.Notification;
 import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.item.ItemRepository;
-import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sparta.mulmul.exception.ErrorCode.*;
+import static com.sparta.mulmul.websocket.chatDto.NotificationType.BARTER;
 
 @CacheConfig
 @RequiredArgsConstructor
@@ -75,15 +74,15 @@ public class BarterService {
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = user.getId();
-        Barter mybarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
+        Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
         // 거래중인 상태가 아니면 예외처리
-        if (mybarter.getStatus() == 1 || mybarter.getStatus() == 2) {
+        if (myBarter.getStatus() == 1 || myBarter.getStatus() == 2) {
             // 거래외 사람이 취소를 할 경우
-            if (!mybarter.getBuyerId().equals(userId) && !mybarter.getSellerId().equals(userId)) {
+            if (!myBarter.getBuyerId().equals(userId) && !myBarter.getSellerId().equals(userId)) {
                 throw new CustomException(NOT_FOUND_BARTER);
             }
 
-            String[] barterIdList = mybarter.getBarter().split(";");
+            String[] barterIdList = myBarter.getBarter().split(";");
             String[] buyerItemId = barterIdList[0].split(",");
             String sellerItemId = barterIdList[1];
 
@@ -91,7 +90,25 @@ public class BarterService {
             updateStatus(buyerItemId, sellerItemId);
             // 거래내역 삭제
             barterRepository.deleteById(barterId);
-            notificationRepository.deleteByChangeIdAndType(barterId, NotificationType.BARTER);
+            notificationRepository.deleteByChangeIdAndType(barterId, BARTER);
+
+            String myPosition;
+            if (myBarter.getBuyerId().equals(userId)) {
+                myPosition = "buyer";
+                // 유저가 셀러라면 셀러거래완료를 true로 변경한다.
+            } else {
+                myPosition = "seller";
+            }
+
+            // 거래취소시 저장된 알림도 삭제된다.
+            List<Notification> notificationCeck;
+            if (myPosition.equals("buyer")){
+                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getSellerId(),barterId);
+                notificationRepository.deleteAll(notificationCeck);
+            } else {
+                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getBuyerId(),barterId);
+                notificationRepository.deleteAll(notificationCeck);
+            }
         } else {
             throw new CustomException(NOT_FOUND_BARTER);
         }
@@ -212,10 +229,25 @@ public class BarterService {
             sendMyMessage(barterId, myBarter, myPosition);
             return new BarterStatusDto(opponentTrade, false, myBarter.getStatus());
         } else {
-            // 알림 내역 저장
-            Notification notification = notificationRepository.save(Notification.createOfBarter(myBarter, user.getNickname(), myPosition, "Barter"));
-            // 상대방의 sup주소로 전송
-            sendTradeMessage(myBarter, myPosition, notification);
+            List<Notification> notificationCeck;
+            if (myPosition.equals("buyer")){
+                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getSellerId(),barterId);
+            } else {
+                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getBuyerId(),barterId);
+            }
+
+            // 이미 저장된 알람이면 스톰프 메시지만 보낸다.
+            if (notificationCeck.size() >= 1){
+                 for (Notification notification : notificationCeck){
+                    sendTradeMessage(myBarter, myPosition, notification);
+                }
+            } else {
+                // 알림 내역 저장
+                Notification notification = notificationRepository.save(Notification.createOfBarter(myBarter, user.getNickname(), myPosition, "Barter"));
+                // 상대방의 sup주소로 전송
+                sendTradeMessage(myBarter, myPosition, notification);
+            }
+
             // 내게 거래완료 메시지 보내기
             sendMyMessage(barterId, myBarter, myPosition);
             return new BarterStatusDto(opponentTrade, false, myBarter.getStatus());

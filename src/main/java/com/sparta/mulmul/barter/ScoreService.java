@@ -1,6 +1,7 @@
 package com.sparta.mulmul.barter;
 
 import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
 import com.sparta.mulmul.barter.barterDto.BarterStatusDto;
 import com.sparta.mulmul.barter.barterDto.MyBarterScorDto;
@@ -11,7 +12,6 @@ import com.sparta.mulmul.item.Item;
 import com.sparta.mulmul.websocket.Notification;
 import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.item.ItemRepository;
-import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;

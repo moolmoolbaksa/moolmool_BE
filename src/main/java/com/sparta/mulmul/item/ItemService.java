@@ -1,6 +1,7 @@
 package com.sparta.mulmul.item;
 import com.sparta.mulmul.barter.BarterRepository;
 import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.itemDto.*;
@@ -11,9 +12,7 @@ import com.sparta.mulmul.user.Bag;
 import com.sparta.mulmul.user.BagRepository;
 import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.user.UserRepository;
-import com.sparta.mulmul.websocket.NotificationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
