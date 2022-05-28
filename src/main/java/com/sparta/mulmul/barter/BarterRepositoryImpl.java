@@ -3,7 +3,6 @@ package com.sparta.mulmul.barter;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.mulmul.barter.barterDto.HotBarterDto;
 import com.sparta.mulmul.barter.barterDto.QHotBarterDto;
-import com.sparta.mulmul.model.QBarter;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
