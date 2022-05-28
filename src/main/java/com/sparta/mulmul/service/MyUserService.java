@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sparta.mulmul.exception.ErrorCode.NOT_FOUND_USER;
+import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +88,7 @@ public class MyUserService {
     @Transactional
     public UserEditResponseDto editMyPage(String nickname, String address, String
             storeInfo, String imgUrl, UserDetailsImpl userDetails) {
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new IllegalArgumentException("user not found"));
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 유저 정보 수정
         updateInfo(nickname, address, storeInfo, imgUrl, user);
         // 수정된 정보를 Response하기위해 정보를 넣어 줌
@@ -112,7 +112,7 @@ public class MyUserService {
         for (Scrab scrab : scrabList) {
             if (scrab.getScrab().equals(true)) {
                 Item item = itemRepository.findById(scrab.getItemId()).orElseThrow(
-                        () -> new IllegalArgumentException("아이템 정보가 없습니다.")
+                        () -> new CustomException(NOT_FOUND_ITEM)
                 );
                 Long itemId = item.getId();
                 String title = item.getTitle();
@@ -131,7 +131,7 @@ public class MyUserService {
     @Cacheable(cacheNames = "anotherUserProfile")
     public UserStoreResponseDto showStore(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalArgumentException("유저 정보가 없습니다.")
+                () -> new CustomException(NOT_FOUND_USER)
         );
         String nickname = user.getNickname();
         String profile = user.getProfile();
@@ -165,7 +165,7 @@ public class MyUserService {
             return "false";
         } else {
             User user = userRepository.findById(userId).orElseThrow(
-                    () -> new IllegalArgumentException("유저 정보가 없습니다.")
+                    () -> new CustomException(NOT_FOUND_USER)
             );
             int reportCnt = user.getReportCnt();
 

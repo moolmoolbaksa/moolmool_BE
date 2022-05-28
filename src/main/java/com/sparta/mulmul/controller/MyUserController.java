@@ -27,13 +27,13 @@ public class MyUserController {
     // 아래에서 부터 주어지는 return 값은 논의 후 한 가지 방법으로 바뀔 수 있습니다.
 
     /*성훈 - 마이페이지 내 정보 보기*/
-    @GetMapping("/api/mypage")
+    @GetMapping("/user/mypage")
     public MyPageResponseDto showMyPageage(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return myUserService.showMyPage(userDetails);
     }
 
     /*성훈 - 마이페이지 내 정보 수정*/
-    @PostMapping("/api/mypage")
+    @PostMapping("/user/mypage")
     public UserEditResponseDto showMyPageage(@RequestParam(value = "nickname", required = false) String nickname,
                                              @RequestParam(value = "profile", required = false) MultipartFile multipartFile,
                                              @RequestParam(value = "address", required = false) String address,

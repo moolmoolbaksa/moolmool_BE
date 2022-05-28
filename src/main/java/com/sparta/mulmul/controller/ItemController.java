@@ -112,7 +112,7 @@ public class ItemController {
     }
 
     // 이승재 교환신청 확인 페이지
-    @GetMapping("/api/items/star")
+    @GetMapping("/items/star")
     public List<ItemStarDto> hotItem(){
         return  itemStarService.hotItem();
     }
