@@ -13,6 +13,9 @@ import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +39,7 @@ public class BarterService {
 
 
     // 성훈 - 거래내역서 보기
-//    @Cacheable(cacheNames = "barterMyInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "barterMyInfo", key = "#userDetails.userId")
     public List<BarterDto> showMyBarter(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new CustomException(NOT_FOUND_USER)
@@ -53,6 +56,9 @@ public class BarterService {
 
     // 엄성훈 - 거래완료취소 유저의 isTrade를 true -> false 업데이트
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public BarterTradeCheckDto cancelBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
@@ -71,6 +77,10 @@ public class BarterService {
 
     // 교환신청 취소 물건상태 2(교환중) -> 0(물품등록한 상태), 거래내역 삭제
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = user.getId();
@@ -102,11 +112,11 @@ public class BarterService {
 
             // 거래취소시 저장된 알림도 삭제된다.
             List<Notification> notificationCeck;
-            if (myPosition.equals("buyer")){
-                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getSellerId(),barterId);
+            if (myPosition.equals("buyer")) {
+                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getSellerId(), barterId);
                 notificationRepository.deleteAll(notificationCeck);
             } else {
-                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getBuyerId(),barterId);
+                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getBuyerId(), barterId);
                 notificationRepository.deleteAll(notificationCeck);
             }
         } else {
@@ -116,6 +126,9 @@ public class BarterService {
 
     // 성훈 - 거래 완료
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true)})
     public BarterStatusDto okayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 거래내역을 조회한다.
@@ -157,6 +170,10 @@ public class BarterService {
 
     // 거래내역 수정하기
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public void editBarter(EditRequestDto editRequestDto, UserDetailsImpl userDetails) {
         // 수정할 거래내역 찾기
         Barter barter = barterRepository.findById(editRequestDto.getBarterId()).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
@@ -230,15 +247,15 @@ public class BarterService {
             return new BarterStatusDto(opponentTrade, false, myBarter.getStatus());
         } else {
             List<Notification> notificationCeck;
-            if (myPosition.equals("buyer")){
-                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getSellerId(),barterId);
+            if (myPosition.equals("buyer")) {
+                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getSellerId(), barterId);
             } else {
-                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getBuyerId(),barterId);
+                notificationCeck = notificationRepository.findAllByUserIdAndChangeId(myBarter.getBuyerId(), barterId);
             }
 
             // 이미 저장된 알람이면 스톰프 메시지만 보낸다.
-            if (notificationCeck.size() >= 1){
-                 for (Notification notification : notificationCeck){
+            if (notificationCeck.size() >= 1) {
+                for (Notification notification : notificationCeck) {
                     sendTradeMessage(myBarter, myPosition, notification);
                 }
             } else {

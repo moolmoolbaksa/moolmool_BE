@@ -26,7 +26,7 @@ public enum CacheType {
     SCRAB_ITEM_INFO("scrabItemInfo", 10, 10000),
 
 
-    BARTER_My_INFO("barterMyInfo", 5, 10000),
+    BARTER_MY_INFO("barterMyInfo", 5, 10000),
     BARTER_INFO("barterInfo", 5, 10000);
 
 

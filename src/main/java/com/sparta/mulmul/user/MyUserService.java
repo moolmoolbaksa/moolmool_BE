@@ -16,6 +16,7 @@ import com.sparta.mulmul.item.Scrab;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -40,19 +41,17 @@ public class MyUserService {
 
     // 성훈_마이페이지_내 정보보기
     @Transactional
-//    @Cacheable(cacheNames = "userProfile", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "userProfile", key = "#userDetails.userId")
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = userDetails.getUserId();
 
         // 한 유저의 모든 아이템을 보여줌
-//        List<Item> myItemList = itemRepository.findAllMyItem(userId);
         List<ItemUserResponseDto> myItemList = itemRepository.findByMyPageItems(userId);
         // 한 유저의 모든 아이템을 보여줌
         List<ItemUserResponseDto> myItemResponseList = addItemList(myItemList);
 
         // 스크랩 정도 넣어주기
-//        List<Scrab> myScrabList = scrabRepository.findTop3ByUserIdAndScrabOrderByModifiedAtDesc(userId, true);
         List<ItemUserResponseDto> myScrabList = itemRepository.findByMyScrabItems(userId);
         // 스크랩 정도 넣어주기
         List<ItemUserResponseDto> myScrapItemList = addItemList(myScrabList);
@@ -70,7 +69,7 @@ public class MyUserService {
         );
     }
 
-    //
+    // 이미지 파싱 대표이미지럴 넣어준다
     private List<ItemUserResponseDto> addItemList(List<ItemUserResponseDto> ItemList) {
         List<ItemUserResponseDto> myItemList = new ArrayList<>();
 
@@ -88,6 +87,7 @@ public class MyUserService {
 
     // 성훈_마이페이지_내 정보수정
     @Transactional
+    @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true)
     public UserEditResponseDto editMyPage(String nickname, String address, String
             storeInfo, String imgUrl, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));

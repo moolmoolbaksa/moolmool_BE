@@ -1,18 +1,24 @@
 package com.sparta.mulmul.item;
+
 import com.sparta.mulmul.barter.BarterRepository;
-import com.sparta.mulmul.model.Barter;
-import com.sparta.mulmul.websocket.NotificationRepository;
-import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.itemDto.*;
-import com.sparta.mulmul.model.*;
-import com.sparta.mulmul.repository.*;
+import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.model.Location;
+import com.sparta.mulmul.model.Report;
+import com.sparta.mulmul.repository.LocationRepository;
+import com.sparta.mulmul.repository.ReportRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.user.Bag;
 import com.sparta.mulmul.user.BagRepository;
 import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.user.UserRepository;
+import com.sparta.mulmul.websocket.NotificationRepository;
+import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +46,9 @@ public class ItemService {
     private final NotificationRepository notificationRepository;
 
     // 이승재 / 보따리 아이템 등록하기
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
         List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
@@ -91,7 +100,7 @@ public class ItemService {
 
     }
     //이승재 / 전체 아이템 조회(카테고리별)
-//    @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")
     public ItemMainResponseDto getItems(int page, String category, UserDetailsImpl userDetails) {
         Pageable pageable = getPageable(page);
         if(category.isEmpty()){
@@ -321,6 +330,9 @@ public class ItemService {
 
     // 이승재 / 아이템 구독하기
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
         Long userId = userDetails.getUserId();
@@ -357,6 +369,9 @@ public class ItemService {
 
     // 이승재 / 아이템 수정
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public void updateItem(ItemUpdateRequestDto itemUpdateRequestDto, UserDetailsImpl userDetails, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_ITEM)
@@ -381,6 +396,9 @@ public class ItemService {
 
     // 이승재 / 아이템 삭제
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_ITEM)
@@ -413,6 +431,8 @@ public class ItemService {
 
     // 이승재 / 아이템 신고하기
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public String reportItem(Long itemId, UserDetailsImpl userDetails) {
         Optional<Report> findReport = reportRepository.findByReporterIdAndReportedItemId(userDetails.getUserId(), itemId);
         if (findReport.isPresent()){

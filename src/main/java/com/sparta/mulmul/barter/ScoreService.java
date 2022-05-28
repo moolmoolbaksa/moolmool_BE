@@ -16,6 +16,7 @@ import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -136,6 +137,7 @@ public class ScoreService {
 
     // 성훈 - 상대 평점주기
     @Transactional
+    @CacheEvict(cacheNames = "userScore", key = "#userDetails.userId", allEntries = true)
     public BarterStatusDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 상대 userId
@@ -174,10 +176,6 @@ public class ScoreService {
         String[] buyerItemId = barterIdList[0].split(",");
         String sellerItemId = barterIdList[1];
 
-//        int viewBonusCntB = 0;
-//        int viewBonusCntS = 0;
-//        int scrabBonusCntB = 0;
-//        int scrabBonusCntS = 0;
         int status = 4;
         // 내 포지션 확인
         String myPosition;
