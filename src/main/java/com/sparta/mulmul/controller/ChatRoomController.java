@@ -2,15 +2,13 @@ package com.sparta.mulmul.controller;
 
 import com.sparta.mulmul.dto.BannedUserDto;
 import com.sparta.mulmul.dto.OkDto;
-import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.dto.chat.MessageResponseDto;
 import com.sparta.mulmul.dto.chat.RoomResponseDto;
+import com.sparta.mulmul.dto.user.UserRequestDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.service.chat.ChatMessageService;
 import com.sparta.mulmul.service.chat.ChatRoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

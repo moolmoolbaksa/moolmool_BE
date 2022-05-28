@@ -54,6 +54,10 @@ public class Barter extends Timestamped {
     @Version
     private Long version;
 
+    @Version // 추가
+    private Long version;
+
+
     public void updateBarter(int status) {
         this.status = status;
     }

@@ -6,6 +6,7 @@ import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -84,6 +85,7 @@ public class ItemService {
 
     }
     //이승재 / 전체 아이템 조회(카테고리별)
+    @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")
     public ItemMainResponseDto getItems(int page, String category, UserDetailsImpl userDetails) {
         Pageable pageable = getPageable(page);
         if(category.isEmpty()){
@@ -187,6 +189,7 @@ public class ItemService {
 
     // 이승재 / 아이템 상세페이지
     @Transactional
+    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId")
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_ITEM)
@@ -209,7 +212,7 @@ public class ItemService {
         for(int i = 0; i<item.getItemImg().split(",").length; i++){
             itemImgList.add(item.getItemImg().split(",")[i]);
         }
-        
+
         // 구독 개수 계산
         List<Scrab> scrabs = scrabRepository.findAllItemById(itemId);
         int scrabCnt = scrabs.size();
@@ -434,6 +437,7 @@ public class ItemService {
 
 
     // 이승재 / 아이템 검색
+    @Cacheable(cacheNames = "itemSearchInfo", key = "#userDetails.userId")
     public List<ItemSearchResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
         List<Item> itemList = itemRepository.searchByKeyword(keyword);
         List<ItemSearchResponseDto> itemResponseDtos = new ArrayList<>();

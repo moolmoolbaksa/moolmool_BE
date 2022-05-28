@@ -127,7 +127,6 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .where(item.id.eq(itemId))
                 .fetchOne();
     }
-
     // 떠로으는 거래
     @Override
     public BarterHotItemListDto findByHotBarterItems(Long itemId) {

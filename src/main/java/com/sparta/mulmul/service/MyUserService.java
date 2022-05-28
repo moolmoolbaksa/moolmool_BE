@@ -15,15 +15,16 @@ import com.sparta.mulmul.model.User;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import static com.sparta.mulmul.exception.ErrorCode.NOT_FOUND_ITEM;
 import static com.sparta.mulmul.exception.ErrorCode.NOT_FOUND_USER;
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class MyUserService {
 
     // 성훈_마이페이지_내 정보보기
     @Transactional
+    @Cacheable(cacheNames = "userProfile", key = "#userDetails.userId")
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = userDetails.getUserId();
@@ -87,7 +89,7 @@ public class MyUserService {
     @Transactional
     public UserEditResponseDto editMyPage(String nickname, String address, String
             storeInfo, String imgUrl, UserDetailsImpl userDetails) {
-        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new IllegalArgumentException("user not found"));
+        User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 유저 정보 수정
         updateInfo(nickname, address, storeInfo, imgUrl, user);
         // 수정된 정보를 Response하기위해 정보를 넣어 줌
@@ -103,6 +105,7 @@ public class MyUserService {
     }
 
     // 이승재 / 찜한 아이템 보여주기
+    @Cacheable(cacheNames = "scrabItemInfo", key = "#userDetails.userId")
     public List<MyScrabItemDto> scrabItem(UserDetailsImpl userDetails) {
         List<Scrab> scrabList = scrabRepository.findAllByUserIdOrderByModifiedAtDesc(userDetails.getUserId());
 
@@ -126,6 +129,7 @@ public class MyUserService {
     }
 
     // 이승재 / 유저 스토어 목록 보기
+    @Cacheable(cacheNames = "anotherUserProfile")
     public UserStoreResponseDto showStore(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_USER)

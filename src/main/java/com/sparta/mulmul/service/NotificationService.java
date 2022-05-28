@@ -10,6 +10,7 @@ import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class NotificationService {
     private final ChatRoomRepository roomRepository;
 
     // 알림 전체 목록
+    @Cacheable(cacheNames = "notificationInfo", key = "#userDetails.userId")
     public List<NotificationDto> getNotification(UserDetailsImpl userDetails){
 
         List<Notification> notifications = notificationRepository.findAllByUserIdOrderByIdDesc(userDetails.getUserId());
