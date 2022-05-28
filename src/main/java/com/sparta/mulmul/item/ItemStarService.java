@@ -18,7 +18,7 @@ public class ItemStarService {
     private final BarterRepository barterRepository;
 
 
-    @Cacheable(cacheNames = "hotItemInfo")
+//    @Cacheable(cacheNames = "hotItemInfo")
     public List<ItemStarDto> hotItem() {
         int status = 1;
 //        List<Barter> barterList = barterRepository.findAllByBarter(status);

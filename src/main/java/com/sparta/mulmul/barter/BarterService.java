@@ -37,7 +37,7 @@ public class BarterService {
 
 
     // 성훈 - 거래내역서 보기
-    @Cacheable(cacheNames = "barterMyInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "barterMyInfo", key = "#userDetails.userId")
     public List<BarterDto> showMyBarter(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                 () -> new CustomException(NOT_FOUND_USER)

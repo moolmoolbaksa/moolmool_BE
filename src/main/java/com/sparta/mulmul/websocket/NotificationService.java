@@ -23,7 +23,7 @@ public class NotificationService {
     private final ChatRoomRepository roomRepository;
 
     // 알림 전체 목록
-    @Cacheable(cacheNames = "notificationInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "notificationInfo", key = "#userDetails.userId")
     public List<NotificationDto> getNotification(UserDetailsImpl userDetails){
 
         List<Notification> notifications = notificationRepository.findAllByUserIdOrderByIdDesc(userDetails.getUserId());
