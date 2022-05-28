@@ -18,12 +18,14 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import static com.sparta.mulmul.exception.ErrorCode.NOT_FOUND_ITEM;
 import static com.sparta.mulmul.exception.ErrorCode.NOT_FOUND_USER;
 
@@ -106,7 +108,7 @@ public class MyUserService {
     }
 
     // 이승재 / 찜한 아이템 보여주기
-//    @Cacheable(cacheNames = "scrabItemInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "scrabItemInfo", key = "#userDetails.userId")
     public List<MyScrabItemDto> scrabItem(UserDetailsImpl userDetails) {
         List<Scrab> scrabList = scrabRepository.findAllByUserIdOrderByModifiedAtDesc(userDetails.getUserId());
 
@@ -130,7 +132,7 @@ public class MyUserService {
     }
 
     // 이승재 / 유저 스토어 목록 보기
-//    @Cacheable(cacheNames = "anotherUserProfile")
+    @Cacheable(cacheNames = "anotherUserProfile")
     public UserStoreResponseDto showStore(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_USER)
@@ -161,7 +163,9 @@ public class MyUserService {
 
     // 이승재 / 유저 신고하기 기능
     @Transactional
-    @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
     public String reportUser(Long userId, UserDetailsImpl userDetails) {
         Optional<Report> findReport = reportRepository.findByReporterIdAndReportedUserId(userDetails.getUserId(), userId);
         if (findReport.isPresent()) {
@@ -186,8 +190,6 @@ public class MyUserService {
             return "true";
         }
     }
-
-
 
 
     // 유저 정보 수정

@@ -20,6 +20,7 @@ import com.sparta.mulmul.websocket.chatDto.NotificationDto;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class TradeService {
     private final SimpMessageSendingOperations messagingTemplate;
 
     // 이승재 / 교환신청하기 전 정보
-//    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId")
     public TradeInfoDto showTradeInfo(Long itemid, Long userId, UserDetailsImpl userDetails) {
         Long myBadId = bagRepository.findByUserId(userDetails.getUserId()).getId();
 
@@ -79,7 +80,9 @@ public class TradeService {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
     public String requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
@@ -132,7 +135,7 @@ public class TradeService {
 
 
     // 이승재 교환신청 확인 페이지
-//    @Cacheable(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId")
     public TradeDecisionDto tradeDecision(Long barterId, UserDetailsImpl userDetails) {
         Barter barter = barterRepository.findById(barterId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_BARTER)
@@ -192,7 +195,9 @@ public class TradeService {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
     public BarterStatusDto acceptTrade(Long barterId) {
         Barter barter = barterRepository.findById(barterId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_BARTER)
@@ -230,7 +235,9 @@ public class TradeService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
     public void deleteTrade(Long barterId) {
         //아이템 상태 업데이트
         Barter barter = barterRepository.findById(barterId).orElseThrow(

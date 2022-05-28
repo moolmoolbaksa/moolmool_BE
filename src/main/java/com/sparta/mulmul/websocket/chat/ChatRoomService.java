@@ -11,6 +11,7 @@ import com.sparta.mulmul.websocket.chatDto.MessageResponseDto;
 import com.sparta.mulmul.websocket.chatDto.RoomDto;
 import com.sparta.mulmul.websocket.chatDto.RoomResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -153,6 +154,7 @@ public class ChatRoomService {
     }
 
     // 회원 차단 기능
+    @CacheEvict(cacheNames = "userBan", key = "#userDetails.userId", allEntries = true)
     public void setBanned(UserDetailsImpl userDetails, Long bannedId){
 
         User user = userRepository
@@ -174,7 +176,7 @@ public class ChatRoomService {
     }
 
     // 차단 회원 불러오기
-//    @Cacheable(cacheNames = "userBan")
+    @Cacheable(cacheNames = "userBan")
     public List<BannedUserDto> getBanned(UserDetailsImpl userDetails){
         User user = userRepository
                 .findById(userDetails.getUserId())
@@ -190,6 +192,7 @@ public class ChatRoomService {
 
     // 회원 차단 풀기
     @Transactional
+    @CacheEvict(cacheNames = "userBan", key = "#userDetails.userId", allEntries = true)
     public void releaseBanned(UserDetailsImpl userDetails, Long bannedId){
 
         User user = userRepository

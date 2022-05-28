@@ -57,7 +57,8 @@ public class BarterService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true)})
     public BarterTradeCheckDto cancelBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
@@ -81,7 +82,10 @@ public class BarterService {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = user.getId();
@@ -132,7 +136,8 @@ public class BarterService {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true),})
     public BarterStatusDto okayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 거래내역을 조회한다.
@@ -178,7 +183,9 @@ public class BarterService {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true)})
     public void editBarter(EditRequestDto editRequestDto, UserDetailsImpl userDetails) {
         // 수정할 거래내역 찾기
         Barter barter = barterRepository.findById(editRequestDto.getBarterId()).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
