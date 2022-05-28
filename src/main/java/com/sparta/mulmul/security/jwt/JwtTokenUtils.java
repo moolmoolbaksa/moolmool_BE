@@ -10,7 +10,7 @@ import java.util.Date;
 public final class JwtTokenUtils {
 
 //    @Value("${jwt.secret-key}")
-//    private static String jwtSecret;
+//    public static String jwtSecret;
 
     private static final int SEC = 1;
     private static final int MINUTE = 60 * SEC;
