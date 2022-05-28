@@ -1,8 +1,8 @@
 package com.sparta.mulmul.utils;
 
-import com.sparta.mulmul.dto.chat.MessageRequestDto;
-import com.sparta.mulmul.model.ChatFilter;
-import com.sparta.mulmul.repository.chat.ChatFilterRepository;
+import com.sparta.mulmul.websocket.chatDto.MessageRequestDto;
+import com.sparta.mulmul.websocket.ChatFilter;
+import com.sparta.mulmul.websocket.chat.ChatFilterRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
