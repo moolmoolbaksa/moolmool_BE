@@ -122,9 +122,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("POST,/user/id-check");
         skipPathList.add("POST,/user/nickname-check");
         skipPathList.add("GET,/user/kakao");
-        skipPathList.add("GET,/user/naver");
-
-        skipPathList.add("GET,//testcode");
 
         skipPathList.add("GET,/favicon.ico");
 

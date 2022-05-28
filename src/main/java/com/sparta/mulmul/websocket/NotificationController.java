@@ -50,9 +50,9 @@ public class NotificationController {
     @GetMapping("/notification/decision")
     private TradeDecisionDto tradeDecision(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                            @RequestParam Long notificationId,
-                                           @RequestParam Long baterId){
+                                           @RequestParam Long barterId){
 
-        TradeDecisionDto decisionDto = tradeService.tradeDecision(baterId, userDetails);
+        TradeDecisionDto decisionDto = tradeService.tradeDecision(barterId, userDetails);
         notificationService.setRead(notificationId);
         return  decisionDto;
     }

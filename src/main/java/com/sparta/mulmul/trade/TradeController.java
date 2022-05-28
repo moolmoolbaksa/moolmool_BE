@@ -25,7 +25,7 @@ public class TradeController {
     }
 
     // 이승재 / 교환신청하기 누르면 아이템의 상태 변환 & 거래내역 생성
-    @PostMapping("/itmes/trade")
+    @PostMapping("/items/trade")
     private ResponseEntity<OkDto> requestTrade(@RequestBody RequestTradeDto requestTradeDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
         String answer = tradeService.requestTrade(requestTradeDto, userDetails);
         if(answer.equals("true")) {
