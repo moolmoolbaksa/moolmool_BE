@@ -1,6 +1,6 @@
 package com.sparta.mulmul.security.provider;
 
-import com.sparta.mulmul.dto.user.UserRequestDto;
+import com.sparta.mulmul.user.userDto.UserRequestDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
 import com.sparta.mulmul.security.jwt.JwtPreProcessingToken;

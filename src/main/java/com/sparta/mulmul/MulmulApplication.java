@@ -1,6 +1,6 @@
 package com.sparta.mulmul;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.sparta.mulmul.model.CacheType;
+import com.sparta.mulmul.utils.CacheType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cache.CacheManager;
@@ -12,8 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.web.config.PageableHandlerMethodArgumentResolverCustomizer;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
