@@ -19,6 +19,7 @@ public enum ErrorCode {
     ALREADY_BANNED(HttpStatus.BAD_REQUEST.value(), "C004", "이미 차단한 회원입니다."),
     NOT_FOUND_REQUESTER(HttpStatus.NOT_FOUND.value(), "C005", "차단을 요청한 회원을 찾을 수 없습니다."),
     EXIT_INVAILED(HttpStatus.BAD_REQUEST.value(), "C006", "'나가기'는 채팅방에 존재하는 회원만 접근 가능한 서비스입니다."),
+    CANNOT_CHAT_WITH_ME(HttpStatus.BAD_REQUEST.value(), "C006", "나 자신은 채팅의 대상이 될 수 없습니다."),
 
     // FILE
     FILE_INVAILED(HttpStatus.BAD_REQUEST.value(), "F001", "잘못된 파일 형식입니다."),
@@ -50,10 +51,11 @@ public enum ErrorCode {
     NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND.value(), "N001", "알림이 없습니다."),
 
     // LOGIN
-    LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "L001", "로그인에 실패했습니다."),
+    LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "L001", "아이디와 비밀번호를 확인해 주세요."),
     INVALID_LENGTH_TOKEN(HttpStatus.BAD_REQUEST.value(), "L002", "유효하지 않은 토큰입니다. 토큰의 길이를 확인해 주세요."),
-    INVALID_CONTENTS_TOKEN(HttpStatus.BAD_REQUEST.value(), "L003", "유효하지 않은 토큰입니다. 토큰 디코딩에 실패했습니다."),
-    EXPIRATION_TOKEN(HttpStatus.BAD_REQUEST.value(), "L004", "만료된 토큰입니다.");
+    DECODING_FAILED_TOKEN(HttpStatus.BAD_REQUEST.value(), "L003", "유효하지 않은 토큰입니다. 토큰 디코딩에 실패했습니다."),
+    EXPIRATION_TOKEN(HttpStatus.BAD_REQUEST.value(), "L004", "만료된 토큰입니다."),
+    INVAILD_CONTENTS_TOKEN(HttpStatus.BAD_REQUEST.value(), "L005", "유효하지 않은 형식의 토큰입니다.");
 
     private final int httpStatus;
     private final String code;

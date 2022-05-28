@@ -1,7 +1,6 @@
 package com.sparta.mulmul.dto.chat;
 
 import com.sparta.mulmul.model.ChatMessage;
-import com.sparta.mulmul.websocket.WsUser;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

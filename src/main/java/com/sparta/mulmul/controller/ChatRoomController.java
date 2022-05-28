@@ -48,7 +48,7 @@ public class ChatRoomController {
     }
 
     // 채팅방 나가기
-    @GetMapping("/room/{roomId}/exit")
+    @GetMapping("/room/exit/{roomId}")
     public ResponseEntity<OkDto> exitRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                           @PathVariable Long roomId){
 
@@ -67,7 +67,7 @@ public class ChatRoomController {
     }
 
     // 채팅 차단하기
-    @GetMapping("/room/{userId}/banned")
+    @GetMapping("/room/banned/{userId}")
     public ResponseEntity<OkDto> setBanned(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                            @PathVariable Long userId){
 
@@ -82,7 +82,7 @@ public class ChatRoomController {
     }
 
     // 차단 유저 해제하기
-    @PutMapping("/room/{userId}/banned")
+    @PutMapping("/room/banned/{userId}")
     public ResponseEntity<OkDto> releaseBanned(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                @PathVariable Long userId){
 

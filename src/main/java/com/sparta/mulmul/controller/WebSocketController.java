@@ -5,15 +5,11 @@ import com.sparta.mulmul.dto.chat.MessageResponseDto;
 import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
-import com.sparta.mulmul.service.NotificationService;
 import com.sparta.mulmul.service.chat.ChatMessageService;
-import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;

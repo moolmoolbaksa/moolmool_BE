@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
+import static com.sparta.mulmul.security.RestLoginSuccessHandler.REFRESH_HEADER;
 
 @Configuration
 @EnableWebSecurity
@@ -119,11 +120,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("GET,/h2-console/**");
         skipPathList.add("POST,/h2-console/**");
         // 회원 관리 API 허용
-        skipPathList.add("POST,/user/signup");
-        skipPathList.add("POST,/user/login");
         skipPathList.add("POST,/user/id-check");
         skipPathList.add("POST,/user/nickname-check");
         skipPathList.add("GET,/user/kakao");
+        skipPathList.add("GET,/user/naver");
+
+        skipPathList.add("GET,//testcode");
 
         skipPathList.add("GET,/favicon.ico");
 
@@ -156,9 +158,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://kapi.kakao.com/v2/user/me");
         configuration.addAllowedOrigin("https://kapi.kakao.com/v2/user/me");
+        configuration.addAllowedOrigin("http://openapi.naver.com/v1/nid/me");
+        configuration.addAllowedOrigin("https://openapi.naver.com/v1/nid/me");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.addExposedHeader(AUTH_HEADER);
+        configuration.addExposedHeader(REFRESH_HEADER);
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -3,7 +3,6 @@ package com.sparta.mulmul.service.chat;
 import com.sparta.mulmul.dto.NotificationDto;
 import com.sparta.mulmul.dto.chat.*;
 import com.sparta.mulmul.exception.CustomException;
-import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.ChatMessage;
 import com.sparta.mulmul.model.ChatRoom;
 import com.sparta.mulmul.model.Notification;
@@ -12,7 +11,6 @@ import com.sparta.mulmul.repository.chat.ChatMessageRepository;
 import com.sparta.mulmul.repository.chat.ChatRoomRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.utils.LanguageFilter;
-import com.sparta.mulmul.websocket.WsUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -134,6 +132,5 @@ public class ChatMessageService {
         RoomMsgUpdateDto msgUpdateDto = RoomMsgUpdateDto.createFrom(requestDto);
         messagingTemplate.convertAndSend("/sub/chat/rooms/" + userId, msgUpdateDto); // 개별 채팅 목록 보기 업데이트
         messagingTemplate.convertAndSend("/sub/chat/room/" + requestDto.getRoomId(), responseDto); // 채팅방 내부로 메시지 전송
-        System.out.println("/sub/chat/room/" + requestDto.getRoomId() + " 로 메시지를 전송하였습니다.");
     }
 }

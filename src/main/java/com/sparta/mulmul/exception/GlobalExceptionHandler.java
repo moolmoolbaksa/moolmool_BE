@@ -12,6 +12,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = CustomException.class)
     public ResponseEntity<ResponseError> customExceptionHandler(CustomException e) {
-        return ResponseError.createFrom(e.getErrorCode());
+        return ResponseError.createEntityFrom(e.getErrorCode());
     }
 }

@@ -13,7 +13,7 @@ public class ResponseError {
     private final String code;
     private final String message;
 
-    public static ResponseEntity<ResponseError> createFrom(ErrorCode errorCode) {
+    public static ResponseEntity<ResponseError> createEntityFrom(ErrorCode errorCode) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseError.builder()
@@ -24,7 +24,7 @@ public class ResponseError {
                         .build()
                 );
     }
-    public static ResponseError creatFrom(ErrorCode errorCode){
+    public static ResponseError createFrom(ErrorCode errorCode){
         return ResponseError.builder()
                 .ok(false)
                 .status(errorCode.getHttpStatus())

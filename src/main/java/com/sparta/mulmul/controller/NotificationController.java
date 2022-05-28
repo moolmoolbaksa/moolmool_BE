@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class NotificationController {
 
@@ -40,9 +40,9 @@ public class NotificationController {
     }
 
     // 개별 채팅방 메시지 불러오기
-    @GetMapping("/notification/{notificationId}/chat")
+    @GetMapping("/notification/chat")
     public List<MessageResponseDto> getMessage(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                               @PathVariable Long notificationId,
+                                               @RequestParam Long notificationId,
                                                @RequestParam Long roomId) {
 //                                               @PageableDefault(size = 20) Pageable pageable) {
 
@@ -52,9 +52,9 @@ public class NotificationController {
     }
 
     // 교환신청페이지 연결
-    @GetMapping("/notification/{notificationId}/decision")
+    @GetMapping("/notification/decision")
     private TradeDecisionDto tradeDecision(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                           @PathVariable Long notificationId,
+                                           @RequestParam Long notificationId,
                                            @RequestParam Long baterId){
 
         TradeDecisionDto decisionDto = tradeService.tradeDecision(baterId, userDetails);
@@ -63,9 +63,9 @@ public class NotificationController {
     }
 
     // 평가 페이지 연결
-    @GetMapping("/notification/{notificationId}/score")
+    @GetMapping("/notification/score")
     public OppentScoreResponseDto showOppentScore(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                  @PathVariable Long notificationId,
+                                                  @RequestParam Long notificationId,
                                                   @RequestParam Long barterId){
 
         OppentScoreResponseDto responseDto = scoreService.showOppentScore(barterId, userDetails);
@@ -82,8 +82,8 @@ public class NotificationController {
     }
 
     // 회원 가입 메시지
-    @GetMapping("/notification/{notificationId}/signup") // 회원가입 축하 메시지에 대해 이 주소로 요청을 보내면 작동합니다.
-    public ResponseEntity<OkDto> signup(@PathVariable Long notificationId){
+    @GetMapping("/notification/signup") // 회원가입 축하 메시지에 대해 이 주소로 요청을 보내면 작동합니다.
+    public ResponseEntity<OkDto> signup(@RequestParam Long notificationId){
 
         notificationService.setRead(notificationId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));

@@ -1,6 +1,6 @@
 package com.sparta.mulmul.websocket;
 
-import com.sparta.mulmul.dto.WsUserDto;
+import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +9,11 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.UUID;
+
+import static com.sparta.mulmul.exception.ErrorCode.*;
 
 @Component
 @RequiredArgsConstructor
@@ -47,9 +47,8 @@ public class StompHandler implements ChannelInterceptor { // 이론상 웹소켓
             String token = extractor.extract(accessor.getFirstNativeHeader("Authorization"));
             Long userId = jwtDecoder.decodeTokenByUserId(token);
             String nickname = jwtDecoder.decodeTokenByNickname(token);
-
         } catch (Exception e) {
-            throw new AccessDeniedException("StompHandler: 유효하지 않은 토큰입니다.");
+            throw new CustomException(INVAILD_CONTENTS_TOKEN);
         }
 
     }

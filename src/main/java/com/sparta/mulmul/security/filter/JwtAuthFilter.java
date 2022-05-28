@@ -1,12 +1,11 @@
 package com.sparta.mulmul.security.filter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.exception.ResponseError;
 import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
+import com.sparta.mulmul.security.jwt.JwtDecoder;
 import com.sparta.mulmul.security.jwt.JwtPreProcessingToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,6 +22,7 @@ import java.io.IOException;
 
 import static com.sparta.mulmul.exception.ErrorCode.*;
 
+
 /**
  * Token 을 내려주는 Filter 가 아닌  client 에서 받아지는 Token 을 서버 사이드에서 검증하는 클레스 SecurityContextHolder 보관소에 해당
  * Token 값의 인증 상태를 보관 하고 필요할때 마다 인증 확인 후 권한 상태 확인 하는 기능
@@ -30,13 +30,13 @@ import static com.sparta.mulmul.exception.ErrorCode.*;
 public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
     private final HeaderTokenExtractor extractor;
+    private final JwtDecoder jwtDecoder = new JwtDecoder();
 
     public JwtAuthFilter(
             RequestMatcher requiresAuthenticationRequestMatcher,
             HeaderTokenExtractor extractor
     ) {
         super(requiresAuthenticationRequestMatcher);
-
         this.extractor = extractor;
     }
 
@@ -50,29 +50,57 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
         // JWT 값을 담아주는 변수 TokenPayload
         String tokenPayload = request.getHeader("Authorization");
+        String refreshToken = request.getHeader("RefreshToken");
         String method = request.getMethod();
 
-        if (tokenPayload == null && !method.equals("GET")) {
+        if ( refreshToken != null ){
 
-            response.setContentType("application/json;charset=utf-8");
-            response.setStatus(HttpServletResponse.SC_OK);
+            jwtToken = getJwtPreProcessingToken(request, response, refreshToken);
+            if (jwtToken == null) { return null; }
 
-            ObjectMapper mapper = new ObjectMapper();
-            String result = mapper.writeValueAsString(OkDto.valueOf("false")
-            );
-            response.getWriter().write(result);
+        } else if ( tokenPayload == null && !method.equals("GET") ) {
+
+            setResponseError(response, INVALID_LENGTH_TOKEN);
             return null;
 
         } else if (tokenPayload == null) {
+
             jwtToken = new JwtPreProcessingToken("null");
+
         } else {
-            jwtToken = new JwtPreProcessingToken(
-                    extractor.extract(tokenPayload, request));
+
+            jwtToken = getJwtPreProcessingToken(request, response, tokenPayload);
+            if (jwtToken == null) { return null; }
+
         }
 
         return super
                 .getAuthenticationManager()
                 .authenticate(jwtToken);
+    }
+
+    private JwtPreProcessingToken getJwtPreProcessingToken(HttpServletRequest request, HttpServletResponse response, String tokenPayload) throws IOException {
+
+        String token;
+        JwtPreProcessingToken jwtToken;
+
+        try {
+            token = extractor.extract(tokenPayload, request);
+        }
+        catch (Exception e) {
+            setResponseError(response, new CustomException(INVAILD_CONTENTS_TOKEN)
+                    .getErrorCode());
+            return null;
+        }
+        try {
+            jwtDecoder.expirationCheck(token);
+            jwtToken = new JwtPreProcessingToken(token);
+        } catch (Exception e) {
+            setResponseError(response, new CustomException(EXPIRATION_TOKEN)
+                    .getErrorCode());
+            return null;
+        }
+        return jwtToken;
     }
 
     @Override

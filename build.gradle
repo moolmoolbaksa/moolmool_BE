@@ -58,11 +58,12 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.3.2.RELEASE'
     implementation 'com.github.ben-manes.caffeine:caffeine'
-    // XSS 방어
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
     //querydsl 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+    // 로그 남기기
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "ch.qos.logback:logback-core:1.2.3"
 }
 
 tasks.named('test') {

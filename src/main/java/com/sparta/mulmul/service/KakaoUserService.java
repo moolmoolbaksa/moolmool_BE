@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.dto.user.KakaoUserInfoDto;
 import com.sparta.mulmul.dto.TokenDto;
 import com.sparta.mulmul.exception.CustomException;
-import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.Bag;
 import com.sparta.mulmul.model.Notification;
 import com.sparta.mulmul.model.User;
@@ -13,10 +12,8 @@ import com.sparta.mulmul.repository.BagRepository;
 import com.sparta.mulmul.repository.NotificationRepository;
 import com.sparta.mulmul.repository.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
-import com.sparta.mulmul.security.jwt.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,6 +24,7 @@ import java.util.UUID;
 
 import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.TOKEN_TYPE;
+import static com.sparta.mulmul.security.jwt.JwtTokenUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +46,11 @@ public class KakaoUserService {
         // 회원가입과 로그인 처리 및 유저 정보 받아오기
         User kakaoUser = registerUserIfNeeded(kakaoUserInfo);
         // 토큰 Dto 만들기
-        return TokenDto.createOf(getJwtToken(kakaoUser), kakaoUser);
+        return TokenDto.createOf(
+                getJwtToken(kakaoUser, ACCESS_TOKEN),
+                getJwtToken(kakaoUser, REFRESH_TOKEN),
+                kakaoUser
+        );
     }
 
     private String getAccessToken(String code) throws JsonProcessingException {
@@ -60,7 +62,7 @@ public class KakaoUserService {
         body.add("grant_type", "authorization_code");
         body.add("client_id", "6c57a62de555a589bbaaabdc73a9e011");
         //https://moolmooldoctor.firebaseapp.com/auth/kakao/callback
-        body.add("redirect_uri", "https://moolmooldoctor.firebaseapp.com/auth/kakao/callback");
+        body.add("redirect_uri", "http://localhost:3000/auth/kakao/callback");
         body.add("code", code);
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
@@ -94,34 +96,43 @@ public class KakaoUserService {
     }
 
     private User registerUserIfNeeded(KakaoUserInfoDto kakaoUserInfo) {
-        // DB 에 중복된 Kakao Id 가 있는지 확인
-        Long kakaoId = kakaoUserInfo.getId();
-        User kakaoUser = userRepository.findByKakaoId(kakaoId)
+
+        User signupUser = userRepository.findByUsername(kakaoUserInfo.getEmail())
                 .orElse(null);
-        // 신고 누적시 처리 진행
+        if ( signupUser == null ){
+            // DB 에 중복된 Kakao Id 가 있는지 확인
+            Long kakaoId = kakaoUserInfo.getId();
+            User kakaoUser = userRepository.findByKakaoId(kakaoId)
+                    .orElse(null);
 
-        if (kakaoUser == null) {
-            String password = passwordEncoder.encode(UUID.randomUUID().toString());
+            if (kakaoUser == null) {
+                String password = passwordEncoder.encode(UUID.randomUUID().toString());
 
-            kakaoUser = userRepository.save(
-                    User.fromKakaoUserWithPassword(kakaoUserInfo, password)
-            );
-            bagRepository.save(new Bag(kakaoUser));
-            // 회원가입 알림 메시지 저장
-            notificationRepository.save(
-                    Notification.createFrom(kakaoUser));
+                kakaoUser = userRepository.save(
+                        User.fromKakaoUserWithPassword(kakaoUserInfo, password)
+                );
+                bagRepository.save(new Bag(kakaoUser));
+                // 회원가입 알림 메시지 저장
+                notificationRepository.save(
+                        Notification.createFrom(kakaoUser));
+            } else {
+                if ( kakaoUser.getReportCnt() >= 5 ){ // 신고 누적시 처리 진행
+                    throw new CustomException(BANNED_USER);
+                }
+            }
+            return kakaoUser;
         } else {
-            if ( kakaoUser.getReportCnt() >= 5 ){
+            if ( signupUser.getReportCnt() >= 5 ){ // 신고 누적시 처리 진행
                 throw new CustomException(BANNED_USER);
             }
+            return signupUser;
         }
 
-        return kakaoUser;
     }
     // JWT 토큰 추출
-    private String getJwtToken(User kakaoUser){
-        return TOKEN_TYPE + " " + JwtTokenUtils.generateJwtToken(
-                UserDetailsImpl.fromUser(kakaoUser)
+    private String getJwtToken(User kakaoUser, String tokenType){
+        return TOKEN_TYPE + " " + generateJwtToken(
+                UserDetailsImpl.fromUser(kakaoUser), tokenType
         );
     }
 }
