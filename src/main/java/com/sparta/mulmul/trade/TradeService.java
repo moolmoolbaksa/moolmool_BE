@@ -78,7 +78,8 @@ public class TradeService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
     public String requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
@@ -190,7 +191,8 @@ public class TradeService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
     public BarterStatusDto acceptTrade(Long barterId) {
         Barter barter = barterRepository.findById(barterId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_BARTER)
@@ -227,7 +229,8 @@ public class TradeService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
     public void deleteTrade(Long barterId) {
         //아이템 상태 업데이트
         Barter barter = barterRepository.findById(barterId).orElseThrow(

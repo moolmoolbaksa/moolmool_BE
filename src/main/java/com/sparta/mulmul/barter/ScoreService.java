@@ -18,6 +18,7 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -137,7 +138,9 @@ public class ScoreService {
 
     // 성훈 - 상대 평점주기
     @Transactional
-    @CacheEvict(cacheNames = "userScore", key = "#userDetails.userId", allEntries = true)
+    @Caching(evict = {
+    @CacheEvict(cacheNames = "userScore", key = "#userDetails.userId", allEntries = true),
+    @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
     public BarterStatusDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 상대 userId
