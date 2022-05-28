@@ -40,7 +40,7 @@ public class MyUserService {
 
     // 성훈_마이페이지_내 정보보기
     @Transactional
-    @Cacheable(cacheNames = "userProfile", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "userProfile", key = "#userDetails.userId")
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = userDetails.getUserId();
