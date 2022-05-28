@@ -1,5 +1,6 @@
 package com.sparta.mulmul.model;
 
+import com.sparta.mulmul.utils.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
