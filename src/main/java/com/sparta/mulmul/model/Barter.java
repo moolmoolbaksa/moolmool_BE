@@ -48,15 +48,10 @@ public class Barter extends Timestamped {
     @Column(nullable = false)
     private Boolean isSellerScore;
 
-
     private LocalDateTime tradeTime;
 
     @Version
     private Long version;
-
-    @Version // 추가
-    private Long version;
-
 
     public void updateBarter(int status) {
         this.status = status;
