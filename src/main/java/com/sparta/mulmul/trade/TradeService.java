@@ -1,6 +1,7 @@
 package com.sparta.mulmul.trade;
 
 import com.sparta.mulmul.barter.BarterRepository;
+import com.sparta.mulmul.barter.barterDto.BarterStatusDto;
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.trade.tradeDto.RequestTradeDto;

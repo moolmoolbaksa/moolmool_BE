@@ -1,8 +1,7 @@
 package com.sparta.mulmul.item;
-import static com.sparta.mulmul.model.QScrab.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
-
+import static com.sparta.mulmul.item.QScrab.*;
 import java.util.List;
 
 @Repository
