@@ -80,7 +80,7 @@ public class ChatMessageService {
     }
 
     // 메시지 찾기, 페이징 처리 (검증이 필요합니다.)
-    @Cacheable(cacheNames = "chatInfo")
+//    @Cacheable(cacheNames = "chatInfo")
     public List<MessageResponseDto> getMessage(Long roomId, UserDetailsImpl userDetails){
         // 메시지 찾아오기
         List<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId);

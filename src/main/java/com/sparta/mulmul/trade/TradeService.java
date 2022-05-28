@@ -2,6 +2,7 @@ package com.sparta.mulmul.trade;
 
 import com.sparta.mulmul.barter.BarterRepository;
 import com.sparta.mulmul.barter.barterDto.BarterStatusDto;
+import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.trade.tradeDto.RequestTradeDto;
@@ -10,7 +11,6 @@ import com.sparta.mulmul.trade.tradeDto.TradeInfoDto;
 import com.sparta.mulmul.trade.tradeDto.TradeInfoImagesDto;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.ItemRepository;
-import com.sparta.mulmul.barter.Barter;
 import com.sparta.mulmul.item.Item;
 import com.sparta.mulmul.user.BagRepository;
 import com.sparta.mulmul.websocket.Notification;
@@ -43,7 +43,7 @@ public class TradeService {
     private final SimpMessageSendingOperations messagingTemplate;
 
     // 이승재 / 교환신청하기 전 정보
-    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId")
     public TradeInfoDto showTradeInfo(Long itemid, Long userId, UserDetailsImpl userDetails) {
         Long myBadId = bagRepository.findByUserId(userDetails.getUserId()).getId();
 
@@ -127,7 +127,7 @@ public class TradeService {
 
 
     // 이승재 교환신청 확인 페이지
-    @Cacheable(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId")
     public TradeDecisionDto tradeDecision(Long barterId, UserDetailsImpl userDetails) {
         Barter barter = barterRepository.findById(barterId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_BARTER)

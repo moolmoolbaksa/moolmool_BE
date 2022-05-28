@@ -43,8 +43,7 @@ public class KakaoUserService {
         User kakaoUser = registerUserIfNeeded(kakaoUserInfo);
         // 토큰 Dto 만들기
         return TokenDto.createOf(
-                getJwtToken(kakaoUser, ACCESS_TOKEN),
-                getJwtToken(kakaoUser, REFRESH_TOKEN),
+                getJwtToken(kakaoUser),
                 kakaoUser
         );
     }
@@ -57,8 +56,8 @@ public class KakaoUserService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", "6c57a62de555a589bbaaabdc73a9e011");
-        //https://moolmooldoctor.firebaseapp.com/auth/kakao/callback
-        body.add("redirect_uri", "http://localhost:3000/auth/kakao/callback");
+        // https://moolmooldoctor.firebaseapp.com/auth/kakao/callback
+        body.add("redirect_uri", "https://moolmooldoctor.firebaseapp.com/auth/kakao/callback");
         body.add("code", code);
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest =
@@ -126,9 +125,9 @@ public class KakaoUserService {
 
     }
     // JWT 토큰 추출
-    private String getJwtToken(User kakaoUser, String tokenType){
+    private String getJwtToken(User kakaoUser){
         return TOKEN_TYPE + " " + generateJwtToken(
-                UserDetailsImpl.fromUser(kakaoUser), tokenType
+                UserDetailsImpl.fromUser(kakaoUser)
         );
     }
 }

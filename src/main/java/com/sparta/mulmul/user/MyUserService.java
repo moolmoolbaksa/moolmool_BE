@@ -106,7 +106,7 @@ public class MyUserService {
     }
 
     // 이승재 / 찜한 아이템 보여주기
-    @Cacheable(cacheNames = "scrabItemInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "scrabItemInfo", key = "#userDetails.userId")
     public List<MyScrabItemDto> scrabItem(UserDetailsImpl userDetails) {
         List<Scrab> scrabList = scrabRepository.findAllByUserIdOrderByModifiedAtDesc(userDetails.getUserId());
 
@@ -130,7 +130,7 @@ public class MyUserService {
     }
 
     // 이승재 / 유저 스토어 목록 보기
-    @Cacheable(cacheNames = "anotherUserProfile")
+//    @Cacheable(cacheNames = "anotherUserProfile")
     public UserStoreResponseDto showStore(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_USER)

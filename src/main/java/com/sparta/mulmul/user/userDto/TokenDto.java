@@ -9,18 +9,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TokenDto {
 
-    private String accessToken;
-    private String refreshToken;
+    private String token;
     private Boolean isFirst;
 
-    public static TokenDto createOf(String accessToken, String refreshToken,User user){
+    public static TokenDto createOf(String token, User user){
 
         TokenDto tokenDto = new TokenDto();
 
         if ( user.getAddress() == null ){ tokenDto.isFirst = true; }
         else { tokenDto.isFirst = false;}
-        tokenDto.accessToken = accessToken;
-        tokenDto.refreshToken = refreshToken;
+        tokenDto.token = token;
 
         return tokenDto;
     }
