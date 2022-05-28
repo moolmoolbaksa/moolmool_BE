@@ -72,7 +72,7 @@ public class ItemController {
 
 
     //이승재 / 아이템 전체조회(카테고리별)
-    @GetMapping("/items/")
+    @GetMapping("/items")
     public ItemMainResponseDto getItems(@RequestParam int page, @RequestParam(required = false) String category, @AuthenticationPrincipal UserDetailsImpl userDetails){
         return itemService.getItems(page, category, userDetails);
     }
