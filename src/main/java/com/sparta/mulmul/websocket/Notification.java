@@ -1,6 +1,6 @@
 package com.sparta.mulmul.websocket;
 
-import com.sparta.mulmul.barter.Barter;
+import com.sparta.mulmul.model.Barter;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.utils.CreationDate;
 import com.sparta.mulmul.user.User;

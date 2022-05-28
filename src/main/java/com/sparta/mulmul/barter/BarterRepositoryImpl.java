@@ -3,10 +3,14 @@ package com.sparta.mulmul.barter;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.mulmul.barter.barterDto.HotBarterDto;
 import com.sparta.mulmul.barter.barterDto.QHotBarterDto;
+import com.sparta.mulmul.model.QBarter;
 import org.springframework.stereotype.Repository;
 
-import static com.sparta.mulmul.barter.QBarter.*;
 import java.util.List;
+
+import static com.sparta.mulmul.model.QBarter.barter1;
+
+
 @Repository
 public class BarterRepositoryImpl implements BarterQuerydsl {
 

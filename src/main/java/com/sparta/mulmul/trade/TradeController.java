@@ -3,10 +3,10 @@ package com.sparta.mulmul.trade;
 
 import com.sparta.mulmul.barter.barterDto.BarterStatusDto;
 import com.sparta.mulmul.dto.OkDto;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.trade.tradeDto.RequestTradeDto;
 import com.sparta.mulmul.trade.tradeDto.TradeDecisionDto;
 import com.sparta.mulmul.trade.tradeDto.TradeInfoDto;
-import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
