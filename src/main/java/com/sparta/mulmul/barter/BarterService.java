@@ -27,7 +27,6 @@ import java.util.List;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.websocket.chatDto.NotificationType.BARTER;
 
-@CacheConfig
 @RequiredArgsConstructor
 @Service
 public class BarterService {
@@ -81,7 +80,8 @@ public class BarterService {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)})
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = user.getId();
@@ -130,7 +130,9 @@ public class BarterService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)})
     public BarterStatusDto okayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 거래내역을 조회한다.

@@ -101,7 +101,7 @@ public class ItemService {
     }
 
     //이승재 / 전체 아이템 조회(카테고리별)
-    @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")
+    @Caching(cacheable = { @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")})
     public ItemMainResponseDto getItems(int page, String category, UserDetailsImpl userDetails) {
         Pageable pageable = getPageable(page);
         if (category.isEmpty()) {
@@ -377,7 +377,8 @@ public class ItemService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)})
     public void updateItem(ItemUpdateRequestDto itemUpdateRequestDto, UserDetailsImpl userDetails, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_ITEM)
@@ -405,7 +406,8 @@ public class ItemService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)})
     public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_ITEM)
@@ -440,7 +442,8 @@ public class ItemService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)})
     public String reportItem(Long itemId, UserDetailsImpl userDetails) {
         Optional<Report> findReport = reportRepository.findByReporterIdAndReportedItemId(userDetails.getUserId(), itemId);
         if (findReport.isPresent()) {

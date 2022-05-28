@@ -19,7 +19,7 @@ public enum CacheType {
 
     ITEM_INFO("itemInfo", 5, 10000),
     ITEM_DETAIL_INFO("itemDetailInfo", 5, 10000),
-    HOT_ITEM_INFO("hotItemInfo", 5, 10000),
+    HOT_ITEM_INFO("hotItemInfo", 10, 10000),
     ITEM_SEARCH_INFO("itemSearchInfo", 5, 10000),
     ITEM_TRADE_INFO("itemTradeInfo", 5, 10000),
     ITEM_TRADE_CHECK_INFO("itemTradeCheckInfo", 10, 10000),
