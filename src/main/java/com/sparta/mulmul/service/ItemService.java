@@ -1,9 +1,7 @@
 package com.sparta.mulmul.service;
 import com.sparta.mulmul.dto.NotificationType;
-import com.sparta.mulmul.dto.detailPageDto.DetailPageBagDto;
 import com.sparta.mulmul.dto.item.*;
 import com.sparta.mulmul.exception.CustomException;
-import com.sparta.mulmul.exception.ErrorCode;
 import com.sparta.mulmul.model.*;
 import com.sparta.mulmul.repository.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
@@ -86,8 +84,8 @@ public class ItemService {
 
     }
     //이승재 / 전체 아이템 조회(카테고리별)
-    public ItemMainResponseDto getItems(int pageNo, String category, UserDetailsImpl userDetails) {
-        Pageable pageable = getPageable(pageNo);
+    public ItemMainResponseDto getItems(int page, String category, UserDetailsImpl userDetails) {
+        Pageable pageable = getPageable(page);
         if(category.isEmpty()){
             Page<Item> itemList = itemRepository.findAllItemOrderByCreatedAtDesc(pageable);
             List<ItemResponseDto> items = new ArrayList<>();
@@ -96,6 +94,8 @@ public class ItemService {
                     //구독 개수
                     List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
                     int scrabCnt = scrabs.size();
+                    //구독 정보 확인
+                    boolean isScarb = checkScrab(userDetails.getUserId(), item.getId());
                     // 거리 계산
                     String distance = getDistance(userDetails, item);
 
@@ -113,7 +113,8 @@ public class ItemService {
                             distance,
                             scrabCnt,
                             item.getViewCnt(),
-                            item.getStatus());
+                            item.getStatus(),
+                    isScarb);
                     items.add(itemResponseDto);
             }
             ItemMainResponseDto itemMainResponseDto = new ItemMainResponseDto(totalCnt, items);
@@ -128,6 +129,8 @@ public class ItemService {
                 //구독 개수
                 List<Scrab> scrabs = scrabRepository.findAllItemById(itemId);
                 int scrabCnt = scrabs.size();
+                //구독 정보 확인
+                boolean isScarb = checkScrab(userDetails.getUserId(), itemId);
                 // 거리 계산
                 String distance = getDistance(userDetails, item);
 
@@ -145,7 +148,8 @@ public class ItemService {
                         distance,
                         scrabCnt,
                         item.getViewCnt(),
-                        item.getStatus());
+                        item.getStatus(),
+                        isScarb);
                 items.add(itemResponseDto);
 
             }
@@ -154,10 +158,10 @@ public class ItemService {
         }
 
     // 이승재 / 페이징 처리
-    private Pageable getPageable(int pageNo) {
+    private Pageable getPageable(int page) {
         Sort.Direction direction = Sort.Direction.DESC;
         Sort sort = Sort.by(direction, "createdAt");
-        return PageRequest.of(pageNo, 10, sort);
+        return PageRequest.of(page, 10, sort);
     }
 
     //이승재 / 구독정보 확인
@@ -181,29 +185,12 @@ public class ItemService {
         return distance;
     }
 
-
-//    private List<DetailPageBagDto> getBagInfos(Item item) {
-//        List<Item> userItemList = itemRepository.findAllByBagId(item.getBag().getId());
-//        List<DetailPageBagDto> bagInfos = new ArrayList<>();
-//        for (Item item1 : userItemList) {
-//            if (item1.getId() != item.getId()) {
-//                String bagImg = item1.getItemImg().split(",")[0];
-//                Long bagItemId = item1.getId();
-//                DetailPageBagDto detailPageBagDto = new DetailPageBagDto(bagImg, bagItemId);
-//                bagInfos.add(detailPageBagDto);
-//            }
-//        }
-//        return bagInfos;
-//    }
     // 이승재 / 아이템 상세페이지
     @Transactional
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new IllegalArgumentException("아이템이 없습니다.")
+                ()-> new CustomException(NOT_FOUND_ITEM)
         );
-        // 아이템에 해당하는 보따리에 담겨있는 모든 아이템 이미지 가져오기
-
-//        List<DetailPageBagDto> bagInfos = getBagInfos(item);
 
         // 이승재 / 아이템 조회수 계산
         int viewCnt = item.getViewCnt();

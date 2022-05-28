@@ -48,20 +48,20 @@ public class MyUserController {
 
     // 이승재 / 찜한 아이템 보여주기
 
-    @GetMapping("/api/mypage/scrab")
+    @GetMapping("/user/mypage/scrabs")
     public List<MyScrabItemDto> scrabItem(@AuthenticationPrincipal UserDetailsImpl userDetails){
         return myUserService.scrabItem(userDetails);
     }
 
     // 이승재 / 유저 스토어 목록 보기
-    @GetMapping("/api/store/{userId}")
+    @GetMapping("/user/store/{userId}")
     private UserStoreResponseDto showStore(@PathVariable Long userId){
         return myUserService.showStore(userId);
     }
 
 
     // 이승재 / 유저 신고 기능
-    @PutMapping("/api/user/report")
+    @PutMapping("/user/report")
     public ResponseEntity<OkDto> reportUser(@RequestParam Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails){
        String answer =  myUserService.reportUser(userId, userDetails);
        if(answer.equals("true")) {
