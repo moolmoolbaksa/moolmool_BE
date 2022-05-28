@@ -1,20 +1,14 @@
 package com.sparta.mulmul.websocket.chat;
 
-import com.sparta.mulmul.websocket.chatDto.BannedUserDto;
-import com.sparta.mulmul.websocket.chatDto.RoomDto;
 import com.sparta.mulmul.exception.CustomException;
-
-import com.sparta.mulmul.user.userDto.UserRequestDto;
-import com.sparta.mulmul.dto.chatDto.*;
-import com.sparta.mulmul.websocket.NotificationRepository;
-import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.user.User;
-import com.sparta.mulmul.websocket.ChatBanned;
-import com.sparta.mulmul.websocket.ChatMessage;
-import com.sparta.mulmul.websocket.ChatRoom;
-import com.sparta.mulmul.websocket.Notification;
+import com.sparta.mulmul.user.UserRepository;
+import com.sparta.mulmul.user.userDto.UserRequestDto;
+import com.sparta.mulmul.websocket.*;
+import com.sparta.mulmul.websocket.chatDto.BannedUserDto;
 import com.sparta.mulmul.websocket.chatDto.MessageResponseDto;
+import com.sparta.mulmul.websocket.chatDto.RoomDto;
 import com.sparta.mulmul.websocket.chatDto.RoomResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,7 +16,8 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.ACCEPTOR;

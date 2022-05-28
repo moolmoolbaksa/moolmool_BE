@@ -1,0 +1,57 @@
+11:57:11.967 INFO  com.sparta.mulmul.MulmulApplication - Starting MulmulApplication using Java 1.8.0_322 on DESKTOP-NON18K4 with PID 79588 (C:\Users\WINNER\Desktop\spring_study\mulmul\build\classes\java\main started by WINNER in C:\Users\WINNER\Desktop\spring_study\mulmul)
+11:57:11.971 INFO  com.sparta.mulmul.MulmulApplication - No active profile set, falling back to 1 default profile: "default"
+11:57:13.406 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+11:57:13.736 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 316 ms. Found 13 JPA repository interfaces.
+11:57:14.008 WARN  com.amazonaws.util.EC2MetadataUtils - Unable to retrieve the requested metadata (/latest/meta-data/instance-id). EC2 Instance Metadata Service is disabled
+com.amazonaws.AmazonClientException: EC2 Instance Metadata Service is disabled
+	at com.amazonaws.internal.InstanceMetadataServiceResourceFetcher.readResource(InstanceMetadataServiceResourceFetcher.java:65)
+	at com.amazonaws.internal.EC2ResourceFetcher.readResource(EC2ResourceFetcher.java:66)
+	at com.amazonaws.util.EC2MetadataUtils.getItems(EC2MetadataUtils.java:402)
+	at com.amazonaws.util.EC2MetadataUtils.getData(EC2MetadataUtils.java:371)
+	at org.springframework.cloud.aws.context.support.env.AwsCloudEnvironmentCheckUtils.isRunningOnCloudEnvironment(AwsCloudEnvironmentCheckUtils.java:38)
+	at org.springframework.cloud.aws.context.annotation.OnAwsCloudEnvironmentCondition.matches(OnAwsCloudEnvironmentCondition.java:38)
+	at org.springframework.context.annotation.ConditionEvaluator.shouldSkip(ConditionEvaluator.java:108)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$TrackedConditionEvaluator.shouldSkip(ConfigurationClassBeanDefinitionReader.java:489)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitionsForConfigurationClass(ConfigurationClassBeanDefinitionReader.java:140)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitions(ConfigurationClassBeanDefinitionReader.java:129)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:343)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:247)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:311)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:112)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:746)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:564)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:145)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:740)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:415)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:303)
+	at org.springframework.boot.builder.SpringApplicationBuilder.run(SpringApplicationBuilder.java:164)
+	at com.sparta.mulmul.MulmulApplication.main(MulmulApplication.java:33)
+11:57:14.420 INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#15f2eda3' of type [com.amazonaws.auth.BasicAWSCredentials] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:57:14.421 INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#51351f28' of type [com.amazonaws.auth.AWSStaticCredentialsProvider] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:57:14.434 INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean '(inner bean)#2e2f720' of type [com.amazonaws.auth.profile.ProfileCredentialsProvider] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:57:14.439 INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'credentialsProvider' of type [org.springframework.cloud.aws.core.credentials.CredentialsProviderFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:57:14.439 INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - Bean 'credentialsProvider' of type [com.amazonaws.auth.AWSCredentialsProviderChain] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:57:14.989 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+11:57:15.006 INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+11:57:15.007 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+11:57:15.007 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.62]
+11:57:15.171 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+11:57:15.172 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3143 ms
+11:57:15.319 WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+11:57:15.564 INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+11:57:15.675 INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 5.6.8.Final
+11:57:15.948 INFO  o.h.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+11:57:16.131 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+11:57:16.569 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+11:57:16.606 INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.MySQL8Dialect
+11:57:18.267 INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+11:57:18.282 INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+11:57:20.934 WARN  o.s.s.c.a.web.builders.WebSecurity - You are asking Spring Security to ignore Ant [pattern='/h2-console/**']. This is not recommended -- please use permitAll via HttpSecurity#authorizeHttpRequests instead.
+11:57:20.935 INFO  o.s.s.web.DefaultSecurityFilterChain - Will not secure Ant [pattern='/h2-console/**']
+11:57:20.977 INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6e355249, org.springframework.security.web.context.SecurityContextPersistenceFilter@7ebfe01a, org.springframework.security.web.header.HeaderWriterFilter@51b59d58, org.springframework.web.filter.CorsFilter@652a1a17, org.springframework.security.web.authentication.logout.LogoutFilter@1eb7ec59, com.sparta.mulmul.security.filter.RestLoginFilter@1bdafb01, com.sparta.mulmul.security.filter.JwtAuthFilter@20b67366, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@35c00c, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@7b10472e, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@186d6033, org.springframework.security.web.session.SessionManagementFilter@7c5d36c3, org.springframework.security.web.access.ExceptionTranslationFilter@33ccead, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@64d53f0d]
+11:57:21.713 INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+11:57:21.746 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+11:57:21.748 INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Starting...
+11:57:21.748 INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5af641d3]]
+11:57:21.749 INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Started.
+11:57:21.756 INFO  com.sparta.mulmul.MulmulApplication - Started MulmulApplication in 10.494 seconds (JVM running for 12.322)

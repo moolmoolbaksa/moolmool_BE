@@ -2,10 +2,10 @@ package com.sparta.mulmul.websocket.chat;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.mulmul.user.User;
+import static com.sparta.mulmul.websocket.QChatBanned.*;
 
 import java.util.List;
 
-import static com.sparta.mulmul.model.QChatBanned.*;
 
 public class ChatBannedRepositoryImpl implements BannedQuerydsl {
 

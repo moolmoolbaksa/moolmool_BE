@@ -5,10 +5,8 @@ import com.sparta.mulmul.barter.barterDto.HotBarterDto;
 import com.sparta.mulmul.dto.barterDto.QHotBarterDto;
 import org.springframework.stereotype.Repository;
 
+import static com.sparta.mulmul.barter.QBarter.*;
 import java.util.List;
-
-import static com.sparta.mulmul.model.QBarter.barter1;
-
 @Repository
 public class BarterRepositoryImpl implements BarterQuerydsl {
 
@@ -29,17 +27,4 @@ public class BarterRepositoryImpl implements BarterQuerydsl {
                 .fetch();
     }
 
-//    @Override
-//    public List<BarterIAlltemListDto> findBybarterItem(Long barterId, Long userId) {
-//        return queryFactory
-//                .select(new QBarterItemListDto(
-//                        item.id,
-//                        item.title,
-//                        item.itemImg,
-//                        item.contents
-//                ))
-//                .from (barter1)
-//                .join(item)on(barter1.buyerId.eq(item.bag.userId))
-//                .
-//    }
 }

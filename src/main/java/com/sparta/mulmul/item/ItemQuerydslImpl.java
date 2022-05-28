@@ -14,10 +14,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
-
-import static com.sparta.mulmul.model.QItem.item;
-import static com.sparta.mulmul.model.QScrab.scrab1;
-
+import static com.sparta.mulmul.item.QItem.*;
+import static com.sparta.mulmul.item.QScrab.*;
 
 @Repository
 public class ItemQuerydslImpl implements ItemQuerydsl {

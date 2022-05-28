@@ -2,7 +2,6 @@ package com.sparta.mulmul.user;
 
 import com.sparta.mulmul.dto.*;
 import com.sparta.mulmul.item.scrabDto.MyScrabItemDto;
-import com.sparta.mulmul.dto.userDto.*;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.image.AwsS3Service;
 import com.sparta.mulmul.user.userDto.*;

@@ -1,7 +1,6 @@
 package com.sparta.mulmul.websocket.chat;
 
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
-import com.sparta.mulmul.dto.chatDto.*;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.websocket.ChatMessage;
 import com.sparta.mulmul.websocket.ChatRoom;
