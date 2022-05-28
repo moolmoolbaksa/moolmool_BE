@@ -154,8 +154,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedOrigin("http://kapi.kakao.com/v2/user/me");
         configuration.addAllowedOrigin("https://kapi.kakao.com/v2/user/me");
-        configuration.addAllowedOrigin("http://openapi.naver.com/v1/nid/me");
-        configuration.addAllowedOrigin("https://openapi.naver.com/v1/nid/me");
+        configuration.addAllowedOrigin("https://accounts.google.com/o/oauth2/v2/auth");
+        configuration.addAllowedOrigin("https://www.googleapis.com/drive/v2/files");
+        configuration.addAllowedOrigin("https://oauth2.googleapis.com/tokeninfo");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.addExposedHeader(AUTH_HEADER);
