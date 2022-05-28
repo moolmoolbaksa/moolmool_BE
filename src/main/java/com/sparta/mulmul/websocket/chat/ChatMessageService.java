@@ -1,16 +1,15 @@
 package com.sparta.mulmul.websocket.chat;
 
+import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.websocket.ChatMessage;
 import com.sparta.mulmul.websocket.ChatRoom;
 import com.sparta.mulmul.websocket.Notification;
-import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.utils.LanguageFilter;
 import com.sparta.mulmul.websocket.chatDto.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -80,7 +79,7 @@ public class ChatMessageService {
     }
 
     // 메시지 찾기, 페이징 처리 (검증이 필요합니다.)
-    @Cacheable(cacheNames = "chatInfo")
+//    @Cacheable(cacheNames = "chatInfo")
     public List<MessageResponseDto> getMessage(Long roomId, UserDetailsImpl userDetails){
         // 메시지 찾아오기
         List<ChatMessage> messages = messageRepository.findAllByRoomIdOrderByIdDesc(roomId);

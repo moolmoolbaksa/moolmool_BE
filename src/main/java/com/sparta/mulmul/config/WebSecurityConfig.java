@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
-import static com.sparta.mulmul.security.RestLoginSuccessHandler.REFRESH_HEADER;
 
 @Configuration
 @EnableWebSecurity
@@ -123,9 +122,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("POST,/user/id-check");
         skipPathList.add("POST,/user/nickname-check");
         skipPathList.add("GET,/user/kakao");
-        skipPathList.add("GET,/user/naver");
-
-        skipPathList.add("GET,//testcode");
 
         skipPathList.add("GET,/favicon.ico");
 
@@ -163,7 +159,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.addExposedHeader(AUTH_HEADER);
-        configuration.addExposedHeader(REFRESH_HEADER);
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

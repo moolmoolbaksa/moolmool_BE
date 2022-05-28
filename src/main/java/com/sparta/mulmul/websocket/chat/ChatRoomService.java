@@ -98,7 +98,7 @@ public class ChatRoomService {
     }
 
     // 사용자별 채팅방 전체 목록 가져오기
-    @Cacheable(cacheNames = "chatListInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "chatListInfo", key = "#userDetails.userId")
     public List<RoomResponseDto> getRooms(UserDetailsImpl userDetails){
         // 회원 찾기
         User user = userRepository.findById(userDetails.getUserId())
@@ -174,7 +174,7 @@ public class ChatRoomService {
     }
 
     // 차단 회원 불러오기
-    @Cacheable(cacheNames = "userBan")
+//    @Cacheable(cacheNames = "userBan")
     public List<BannedUserDto> getBanned(UserDetailsImpl userDetails){
         User user = userRepository
                 .findById(userDetails.getUserId())

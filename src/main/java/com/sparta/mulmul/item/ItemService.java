@@ -1,6 +1,7 @@
 package com.sparta.mulmul.item;
 import com.sparta.mulmul.barter.BarterRepository;
 import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.itemDto.*;
@@ -11,9 +12,7 @@ import com.sparta.mulmul.user.Bag;
 import com.sparta.mulmul.user.BagRepository;
 import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.user.UserRepository;
-import com.sparta.mulmul.websocket.NotificationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -92,7 +91,7 @@ public class ItemService {
 
     }
     //이승재 / 전체 아이템 조회(카테고리별)
-    @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")
     public ItemMainResponseDto getItems(int page, String category, UserDetailsImpl userDetails) {
         Pageable pageable = getPageable(page);
         if(category.isEmpty()){
@@ -196,7 +195,7 @@ public class ItemService {
 
     // 이승재 / 아이템 상세페이지
     @Transactional
-    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId")
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_ITEM)
@@ -444,7 +443,7 @@ public class ItemService {
 
 
     // 이승재 / 아이템 검색
-    @Cacheable(cacheNames = "itemSearchInfo", key = "#userDetails.userId")
+//    @Cacheable(cacheNames = "itemSearchInfo", key = "#userDetails.userId")
     public List<ItemSearchResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
         List<Item> itemList = itemRepository.searchByKeyword(keyword);
         List<ItemSearchResponseDto> itemResponseDtos = new ArrayList<>();
