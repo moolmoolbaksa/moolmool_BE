@@ -161,8 +161,6 @@ public class MyUserService {
 
     // 이승재 / 유저 신고하기 기능
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true)})
     public String reportUser(Long userId, UserDetailsImpl userDetails) {
         Optional<Report> findReport = reportRepository.findByReporterIdAndReportedUserId(userDetails.getUserId(), userId);
         if (findReport.isPresent()) {

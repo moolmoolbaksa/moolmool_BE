@@ -78,7 +78,7 @@ public class TradeService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
     public String requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트

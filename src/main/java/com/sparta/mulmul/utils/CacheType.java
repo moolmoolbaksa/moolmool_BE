@@ -9,11 +9,11 @@ public enum CacheType {
 
     USER_PROFILE("userProfile", 30, 10000),
 
-    ITEM_INFO("itemInfo", 5, 10000),
+    ITEM_INFO("itemInfo", 2, 10000),
     ITEM_DETAIL_INFO("itemDetailInfo", 5, 10000),
     ITEM_TRADE_CHECK_INFO("itemTradeCheckInfo", 10, 10000),
 
-    BARTER_MY_INFO("barterMyInfo", 3, 10000);
+    BARTER_MY_INFO("barterMyInfo", 2, 10000);
 
 
     // 캐시 이름, 만료 시간, 저장 가능한 최대 갯수

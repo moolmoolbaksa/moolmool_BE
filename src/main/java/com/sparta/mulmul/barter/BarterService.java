@@ -55,7 +55,7 @@ public class BarterService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
 //            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
             @CacheEvict(cacheNames = "itemTradeCheckInfo", allEntries = true)})
     public BarterTradeCheckDto cancelBarter(Long barterId, UserDetailsImpl userDetails) {
@@ -78,7 +78,7 @@ public class BarterService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
 //            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
 //            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
@@ -178,7 +178,7 @@ public class BarterService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #editRequestDto.itemId", allEntries = true),
             @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #editRequestDto.itemId", allEntries = true)})
     public void editBarter(EditRequestDto editRequestDto, UserDetailsImpl userDetails) {
