@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 public enum CacheType {
 
     USER_PROFILE("userProfile", 30, 10000),
-    USER_BAN("userBan", 5, 10000),
 
     ITEM_INFO("itemInfo", 5, 10000),
     ITEM_DETAIL_INFO("itemDetailInfo", 5, 10000),
