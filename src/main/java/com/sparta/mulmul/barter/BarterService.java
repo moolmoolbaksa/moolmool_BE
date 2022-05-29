@@ -12,7 +12,6 @@ import com.sparta.mulmul.websocket.Notification;
 import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -48,8 +47,7 @@ public class BarterService {
         // 유저의 거래내역 리스트를 전부 조회한다
         List<Barter> mybarterList = barterRepository.findAllByBuyerIdOrSellerId(userId, userId);
         // 거래내역 리스트를 담기
-        List<BarterDto> totalList = addTotalList(userId, mybarterList);
-        return totalList;
+        return addTotalList(userId, mybarterList);
     }
 
 
@@ -58,7 +56,8 @@ public class BarterService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
+//            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", allEntries = true)})
     public BarterTradeCheckDto cancelBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Barter mybarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
@@ -80,11 +79,11 @@ public class BarterService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
+//            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+//            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", allEntries = true)})
     public void deleteBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = user.getId();
@@ -133,9 +132,8 @@ public class BarterService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
+//            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", allEntries = true)})
     public BarterStatusDto okayBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 거래내역을 조회한다.
@@ -181,9 +179,8 @@ public class BarterService {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #editRequestDto.itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #editRequestDto.itemId", allEntries = true)})
     public void editBarter(EditRequestDto editRequestDto, UserDetailsImpl userDetails) {
         // 수정할 거래내역 찾기
         Barter barter = barterRepository.findById(editRequestDto.getBarterId()).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
@@ -201,16 +198,16 @@ public class BarterService {
             eachItems.statusUpdate(eachItemId, 0);
         }
 
-        String editItemIds = null;
+        StringBuilder editItemIds = null;
         // 수정할 아이템의 아이템 상태를 거래중 (2)로 만들어준다.
         for (Long eachEditItemId : editRequestDto.getItemId()) {
             Item editItems = itemRepository.findById(eachEditItemId).orElseThrow(() -> new CustomException(NOT_FOUND_ITEM));
             editItems.statusUpdate(eachEditItemId, 2);
             // 아이템의 아이디를 String형태로 변환하여 edit
             if (editItemIds != null) {
-                editItemIds = editItemIds + "," + eachEditItemId;
+                editItemIds.append(",").append(eachEditItemId);
             } else {
-                editItemIds = String.valueOf(eachEditItemId);
+                editItemIds = new StringBuilder(String.valueOf(eachEditItemId));
             }
         }
         // 수정된 거래사항을 업데이트합니다.

@@ -48,8 +48,7 @@ public class ItemService {
     // 이승재 / 보따리 아이템 등록하기
     @Caching(evict = {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true)})
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails) {
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
         List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
@@ -339,9 +338,7 @@ public class ItemService {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
         Long userId = userDetails.getUserId();
@@ -381,9 +378,7 @@ public class ItemService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
             @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public void updateItem(ItemUpdateRequestDto itemUpdateRequestDto, UserDetailsImpl userDetails, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
@@ -413,8 +408,6 @@ public class ItemService {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
-            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
             @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
@@ -450,7 +443,6 @@ public class ItemService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
             @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public String reportItem(Long itemId, UserDetailsImpl userDetails) {

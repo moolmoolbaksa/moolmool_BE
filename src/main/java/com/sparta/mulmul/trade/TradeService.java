@@ -44,7 +44,6 @@ public class TradeService {
     private final SimpMessageSendingOperations messagingTemplate;
 
     // 이승재 / 교환신청하기 전 정보
-    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemid")
     public TradeInfoDto showTradeInfo(Long itemid, Long userId, UserDetailsImpl userDetails) {
         Long myBadId = bagRepository.findByUserId(userDetails.getUserId()).getId();
 
@@ -80,8 +79,7 @@ public class TradeService {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #requestTradeDto.itemId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
     public String requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
