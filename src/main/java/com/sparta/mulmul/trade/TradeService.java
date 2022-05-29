@@ -44,7 +44,7 @@ public class TradeService {
     private final SimpMessageSendingOperations messagingTemplate;
 
     // 이승재 / 교환신청하기 전 정보
-    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemid")
     public TradeInfoDto showTradeInfo(Long itemid, Long userId, UserDetailsImpl userDetails) {
         Long myBadId = bagRepository.findByUserId(userDetails.getUserId()).getId();
 
@@ -81,8 +81,7 @@ public class TradeService {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #requestTradeDto.itemId", allEntries = true)})
     public String requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
@@ -192,12 +191,11 @@ public class TradeService {
     // 이승재 교환신청 확인 페이지 수락 버튼
     @Transactional
     @Caching(evict = {
-            @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "barterMyInfo", allEntries = true),
+            @CacheEvict(cacheNames = "userProfile", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", allEntries = true)})
     public BarterStatusDto acceptTrade(Long barterId) {
         Barter barter = barterRepository.findById(barterId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_BARTER)
@@ -233,11 +231,10 @@ public class TradeService {
     //  교환신청 확인페이지 거절버튼
     @Transactional
     @Caching(evict = {
-            @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "barterMyInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", allEntries = true)})
     public void deleteTrade(Long barterId) {
         //아이템 상태 업데이트
         Barter barter = barterRepository.findById(barterId).orElseThrow(

@@ -49,7 +49,7 @@ public class ItemService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails) {
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
         List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
@@ -207,7 +207,7 @@ public class ItemService {
 
     // 이승재 / 아이템 상세페이지
     @Transactional
-    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId")
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_ITEM)
@@ -338,10 +338,9 @@ public class ItemService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "scrabItemInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
             @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
     public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
@@ -382,10 +381,10 @@ public class ItemService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public void updateItem(ItemUpdateRequestDto itemUpdateRequestDto, UserDetailsImpl userDetails, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_ITEM)
@@ -413,10 +412,10 @@ public class ItemService {
     @Caching(evict = {
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
             @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemTradeInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_ITEM)
@@ -451,10 +450,9 @@ public class ItemService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(cacheNames = "itemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "hotItemInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId", allEntries = true),
-            @CacheEvict(cacheNames = "anotherUserProfile", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public String reportItem(Long itemId, UserDetailsImpl userDetails) {
         Optional<Report> findReport = reportRepository.findByReporterIdAndReportedItemId(userDetails.getUserId(), itemId);
         if (findReport.isPresent()) {
@@ -485,7 +483,6 @@ public class ItemService {
 
 
     // 이승재 / 아이템 검색
-//    @Cacheable(cacheNames = "itemSearchInfo", key = "#userDetails.userId")
     public List<ItemSearchResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
         List<Item> itemList = itemRepository.searchByKeyword(keyword);
         List<ItemSearchResponseDto> itemResponseDtos = new ArrayList<>();
