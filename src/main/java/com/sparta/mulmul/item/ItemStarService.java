@@ -1,11 +1,10 @@
 package com.sparta.mulmul.item;
 
+import com.sparta.mulmul.barter.BarterRepository;
 import com.sparta.mulmul.barter.barterDto.BarterHotItemListDto;
 import com.sparta.mulmul.barter.barterDto.HotBarterDto;
 import com.sparta.mulmul.item.itemDto.ItemStarDto;
-import com.sparta.mulmul.barter.BarterRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

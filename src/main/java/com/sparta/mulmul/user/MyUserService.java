@@ -1,24 +1,23 @@
 package com.sparta.mulmul.user;
 
 
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.item.Item;
+import com.sparta.mulmul.item.ItemRepository;
+import com.sparta.mulmul.item.Scrab;
+import com.sparta.mulmul.item.ScrabRepository;
 import com.sparta.mulmul.item.itemDto.ItemUserResponseDto;
 import com.sparta.mulmul.item.scrabDto.MyScrabItemDto;
+import com.sparta.mulmul.model.Report;
+import com.sparta.mulmul.repository.ReportRepository;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.user.userDto.MyPageResponseDto;
 import com.sparta.mulmul.user.userDto.UserEditDtailResponseDto;
 import com.sparta.mulmul.user.userDto.UserEditResponseDto;
 import com.sparta.mulmul.user.userDto.UserStoreResponseDto;
-import com.sparta.mulmul.exception.CustomException;
-import com.sparta.mulmul.item.Item;
-import com.sparta.mulmul.item.ItemRepository;
-import com.sparta.mulmul.item.ScrabRepository;
-import com.sparta.mulmul.model.Report;
-import com.sparta.mulmul.item.Scrab;
-import com.sparta.mulmul.repository.*;
-import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

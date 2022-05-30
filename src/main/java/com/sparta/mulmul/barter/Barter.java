@@ -1,4 +1,4 @@
-package com.sparta.mulmul.model;
+package com.sparta.mulmul.barter;
 
 import com.sparta.mulmul.utils.Timestamped;
 import lombok.AllArgsConstructor;

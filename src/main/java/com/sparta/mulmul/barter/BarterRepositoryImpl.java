@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.sparta.mulmul.model.QBarter.barter1;
+import static com.sparta.mulmul.barter.QBarter.barter1;
 
 
 @Repository
