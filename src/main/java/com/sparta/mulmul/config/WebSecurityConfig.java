@@ -123,6 +123,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("GET,/user/kakao");
         skipPathList.add("GET,/user/google");
         skipPathList.add("GET,/user/refresh");
+        skipPathList.add("GET,/health");
 
         skipPathList.add("GET,/favicon.ico");
 
