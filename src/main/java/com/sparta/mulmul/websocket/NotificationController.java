@@ -83,4 +83,12 @@ public class NotificationController {
         notificationService.setRead(notificationId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
+
+    // 교환 확정하기
+    @GetMapping("/notification/barter-complete") // 회원가입 축하 메시지에 대해 이 주소로 요청을 보내면 작동합니다.
+    public ResponseEntity<OkDto> barterComplete(@RequestParam Long notificationId){
+
+        notificationService.setRead(notificationId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
 }

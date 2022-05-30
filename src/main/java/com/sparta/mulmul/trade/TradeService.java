@@ -45,14 +45,14 @@ public class TradeService {
     // 이승재 / 교환신청하기 전 정보
 //    @Cacheable(cacheNames = "itemTradeInfo", key = "#userDetails.userId")
     public TradeInfoDto showTradeInfo(Long itemid, Long userId, UserDetailsImpl userDetails) {
-        Long myBadId = bagRepository.findByUserId(userDetails.getUserId()).getId();
+        Long myBagId = bagRepository.findByUserId(userDetails.getUserId()).getId();
 
         User user = userRepository.findById(userId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_USER)
         );
         String sellerNickName = user.getNickname();
 
-        List<Item> myItemList = itemRepository.findAllByBagId(myBadId);
+        List<Item> myItemList = itemRepository.findAllByBagId(myBagId);
 
         Item item = itemRepository.findById(itemid).orElseThrow(
                 () -> new CustomException(NOT_FOUND_ITEM)

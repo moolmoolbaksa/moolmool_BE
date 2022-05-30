@@ -24,4 +24,6 @@ public interface ItemQuerydsl {
 
      BarterHotItemListDto findByHotBarterItems(Long itemId);
 
+     List<Item> findAllBybagId(Long bagId);
+
 }

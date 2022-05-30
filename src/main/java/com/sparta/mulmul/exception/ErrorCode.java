@@ -28,6 +28,7 @@ public enum ErrorCode {
     NO_MORE_ITEM(HttpStatus.BAD_REQUEST.value(), "I001", "더이상 아이템을 등록할 수 없습니다."),
     CANT_SCRAB_OWN_ITEM(HttpStatus.BAD_REQUEST.value(), "I002", "자신의 아이템은 구독할 수 없습니다."),
     EXISTED_ITEM(HttpStatus.BAD_REQUEST.value(), "I003", "이미 아이템이 올라가 있습니다."),
+    WRONG_CATEGORY(HttpStatus.BAD_REQUEST.value(), "I004", "올바르지 않은 카테고리입니다."),
 
     //IMAGE
     FAILIED_UPLOAD_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "M001", "파일 업로드에 실패하였습니다"),

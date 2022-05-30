@@ -39,10 +39,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation group: 'org.springframework', name: 'spring-test', version: '5.3.19'
 
-    //로그남기기
-    implementation 'ch.qos.logback:logback-classic:1.2.3'
-    implementation 'ch.qos.logback:logback-core:1.2.3'
-
     // 이미지 업로드
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     implementation 'com.github.downgoon:marvin:1.5.5'
@@ -55,11 +51,6 @@ dependencies {
     implementation 'com.auth0:java-jwt:3.13.0'
     //WEB Socket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.3.2.RELEASE'
-    implementation 'com.github.ben-manes.caffeine:caffeine'
-    // XSS 방어
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
     //querydsl 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"

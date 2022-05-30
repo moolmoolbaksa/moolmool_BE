@@ -3,14 +3,22 @@ package com.sparta.mulmul.security.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.sparta.mulmul.security.UserDetailsImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 
+@Component
 public final class JwtTokenUtils {
 
-//    @Value("${jwt.secret-key}")
-//    public static String jwtSecret;
+    public static String JWT_SECRET;
+
+    @Value("${jwt.secret-key}")
+    private void setKey(String secret) {
+        JwtTokenUtils.JWT_SECRET = secret;
+    }
 
     private static final int SEC = 1;
     private static final int MINUTE = 60 * SEC;
@@ -25,8 +33,6 @@ public final class JwtTokenUtils {
     public static final String CLAIM_EXPIRED_DATE = "EXPIRED_DATE";
     public static final String CLAIM_USER_ID = "USER_ID";
     public static final String CLAIM_NICK_NAME = "NICK_NAME";
-//    public static final String JWT_SECRET = jwtSecret;
-    public static final String JWT_SECRET = "jwt_secret_!@#$%";
 
     public static String generateJwtToken(UserDetailsImpl userDetails) {
 

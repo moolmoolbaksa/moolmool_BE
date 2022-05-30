@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class KakaoUserInfoDto {
+
     private Long id;
     private String email;
     private String nickname;
