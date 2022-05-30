@@ -1,5 +1,6 @@
 package com.sparta.mulmul.user;
 
+import com.sparta.mulmul.security.jwt.HeaderTokenExtractor;
 import com.sparta.mulmul.security.jwt.JwtDecoder;
 import com.sparta.mulmul.user.userDto.TokenDto;
 import com.sparta.mulmul.user.userDto.UserCheckResponseDto;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,12 +30,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtDecoder jwtDecoder;
+    private final HeaderTokenExtractor extractor;
 
     // 회원 정보 초기화 시켜주기
     @Transactional
     public void setUserInfo(UserDetailsImpl userDetails, UserRequestDto requestDto) {
 
-        System.out.println(requestDto.getAddress());
         User user = userRepository.findById(userDetails
                         .getUserId())
                 .orElseThrow(() -> new CustomException(NOT_FOUND_USER));
@@ -51,11 +53,13 @@ public class UserService {
         );
     }
 
-    public String getRefreshToken(String token){
+    public String getRefreshToken(String payload) throws IOException {
 
         Long userId;
         String nickname;
+        System.out.println(payload);
         try {
+            String token = extractor.extract(payload);
             userId = jwtDecoder.decodeTokenByUserId(token);
             nickname = jwtDecoder.decodeTokenByNickname(token);
         } catch (CustomException e) {

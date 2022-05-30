@@ -27,9 +27,9 @@ public final class JwtTokenUtils {
     private static final int DAY = 24 * HOUR;
 
     // JWT 액세스 토큰의 유효기간: 30분 (단위: seconds)
-    private static final int JWT_TOKEN_VALID_SEC = 3 * MINUTE;
+    private static final int ACCESS_TOKEN_VALID_SEC = 30 * SEC;
     // JWT 액세스 토큰의 유효기간: 3일 (단위: milliseconds)
-    private static final int JWT_TOKEN_VALID_MILLI_SEC = JWT_TOKEN_VALID_SEC * 1000;
+    private static final int ACCESS_TOKEN_VALID_MILLI_SEC = ACCESS_TOKEN_VALID_SEC * 1000;
 
     // JWT 액세스 토큰의 유효기간: 30분 (단위: seconds)
     private static final int REFRESH_TOKEN_VALID_SEC = 3 * DAY;
@@ -53,7 +53,7 @@ public final class JwtTokenUtils {
                     .withClaim(CLAIM_USER_ID, userDetails.getUserId())
                     .withClaim(CLAIM_NICK_NAME, userDetails.getNickname())
                      // 토큰 만료 일시 = 현재 시간 + 토큰 유효기간)
-                    .withClaim(CLAIM_EXPIRED_DATE, new Date(System.currentTimeMillis() + JWT_TOKEN_VALID_MILLI_SEC))
+                    .withClaim(CLAIM_EXPIRED_DATE, new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALID_MILLI_SEC))
                     .sign(generateAlgorithm());
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -83,11 +83,11 @@ public final class JwtTokenUtils {
 
     public String getJwtToken(User user, String type){
         switch (type){
-            case REFRESH_TOKEN:
+            case ACCESS_TOKEN:
                 return TOKEN_TYPE + " " + generateAccessToken(
                         UserDetailsImpl.fromUser(user)
                 );
-            case ACCESS_TOKEN:
+            case REFRESH_TOKEN:
                 return TOKEN_TYPE + " " + generateRefreshToken(
                         UserDetailsImpl.fromUser(user)
                 );
