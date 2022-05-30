@@ -6,12 +6,18 @@ import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.image.AwsS3Service;
 import com.sparta.mulmul.user.userDto.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+
+import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
+import static com.sparta.mulmul.security.RestLoginSuccessHandler.REFRESH_HEADER;
 
 // 유저 회원가입과 로그인 관련 처리 담당
 @RestController
@@ -78,5 +84,20 @@ public class UserController {
         }else {
             return ResponseEntity.ok().body(OkDto.valueOf("false"));
         }
+    }
+
+    // 리프레시 토큰 발급
+    @GetMapping("/user/refresh")
+    public ResponseEntity<OkDto> sendRefreshToken(@RequestHeader("Authorization") String payload) throws IOException {
+
+        // 토큰 추가 처리 필요
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTH_HEADER, userService.getRefreshToken(payload));
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(OkDto.valueOf("true")
+                );
     }
 }

@@ -42,22 +42,10 @@ public class User {
     private Boolean isBan;
     private float grade;
 
-
     // 회원 정보 초기화 (초기설정을 어떻게 해줄 것인지, 점수 알고리즘이 나오면 다시 만들어 보도록 합니다.)
     public void initProfile(String address){
         this.address = address;
     }
-
-    public static User withPassword(UserRequestDto requestDto, String password){
-
-        User user = new User();
-        user.username = requestDto.getUsername();
-        user.nickname = requestDto.getNickname();
-        user.password = password;
-
-        return user;
-    }
-
 
     public static User fromKakaoUserWithPassword(KakaoUserInfoDto kakaoUserInfo, String password){
 

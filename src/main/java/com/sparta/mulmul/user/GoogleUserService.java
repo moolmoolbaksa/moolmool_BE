@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.security.UserDetailsImpl;
+
+import com.sparta.mulmul.security.jwt.JwtTokenUtils;
+
 import com.sparta.mulmul.user.userDto.GoogleAccessTokenDto;
 import com.sparta.mulmul.user.userDto.GoogleUserInfoDto;
 import com.sparta.mulmul.user.userDto.TokenDto;
@@ -24,8 +27,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.UUID;
 
 import static com.sparta.mulmul.exception.ErrorCode.BANNED_USER;
+
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.TOKEN_TYPE;
-import static com.sparta.mulmul.security.jwt.JwtTokenUtils.generateJwtToken;
+
+import static com.sparta.mulmul.security.jwt.JwtTokenUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,9 @@ public class GoogleUserService {
     private final UserRepository userRepository;
     private final BagRepository bagRepository;
     private final NotificationRepository notificationRepository;
+
+    private final JwtTokenUtils jwtTokenUtils;
+
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private RestTemplate rt = new RestTemplate();
@@ -57,7 +65,8 @@ public class GoogleUserService {
         User googleUser = registerUserIfNeeded(googleUserInfo);
         // 토큰 Dto 만들기
         return TokenDto.createOf(
-                getJwtToken(googleUser),
+                jwtTokenUtils.getJwtToken(googleUser, ACCESS_TOKEN),
+                jwtTokenUtils.getJwtToken(googleUser, REFRESH_TOKEN),
                 googleUser
         );
     }
@@ -140,12 +149,6 @@ public class GoogleUserService {
             return signupUser;
         }
 
-    }
-    // JWT 토큰 추출
-    private String getJwtToken(User kakaoUser){
-        return TOKEN_TYPE + " " + generateJwtToken(
-                UserDetailsImpl.fromUser(kakaoUser)
-        );
     }
 
 }

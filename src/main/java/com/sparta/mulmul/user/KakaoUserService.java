@@ -2,6 +2,7 @@ package com.sparta.mulmul.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.mulmul.security.jwt.JwtTokenUtils;
 import com.sparta.mulmul.user.userDto.KakaoUserInfoDto;
 import com.sparta.mulmul.user.userDto.TokenDto;
 import com.sparta.mulmul.exception.CustomException;
@@ -31,6 +32,7 @@ public class KakaoUserService {
     private final UserRepository userRepository;
     private final BagRepository bagRepository;
     private final NotificationRepository notificationRepository;
+    private final JwtTokenUtils jwtTokenUtils;
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private RestTemplate rt = new RestTemplate();
@@ -50,7 +52,8 @@ public class KakaoUserService {
         User kakaoUser = registerUserIfNeeded(kakaoUserInfo);
         // 토큰 Dto 만들기
         return TokenDto.createOf(
-                getJwtToken(kakaoUser),
+                jwtTokenUtils.getJwtToken(kakaoUser, ACCESS_TOKEN),
+                jwtTokenUtils.getJwtToken(kakaoUser, REFRESH_TOKEN),
                 kakaoUser
         );
     }
@@ -129,12 +132,5 @@ public class KakaoUserService {
             }
             return signupUser;
         }
-
-    }
-    // JWT 토큰 추출
-    private String getJwtToken(User kakaoUser){
-        return TOKEN_TYPE + " " + generateJwtToken(
-                UserDetailsImpl.fromUser(kakaoUser)
-        );
     }
 }

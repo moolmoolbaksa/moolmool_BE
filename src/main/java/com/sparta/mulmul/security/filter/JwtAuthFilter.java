@@ -96,7 +96,7 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
             jwtDecoder.expirationCheck(token);
             jwtToken = new JwtPreProcessingToken(token);
         } catch (Exception e) {
-            setResponseError(response, new CustomException(EXPIRATION_TOKEN)
+            setExpirationError(response, new CustomException(EXPIRATION_TOKEN)
                     .getErrorCode());
             return null;
         }
@@ -150,6 +150,18 @@ public class JwtAuthFilter extends AbstractAuthenticationProcessingFilter {
 
         response.setContentType("application/json;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String result = mapper.writeValueAsString(ResponseError
+                .createFrom(error)
+        );
+        response.getWriter().write(result);
+    }
+
+    private void setExpirationError(HttpServletResponse response, ErrorCode error) throws IOException {
+
+        response.setContentType("application/json;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ObjectMapper mapper = new ObjectMapper();
         String result = mapper.writeValueAsString(ResponseError

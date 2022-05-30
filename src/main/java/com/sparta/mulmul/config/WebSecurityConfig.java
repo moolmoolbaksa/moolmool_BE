@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.sparta.mulmul.security.RestLoginSuccessHandler.AUTH_HEADER;
+import static com.sparta.mulmul.security.RestLoginSuccessHandler.REFRESH_HEADER;
 
 @Configuration
 @EnableWebSecurity
@@ -119,9 +120,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         skipPathList.add("GET,/h2-console/**");
         skipPathList.add("POST,/h2-console/**");
         // 회원 관리 API 허용
-        skipPathList.add("POST,/user/id-check");
-        skipPathList.add("POST,/user/nickname-check");
         skipPathList.add("GET,/user/kakao");
+        skipPathList.add("GET,/user/google");
+        skipPathList.add("GET,/user/refresh");
 
         skipPathList.add("GET,/favicon.ico");
 
@@ -152,13 +153,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedOrigin("https://moolmooldoctor.firebaseapp.com");
         configuration.addAllowedOrigin("https://moolmooldoctor.shop");
         configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedOrigin("http://kapi.kakao.com/v2/user/me");
         configuration.addAllowedOrigin("https://kapi.kakao.com/v2/user/me");
         configuration.addAllowedOrigin("https://accounts.google.com/o/oauth2/v2/auth");
         configuration.addAllowedOrigin("https://www.googleapis.com/drive/v2/files");
         configuration.addAllowedOrigin("https://oauth2.googleapis.com/tokeninfo");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
+        configuration.addExposedHeader(REFRESH_HEADER);
         configuration.addExposedHeader(AUTH_HEADER);
         configuration.setAllowCredentials(true);
 
