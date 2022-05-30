@@ -185,7 +185,8 @@ public class ItemService {
     //이승재 / 구독정보 확인
     private boolean checkScrab(Long userId, Long itemId) {
         if (scrabRepository.findByUserIdAndItemId(userId, itemId).isPresent()) {
-            return true;
+           Scrab scrabCeck =  scrabRepository.findByUserIdAndItemId(userId, itemId).orElseThrow(() -> new CustomException(NOT_FOUND_SCRAB));
+            return scrabCeck.getScrab();
         } else {
             return false;
         }
