@@ -407,7 +407,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new CustomException(NOT_FOUND_ITEM)
         );
-        if(item.getBag().getUserId().equals(userDetails.getUserId())){
+        if(item.getBag().getUserId().equals(userDetails.getUserId())){ // 예외 처리 필요
             item.setDeleted(itemId, 6);
         }
 

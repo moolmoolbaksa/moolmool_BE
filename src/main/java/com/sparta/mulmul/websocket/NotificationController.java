@@ -72,6 +72,7 @@ public class NotificationController {
     @DeleteMapping("/notification/{notificationId}")
     public ResponseEntity<OkDto> deleteNotification(@PathVariable Long notificationId){
 
+        // 회원 비교 절차 필요
         notificationRepository.deleteById(notificationId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }

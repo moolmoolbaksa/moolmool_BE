@@ -27,12 +27,12 @@ public final class JwtTokenUtils {
     private static final int DAY = 24 * HOUR;
 
     // JWT 액세스 토큰의 유효기간: 30분 (단위: seconds)
-    private static final int ACCESS_TOKEN_VALID_SEC = DAY;
+    private static final int ACCESS_TOKEN_VALID_SEC = 30 * SEC;
     // JWT 액세스 토큰의 유효기간: 3일 (단위: milliseconds)
     private static final int ACCESS_TOKEN_VALID_MILLI_SEC = ACCESS_TOKEN_VALID_SEC * 1000;
 
     // JWT 액세스 토큰의 유효기간: 30분 (단위: seconds)
-    private static final int REFRESH_TOKEN_VALID_SEC = 3 * DAY;
+    private static final int REFRESH_TOKEN_VALID_SEC = DAY;
     // JWT 액세스 토큰의 유효기간: 3일 (단위: milliseconds)
     private static final int REFRESH_TOKEN_VALID_MILLI_SEC = REFRESH_TOKEN_VALID_SEC * 1000;
 
