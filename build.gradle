@@ -11,7 +11,9 @@ plugins {
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'java'
 }
-jar { enabled=false }
+jar {
+    enabled=false
+}
 
 group = 'com.sparta'
 version = '0.0.1-SNAPSHOT'
