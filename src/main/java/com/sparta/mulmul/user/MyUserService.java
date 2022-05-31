@@ -180,7 +180,23 @@ public class MyUserService {
             itemUserResponseDtos.add(itemUserResponseDto);
         }
 
-        return new UserStoreResponseDto(nickname, profile, degree, grade, address, storeInfo, itemUserResponseDtos);
+        // 유저의 전체 점수 float -> int 형변환
+        int totalPoint = (int) user.getTotalGrade();
+        int degreePoint;
+        // 상한치 1000?
+        if (totalPoint >= 500) {
+            degreePoint = 1000;
+        } else if (totalPoint >= 200) {
+            degreePoint = 500;
+        } else if (totalPoint >= 100) {
+            degreePoint = 200;
+        } else if (totalPoint >= 30) {
+            degreePoint = 100;
+        } else {
+            degreePoint = 30;
+        }
+
+        return new UserStoreResponseDto(nickname, profile, degree, totalPoint, degreePoint, address, storeInfo, itemUserResponseDtos);
 
     }
 

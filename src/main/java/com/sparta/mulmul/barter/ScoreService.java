@@ -174,6 +174,11 @@ public class ScoreService {
             // 자기 자신에게 점수를 줄 경우
         } else if (opponentUserId.equals(user.getId())) {
             throw new CustomException(NOT_SCORE_MY_BARTER);
+            // 평가점수는 1 ~ 5 사이이다.
+        } else if (gradeScore > 5){
+            throw new CustomException(NOT_COMPLETE_SCORE);
+        }else if (gradeScore < 1){
+            throw new CustomException(NOT_COMPLETE_SCORE);
         }
 
         String[] barterIdList = barter.getBarter().split(";");

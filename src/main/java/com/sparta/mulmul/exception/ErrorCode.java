@@ -46,6 +46,7 @@ public enum ErrorCode {
     NOT_SCORE_MY_BARTER(HttpStatus.BAD_REQUEST.value(), "B009", "자신에게 평가는 할 수 없습니다."),
     NOT_TRADE_BARTER(HttpStatus.BAD_REQUEST.value(), "B010", "거래중인 상태가 아닙니다."),
     NOT_TRADE_COMPLETE_BARTER(HttpStatus.BAD_REQUEST.value(), "B011", "완료된 거래가 아닙니다."),
+    NOT_COMPLETE_SCORE(HttpStatus.BAD_REQUEST.value(), "B012", "올바르지 않은 평가입니다."),
 
     // NOTIFICATION
     NOT_FOUND_NOTIFICATION(HttpStatus.NOT_FOUND.value(), "N001", "알림이 없습니다."),
