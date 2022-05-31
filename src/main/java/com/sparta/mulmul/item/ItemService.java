@@ -64,11 +64,11 @@ public class ItemService {
             return 0L;
         }
         //카테고리값 비교
-        String category = itemRequestDto.getCategory();
-        if(category.equals("디지털기기") || category.equals("생활가전") || category.equals("가구/인테리어") || category.equals("유아동")
-            || category.equals("유아도서") || category.equals("생활/가공식품") || category.equals("스포츠/레저") || category.equals("여성잡화")
-            || category.equals("여성의류") || category.equals("남성패션/잡화") || category.equals("게임/취미") || category.equals("뷰티/미용")
-            || category.equals("반려동물용품") || category.equals("도서/티켓/음반") || category.equals("식물")){
+//        String category = itemRequestDto.getCategory();
+//        if(category.equals("디지털기기") || category.equals("생활가전") || category.equals("가구/인테리어") || category.equals("유아동")
+//            || category.equals("유아도서") || category.equals("생활/가공식품") || category.equals("스포츠/레저") || category.equals("여성잡화")
+//            || category.equals("여성의류") || category.equals("남성패션/잡화") || category.equals("게임/취미") || category.equals("뷰티/미용")
+//            || category.equals("반려동물용품") || category.equals("도서/티켓/음반") || category.equals("식물")){
             List<String> imgUrlList = itemRequestDto.getImgUrl();
             List<String> favoredList = itemRequestDto.getFavored();
             String imgUrl = String.join(",", imgUrlList);
@@ -111,9 +111,9 @@ public class ItemService {
                 return item.getId();
             }
 
-        }else {
-            throw new CustomException(WRONG_CATEGORY);
-        }
+//        }else {
+//            throw new CustomException(WRONG_CATEGORY);
+//        }
     }
 
     //이승재 / 전체 아이템 조회(카테고리별)
