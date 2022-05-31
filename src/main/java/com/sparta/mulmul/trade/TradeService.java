@@ -1,6 +1,7 @@
 package com.sparta.mulmul.trade;
 
 import com.sparta.mulmul.barter.BarterRepository;
+import com.sparta.mulmul.barter.barterDto.BarterMessageDto;
 import com.sparta.mulmul.barter.barterDto.BarterStatusDto;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.Item;
@@ -79,7 +80,7 @@ public class TradeService {
             @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", allEntries = true),
-            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #requestTradeDto.itemId")})
     public String requestTrade(RequestTradeDto requestTradeDto, UserDetailsImpl userDetails) {
         // 아이템 상태 업데이트
         Item sellerItem = itemRepository.findById(requestTradeDto.getItemId()).orElseThrow(
@@ -189,12 +190,12 @@ public class TradeService {
     // 이승재 교환신청 확인 페이지 수락 버튼
     @Transactional
     @Caching(evict = {
-            @CacheEvict(cacheNames = "barterMyInfo", allEntries = true),
+            @CacheEvict(cacheNames = "barterMyInfo", key = "#userDetails.userId", allEntries = true),
             @CacheEvict(cacheNames = "userProfile", allEntries = true),
             @CacheEvict(cacheNames = "itemInfo", allEntries = true),
             @CacheEvict(cacheNames = "itemDetailInfo", allEntries = true),
             @CacheEvict(cacheNames = "itemTradeCheckInfo", allEntries = true)})
-    public BarterStatusDto acceptTrade(Long barterId) {
+    public BarterStatusDto acceptTrade(Long barterId, UserDetailsImpl userDetails) {
         Barter barter = barterRepository.findById(barterId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_BARTER)
         );
@@ -221,8 +222,38 @@ public class TradeService {
         Boolean isTrade = false;
         Boolean isScore = false;
         int status = 2;
+
+        sendMyMessage(barterId, barter, userDetails.getUserId());
         return new BarterStatusDto(isTrade, isScore, status);
 
+    }
+
+    // 내게 거래완료 정보 메시지 보내기
+    private void sendMyMessage(Long barterId, Barter barter, Long userId) {
+        // 나의 sup주소로 전송
+        if (barter.getBuyerId().equals(userId)) {
+            // 내게 보낼 메시지 정보 담기
+            BarterMessageDto messageDto = new BarterMessageDto(
+                    barterId,
+                    false,
+                    barter.getStatus(),
+                    "seller"
+            );
+            messagingTemplate.convertAndSend(
+                    "/sub/barter/" + barter.getSellerId(), messageDto
+            );
+        } else {
+            // 내게 보낼 메시지 정보 담기
+            BarterMessageDto messageDto = new BarterMessageDto(
+                    barterId,
+                    false,
+                    barter.getStatus(),
+                    "buyer"
+            );
+            messagingTemplate.convertAndSend(
+                    "/sub/barter/" + barter.getBuyerId(), messageDto
+            );
+        }
     }
 
 

@@ -59,16 +59,18 @@ public class BarterService {
             @CacheEvict(cacheNames = "itemTradeCheckInfo", allEntries = true)})
     public BarterTradeCheckDto cancelBarter(Long barterId, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-        Barter mybarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
+        Barter myBarter = barterRepository.findById(barterId).orElseThrow(() -> new CustomException(NOT_FOUND_BARTER));
         BarterTradeCheckDto oppononetTreadeCheck;
         Long userId = user.getId();
         // 거래완료 취소 업데이트
-        if (mybarter.getStatus() == 2) {
-            oppononetTreadeCheck = getBarterTradeCheckDto(userId, mybarter);
+        if (myBarter.getStatus() == 2) {
+            oppononetTreadeCheck = getBarterTradeCheckDto(userId, myBarter);
         } else {
             // 거래중인 상태가 아니면 예외처리
             throw new CustomException(NOT_TRADE_BARTER);
         }
+        // 내게 거래완료 메시지 보내기
+        sendMyCancelMessage(barterId, myBarter, userId);
         return oppononetTreadeCheck;
     }
 
@@ -435,7 +437,37 @@ public class BarterService {
         }
     }
 
-    // 내게 거래완료 정보 메시지 보내기 리팩토링
+
+    // 내게 거래완료취소시 메시지 보내기
+    private void sendMyCancelMessage(Long barterId, Barter myBarter, Long userId) {
+        // 나의 sup주소로 전송
+        if (myBarter.getBuyerId().equals(userId)) {
+            // 내게 보낼 메시지 정보 담기
+            BarterMessageDto messageDto = new BarterMessageDto(
+                    barterId,
+                    false,
+                    myBarter.getStatus(),
+                    "seller"
+            );
+            messagingTemplate.convertAndSend(
+                    "/sub/barter/" + myBarter.getSellerId(), messageDto
+            );
+        } else {
+            // 내게 보낼 메시지 정보 담기
+            BarterMessageDto messageDto = new BarterMessageDto(
+                    barterId,
+                    false,
+                    myBarter.getStatus(),
+                    "buyer"
+            );
+            messagingTemplate.convertAndSend(
+                    "/sub/barter/" + myBarter.getBuyerId(), messageDto
+            );
+        }
+    }
+
+
+    // 내게 거래완료 정보 메시지 보내기
     private void sendMyMessage(Long barterId, Barter myBarter, String myPosition) {
         // 나의 sup주소로 전송
         if (myPosition.equals("buyer")) {
