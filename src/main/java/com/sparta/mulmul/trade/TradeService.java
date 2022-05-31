@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.sparta.mulmul.exception.ErrorCode.*;
+import static com.sparta.mulmul.websocket.chatDto.NotificationType.BARTER;
 
 @Service
 @RequiredArgsConstructor
@@ -122,7 +123,8 @@ public class TradeService {
             barterRepository.save(barter);
             // 알림 내역 저장 후 상대방에게 전송
             User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
-            Notification notification = notificationRepository.save(Notification.createOf(barter, user.getNickname()));
+            Notification notification = Notification.createOf(barter, user.getNickname());
+            notificationRepository.save(notification);
             // 리팩토링 필요
             messagingTemplate.convertAndSend(
                     "/sub/notification/" + requestTradeDto.getUserId(), NotificationDto.createFrom(notification)
