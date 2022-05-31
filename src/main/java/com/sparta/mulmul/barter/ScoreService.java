@@ -139,7 +139,8 @@ public class ScoreService {
     // 성훈 - 상대 평점주기
     @Transactional
     @Caching(evict = {
-    @CacheEvict(cacheNames = "userScore", key = "#userDetails.userId", allEntries = true),
+            // 상대방 을 평가하기 때문에, 상대방 마이페이지 캐시를 비운다
+    @CacheEvict(cacheNames = "userProfile", key = "#gradeScoreRequestDto.userId", allEntries = true),
     @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
     public BarterStatusDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
@@ -218,12 +219,9 @@ public class ScoreService {
             barter.updateScoreBuyer(true);
         }
 
-        // 상대의 전체 점수에 1, 2은 - / 3은 0 / 4, 5은 +
-        if (gradeScore <= 2) {
-            opponentUserTotalGrade = opponentUserTotalGrade - (3.0f - gradeScore);
-        } else if (gradeScore >= 4) {
-            opponentUserTotalGrade = opponentUserTotalGrade + (gradeScore - 3.0f);
-        }
+        // 상대의 전체 점수에 가산점
+            opponentUserTotalGrade = opponentUserTotalGrade + gradeScore*10;
+
         // 유저의 평균 평점
         if (opponentGrade == 0) {
             opponentGrade = gradeScore;
@@ -287,13 +285,13 @@ public class ScoreService {
     private String updateDegree(float totalGrade) {
         String degree;
         // 칭호 등급
-        if (totalGrade >= 150.0f) {
+        if (totalGrade >= 500.0f) {
             degree = "물물박사";
-        } else if (totalGrade >= 100.0f) {
+        } else if (totalGrade >= 200.0f) {
             degree = "물물석사";
-        } else if (totalGrade >= 70.0f) {
+        } else if (totalGrade >= 100.0f) {
             degree = "물물학사";
-        } else if (totalGrade >= 50.0f) {
+        } else if (totalGrade >= 30.0f) {
             degree = "물물학생";
         } else {
             degree = "물물어린이";

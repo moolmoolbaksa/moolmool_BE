@@ -1,6 +1,7 @@
 package com.sparta.mulmul.user;
 
 
+import com.sparta.mulmul.barter.BarterRepository;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.Item;
 import com.sparta.mulmul.item.ItemRepository;
@@ -38,6 +39,7 @@ public class MyUserService {
     private final ItemRepository itemRepository;
     private final ScrabRepository scrabRepository;
     private final BagRepository bagRepository;
+    private final BarterRepository barterRepository;
     private final ReportRepository reportRepository;
 
     // 성훈_마이페이지_내 정보보기
@@ -57,12 +59,37 @@ public class MyUserService {
         // 스크랩 정도 넣어주기
         List<ItemUserResponseDto> myScrapItemList = addItemList(myScrabList);
 
+// 칭호 등급
+
+        // 유저의 전체 점수 float -> int 형변환
+        int totalPoint = (int) user.getTotalGrade();
+        int degreePoint;
+        // 상한치 1000?
+        if (totalPoint >= 500) {
+            degreePoint = 1000;
+        } else if (totalPoint >= 200) {
+            degreePoint = 500;
+        } else if (totalPoint >= 100) {
+            degreePoint = 200;
+        } else if (totalPoint >= 30) {
+            degreePoint = 100;
+        } else {
+            degreePoint = 30;
+        }
+
+        Long acceptorcnt = barterRepository.findByMyAcceptorCnt(userId);
+        Long requesterCnt = barterRepository.findByMyRequestorCnt(userId);
+
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
         return new MyPageResponseDto(
                 user.getNickname(),
                 user.getProfile(),
                 user.getDegree(),
-                user.getGrade(),
+                totalPoint,
+                degreePoint,
+                acceptorcnt,
+                requesterCnt,
+                user.getRaterCount(),
                 user.getAddress(),
                 user.getStoreInfo(),
                 myItemResponseList,
