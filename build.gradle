@@ -35,7 +35,6 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-test', version: '5.3.19'
     implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.4'
 
-
     // 이미지 업로드
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     implementation 'com.github.downgoon:marvin:1.5.5'
@@ -51,10 +50,12 @@ dependencies {
     //querydsl 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
-
     //Caffeine
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
+    // 로그 남기기
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "ch.qos.logback:logback-core:1.2.3"
 }
 
 tasks.named('test') {
