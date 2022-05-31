@@ -48,9 +48,9 @@ public class ItemService {
     private final NotificationRepository notificationRepository;
 
     // 이승재 / 보따리 아이템 등록하기
-//    @Caching(evict = {
-//            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
-//            @CacheEvict(cacheNames = "itemInfo", allEntries = true)})
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true)})
     public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails) {
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
         List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
