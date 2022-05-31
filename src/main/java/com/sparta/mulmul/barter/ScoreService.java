@@ -266,7 +266,8 @@ public class ScoreService {
         }
 
         // 알림 내역 저장
-        Notification notification = notificationRepository.save(Notification.createOfBarter(barter, user.getNickname(), myPosition, "Score"));
+        Notification notification = Notification.createOfBarter(barter, user.getNickname(), myPosition, "Score");
+        notificationRepository.save(notification);
         // 상대방의 sup주소로 알람전송
         sendScoreMessage(barter, myPosition, notification);
 

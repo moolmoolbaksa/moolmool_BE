@@ -268,7 +268,9 @@ public class BarterService {
                 }
             } else {
                 // 알림 내역 저장
-                Notification notification = notificationRepository.save(Notification.createOfBarter(myBarter, user.getNickname(), myPosition, "Barter"));
+                Notification notification = Notification.createOfBarter(myBarter, user.getNickname(), myPosition, "Barter");
+                notificationRepository.save(notification);
+
                 // 상대방의 sup주소로 전송
                 sendTradeMessage(myBarter, myPosition, notification);
             }
