@@ -1,6 +1,7 @@
 package com.sparta.mulmul.barter;
 
-import com.sparta.mulmul.model.Barter;
+import com.sparta.mulmul.barter.Barter;
+import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationDto;
 import com.sparta.mulmul.barter.barterDto.BarterStatusDto;
 import com.sparta.mulmul.barter.barterDto.MyBarterScorDto;
@@ -15,7 +16,9 @@ import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -135,6 +138,10 @@ public class ScoreService {
 
     // 성훈 - 상대 평점주기
     @Transactional
+    @Caching(evict = {
+            // 상대방 을 평가하기 때문에, 상대방 마이페이지 캐시를 비운다
+    @CacheEvict(cacheNames = "userProfile", key = "#gradeScoreRequestDto.userId", allEntries = true),
+    @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId", allEntries = true)})
     public BarterStatusDto gradeScore(GradeScoreRequestDto gradeScoreRequestDto, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         // 상대 userId
@@ -167,16 +174,17 @@ public class ScoreService {
             // 자기 자신에게 점수를 줄 경우
         } else if (opponentUserId.equals(user.getId())) {
             throw new CustomException(NOT_SCORE_MY_BARTER);
+            // 평가점수는 1 ~ 5 사이이다.
+        } else if (gradeScore > 5){
+            throw new CustomException(NOT_COMPLETE_SCORE);
+        }else if (gradeScore < 1){
+            throw new CustomException(NOT_COMPLETE_SCORE);
         }
 
         String[] barterIdList = barter.getBarter().split(";");
         String[] buyerItemId = barterIdList[0].split(",");
         String sellerItemId = barterIdList[1];
 
-//        int viewBonusCntB = 0;
-//        int viewBonusCntS = 0;
-//        int scrabBonusCntB = 0;
-//        int scrabBonusCntS = 0;
         int status = 4;
         // 내 포지션 확인
         String myPosition;
@@ -216,12 +224,9 @@ public class ScoreService {
             barter.updateScoreBuyer(true);
         }
 
-        // 상대의 전체 점수에 1, 2은 - / 3은 0 / 4, 5은 +
-        if (gradeScore <= 2) {
-            opponentUserTotalGrade = opponentUserTotalGrade - (3.0f - gradeScore);
-        } else if (gradeScore >= 4) {
-            opponentUserTotalGrade = opponentUserTotalGrade + (gradeScore - 3.0f);
-        }
+        // 상대의 전체 점수에 가산점
+            opponentUserTotalGrade = opponentUserTotalGrade + gradeScore*10;
+
         // 유저의 평균 평점
         if (opponentGrade == 0) {
             opponentGrade = gradeScore;
@@ -285,13 +290,13 @@ public class ScoreService {
     private String updateDegree(float totalGrade) {
         String degree;
         // 칭호 등급
-        if (totalGrade >= 150.0f) {
+        if (totalGrade >= 500.0f) {
             degree = "물물박사";
-        } else if (totalGrade >= 100.0f) {
+        } else if (totalGrade >= 200.0f) {
             degree = "물물석사";
-        } else if (totalGrade >= 70.0f) {
+        } else if (totalGrade >= 100.0f) {
             degree = "물물학사";
-        } else if (totalGrade >= 50.0f) {
+        } else if (totalGrade >= 30.0f) {
             degree = "물물학생";
         } else {
             degree = "물물어린이";

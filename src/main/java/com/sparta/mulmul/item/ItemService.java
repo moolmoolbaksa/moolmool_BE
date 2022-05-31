@@ -1,18 +1,26 @@
 package com.sparta.mulmul.item;
+
 import com.sparta.mulmul.barter.BarterRepository;
-import com.sparta.mulmul.model.Barter;
-import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.item.itemDto.*;
-import com.sparta.mulmul.model.*;
-import com.sparta.mulmul.repository.*;
+import com.sparta.mulmul.barter.Barter;
+import com.sparta.mulmul.model.Location;
+import com.sparta.mulmul.model.Report;
+import com.sparta.mulmul.repository.LocationRepository;
+import com.sparta.mulmul.repository.ReportRepository;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.user.Bag;
 import com.sparta.mulmul.user.BagRepository;
 import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.websocket.NotificationRepository;
+import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,16 +48,19 @@ public class ItemService {
     private final NotificationRepository notificationRepository;
 
     // 이승재 / 보따리 아이템 등록하기
-    public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails){
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true)})
+    public Long createItem(ItemRequestDto itemRequestDto, UserDetailsImpl userDetails) {
         Bag bag = bagRepositroy.findByUserId(userDetails.getUserId());
         List<Item> itemList = itemRepository.findAllByBagId(bag.getId());
         int itemCnt = 0;
-        for(Item item : itemList){
-            if(item.getStatus() == 0 || item.getStatus() == 1 || item.getStatus() ==2){
+        for (Item item : itemList) {
+            if (item.getStatus() == 0 || item.getStatus() == 1 || item.getStatus() == 2) {
                 itemCnt++;
             }
         }
-        if(itemCnt>=9){
+        if (itemCnt >= 9) {
             return 0L;
         }
         //카테고리값 비교
@@ -103,66 +114,31 @@ public class ItemService {
         }else {
             throw new CustomException(WRONG_CATEGORY);
         }
-
     }
+
     //이승재 / 전체 아이템 조회(카테고리별)
-//    @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId")
+    @Caching(cacheable = { @Cacheable(cacheNames = "itemInfo", key = "#userDetails.userId + '::' + #page + '::' + #category")})
     public ItemMainResponseDto getItems(int page, String category, UserDetailsImpl userDetails) {
         Pageable pageable = getPageable(page);
-        if(category.isEmpty()){
+        if (category.isEmpty()) {
             Page<Item> itemList = itemRepository.findAllItemOrderByCreatedAtDesc(pageable);
             List<ItemResponseDto> items = new ArrayList<>();
             Long totalCnt = itemList.getTotalElements();
-            for(Item item : itemList) {
-                    //구독 개수
-                    List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
-                    int scrabCnt = scrabs.size();
-                    //구독 정보 확인
-                    boolean isScarb = checkScrab(userDetails.getUserId(), item.getId());
-                    // 거리 계산
-                    String distance = getDistance(userDetails, item);
-
-                    User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
-                            () -> new CustomException(NOT_FOUND_USER)
-                    );
-                    String nickname = user.getNickname();
-                    ItemResponseDto itemResponseDto = new ItemResponseDto(
-                            item.getId(),
-                            nickname,
-                            item.getCategory(),
-                            item.getTitle(),
-                            item.getContents(),
-                            item.getItemImg().split(",")[0],
-                            distance,
-                            scrabCnt,
-                            item.getViewCnt(),
-                            item.getStatus(),
-                    isScarb);
-                    items.add(itemResponseDto);
-            }
-            ItemMainResponseDto itemMainResponseDto = new ItemMainResponseDto(totalCnt, items);
-            return itemMainResponseDto;
-        }
-        Page<Item> itemList = itemRepository.findAllItemByCategoryOrderByCreatedAtDesc(category, pageable);
-        Long totalCnt = itemList.getTotalElements();
-        List<ItemResponseDto> items = new ArrayList<>();
-        for(Item item : itemList) {
-                Long itemId = item.getId();
-
+            for (Item item : itemList) {
                 //구독 개수
-                List<Scrab> scrabs = scrabRepository.findAllItemById(itemId);
+                List<Scrab> scrabs = scrabRepository.findAllItemById(item.getId());
                 int scrabCnt = scrabs.size();
                 //구독 정보 확인
-                boolean isScarb = checkScrab(userDetails.getUserId(), itemId);
+                boolean isScarb = checkScrab(userDetails.getUserId(), item.getId());
                 // 거리 계산
                 String distance = getDistance(userDetails, item);
 
                 User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
-                     () -> new CustomException(NOT_FOUND_USER)
+                        () -> new CustomException(NOT_FOUND_USER)
                 );
-                 String nickname = user.getNickname();
+                String nickname = user.getNickname();
                 ItemResponseDto itemResponseDto = new ItemResponseDto(
-                        itemId,
+                        item.getId(),
                         nickname,
                         item.getCategory(),
                         item.getTitle(),
@@ -174,11 +150,46 @@ public class ItemService {
                         item.getStatus(),
                         isScarb);
                 items.add(itemResponseDto);
-
             }
-        ItemMainResponseDto itemMainResponseDto = new ItemMainResponseDto(totalCnt, items);
+            ItemMainResponseDto itemMainResponseDto = new ItemMainResponseDto(totalCnt, items);
             return itemMainResponseDto;
         }
+        Page<Item> itemList = itemRepository.findAllItemByCategoryOrderByCreatedAtDesc(category, pageable);
+        Long totalCnt = itemList.getTotalElements();
+        List<ItemResponseDto> items = new ArrayList<>();
+        for (Item item : itemList) {
+            Long itemId = item.getId();
+
+            //구독 개수
+            List<Scrab> scrabs = scrabRepository.findAllItemById(itemId);
+            int scrabCnt = scrabs.size();
+            //구독 정보 확인
+            boolean isScarb = checkScrab(userDetails.getUserId(), itemId);
+            // 거리 계산
+            String distance = getDistance(userDetails, item);
+
+            User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
+                    () -> new CustomException(NOT_FOUND_USER)
+            );
+            String nickname = user.getNickname();
+            ItemResponseDto itemResponseDto = new ItemResponseDto(
+                    itemId,
+                    nickname,
+                    item.getCategory(),
+                    item.getTitle(),
+                    item.getContents(),
+                    item.getItemImg().split(",")[0],
+                    distance,
+                    scrabCnt,
+                    item.getViewCnt(),
+                    item.getStatus(),
+                    isScarb);
+            items.add(itemResponseDto);
+
+        }
+        ItemMainResponseDto itemMainResponseDto = new ItemMainResponseDto(totalCnt, items);
+        return itemMainResponseDto;
+    }
 
     // 이승재 / 페이징 처리
     private Pageable getPageable(int page) {
@@ -188,38 +199,49 @@ public class ItemService {
     }
 
     //이승재 / 구독정보 확인
-    private boolean checkScrab(Long userId, Long itemId){
-        if(scrabRepository.findByUserIdAndItemId(userId, itemId).isPresent()){
-            return true;
-        }else{
+    private boolean checkScrab(Long userId, Long itemId) {
+        if (scrabRepository.findByUserIdAndItemId(userId, itemId).isPresent()) {
+           Scrab scrabCeck =  scrabRepository.findByUserIdAndItemId(userId, itemId).orElseThrow(() -> new CustomException(NOT_FOUND_SCRAB));
+            return scrabCeck.getScrab();
+        } else {
             return false;
         }
     }
+
     //이승재 / 거리 계산
-    private String getDistance(UserDetailsImpl userDetails, Item item){
+    private String getDistance(UserDetailsImpl userDetails, Item item) {
         String distance;
-        if(userDetails == null){
-             distance = "null";
-             return distance;
-        }else{
+
+        if (userDetails == null) {
+            distance = "null";
+            return distance;
+        } else {
             String itemAddress;
-            if(item.getAddress().equals("null")){
-                distance="null";
+            if (item.getAddress().equals("null")) {
+                distance = "null";
                 return distance;
-            }else{
-                itemAddress=item.getAddress();
+            } else {
+                itemAddress = item.getAddress();
             }
             distance = caculateDistance(userDetails.getUserId(), itemAddress);
-        }
-        return distance;
-    }
 
+            if (userDetails == null) {
+                distance = "null";
+                return distance;
+            } else {
+
+                distance = caculateDistance(userDetails.getUserId(), item.getAddress());
+
+            }
+            return distance;
+        }
+    }
     // 이승재 / 아이템 상세페이지
     @Transactional
-//    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId")
     public ItemDetailResponseDto getItemDetail(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new CustomException(NOT_FOUND_ITEM)
+                () -> new CustomException(NOT_FOUND_ITEM)
         );
 
         // 이승재 / 아이템 조회수 계산
@@ -232,11 +254,11 @@ public class ItemService {
         boolean isScrab = checkScrab(userId, itemId);
 
         User user = userRepository.findById(item.getBag().getUserId()).orElseThrow(
-                ()-> new CustomException(NOT_FOUND_USER)
+                () -> new CustomException(NOT_FOUND_USER)
         );
 
         List<String> itemImgList = new ArrayList<>();
-        for(int i = 0; i<item.getItemImg().split(",").length; i++){
+        for (int i = 0; i < item.getItemImg().split(",").length; i++) {
             itemImgList.add(item.getItemImg().split(",")[i]);
         }
 
@@ -253,23 +275,23 @@ public class ItemService {
 
         // 교환신청했는지 확인하기
         String traded = null;
-              Long barterId = Long.valueOf(0);
+        Long barterId = Long.valueOf(0);
         Long buyerId = userDetails.getUserId();
         Long sellerId = user.getId();
         List<Barter> barterList = barterRepository.findAllByBuyerIdAndSellerId(buyerId, sellerId);
         int tradeCnt = 0;
-        for(Barter barter : barterList){
-            if(barter.getBarter().split(";")[1].equals(itemId.toString())){
+        for (Barter barter : barterList) {
+            if (barter.getBarter().split(";")[1].equals(itemId.toString())) {
                 barterId = barter.getId();
                 tradeCnt++;
             }
         }
-        if(barterList.isEmpty() || tradeCnt==0 ){
+        if (barterList.isEmpty() || tradeCnt == 0) {
             traded = "false";
-        }else if(tradeCnt>0){
+        } else if (tradeCnt > 0) {
             traded = "true";
 
-     }
+        }
 
         ItemDetailResponseDto itemDetailResponseDto = new ItemDetailResponseDto(
                 user.getId(),
@@ -298,9 +320,9 @@ public class ItemService {
     // 이승재 / 위도 경도 거리계산하기
     private String caculateDistance(Long userId, String address) {
 
-        if(userId == null){
+        if (userId == null) {
             return "null";
-        }else {
+        } else {
             User user = userRepository.findById(userId).orElseThrow(
                     () -> new CustomException(NOT_FOUND_USER)
             );
@@ -334,30 +356,37 @@ public class ItemService {
             }
         }
     }
-    private double deg2rad(double deg){
+
+    private double deg2rad(double deg) {
         return (deg * Math.PI / 180.0);
     }
-    private double rad2deg(double rad){
+
+    private double rad2deg(double rad) {
         return (rad * 180 / Math.PI);
     }
 
     // 이승재 / 아이템 구독하기
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public void scrabItem(Long itemId, UserDetailsImpl userDetails) {
 
         Long userId = userDetails.getUserId();
         Optional<Scrab> scrab = scrabRepository.findByUserIdAndItemId(userId, itemId);
-        if(scrab.isPresent()){
+        if (scrab.isPresent()) {
             Long scrabId = scrab.get().getId();
             Scrab scrab1 = scrabRepository.findById(scrabId).orElseThrow(
-                    ()-> new IllegalArgumentException("구독 정보가 없습니다.")
+                    () -> new IllegalArgumentException("구독 정보가 없습니다.")
             );
-            if(scrab1.getScrab().equals(true)) {
+            if (scrab1.getScrab().equals(true)) {
                 scrab1.update(scrabId, false);
-            }else{
+            } else {
                 scrab1.update(scrabId, true);
             }
-        }else{
+        } else {
             Item item = itemRepository.findById(itemId).orElseThrow(
                     () -> new CustomException(NOT_FOUND_ITEM)
             );
@@ -365,7 +394,7 @@ public class ItemService {
             System.out.println(item.getBag().getUserId());
             if (userDetails.getUserId().equals(item.getBag().getUserId())) {
                 throw new CustomException(CANT_SCRAB_OWN_ITEM);
-            }else {
+            } else {
 
                 Scrab newScrab = Scrab.builder()
                         .userId(userId)
@@ -379,23 +408,28 @@ public class ItemService {
 
     // 이승재 / 아이템 수정
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public void updateItem(ItemUpdateRequestDto itemUpdateRequestDto, UserDetailsImpl userDetails, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new CustomException(NOT_FOUND_ITEM)
+                () -> new CustomException(NOT_FOUND_ITEM)
         );
         List<String> images = itemUpdateRequestDto.getImages();
         List<String> imagesUrl = itemUpdateRequestDto.getImagesUrl();
         List<String> imagesJoind = new ArrayList<>();
-        if(images.contains("null")) {
+        if (images.contains("null")) {
             imagesJoind.addAll(imagesUrl);
-        }else{
+        } else {
             imagesJoind.addAll(imagesUrl);
             imagesJoind.addAll(images);
         }
         List<String> favoredList = itemUpdateRequestDto.getFavored();
         String imgUrl = String.join(",", imagesJoind);
         String favored = String.join(",", favoredList);
-        if(item.getBag().getUserId().equals(userDetails.getUserId())){
+        if (item.getBag().getUserId().equals(userDetails.getUserId())) {
             item.itemUpdate(itemUpdateRequestDto, imgUrl, favored);
         }
     }
@@ -403,25 +437,30 @@ public class ItemService {
 
     // 이승재 / 아이템 삭제
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true),
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public void deleteItem(Long itemId, UserDetailsImpl userDetails) {
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new CustomException(NOT_FOUND_ITEM)
+                () -> new CustomException(NOT_FOUND_ITEM)
         );
-        if(item.getBag().getUserId().equals(userDetails.getUserId())){
+        if (item.getBag().getUserId().equals(userDetails.getUserId())) {
             item.setDeleted(itemId, 6);
         }
 
         // 아이템 이 삭제 되면 연관된 거래내역 삭제 및 아이템 상태 0으로 변환
         List<Barter> sellerBarterList = barterRepository.findAllBySellerId(userDetails.getUserId());
-        for(Barter eachBarter : sellerBarterList){
+        for (Barter eachBarter : sellerBarterList) {
             String[] eachBarterIdList = eachBarter.getBarter().split(";");
             String[] eachBuyerItemIds = eachBarterIdList[0].split(",");
             String eachSellerItemId = eachBarterIdList[1];
-            Long sellerItemId =  Long.parseLong(eachSellerItemId);
-            if(sellerItemId.equals(itemId)){
-                for(String eachBuyerItemId : eachBuyerItemIds){
+            Long sellerItemId = Long.parseLong(eachSellerItemId);
+            if (sellerItemId.equals(itemId)) {
+                for (String eachBuyerItemId : eachBuyerItemIds) {
                     Long buyerItemId = Long.parseLong(eachBuyerItemId);
-                    Item eachBuyerItem = itemRepository.findById(buyerItemId).orElseThrow(()->new CustomException(NOT_FOUND_ITEM));
+                    Item eachBuyerItem = itemRepository.findById(buyerItemId).orElseThrow(() -> new CustomException(NOT_FOUND_ITEM));
                     eachBuyerItem.statusUpdate(buyerItemId, 0);
 
                     barterRepository.delete(eachBarter);
@@ -435,11 +474,15 @@ public class ItemService {
 
     // 이승재 / 아이템 신고하기
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "itemInfo", allEntries = true),
+            @CacheEvict(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId", allEntries = true),
+            @CacheEvict(cacheNames = "itemTradeCheckInfo", key = "#userDetails.userId+ '::' + #itemId", allEntries = true)})
     public String reportItem(Long itemId, UserDetailsImpl userDetails) {
         Optional<Report> findReport = reportRepository.findByReporterIdAndReportedItemId(userDetails.getUserId(), itemId);
-        if (findReport.isPresent()){
+        if (findReport.isPresent()) {
             return "false";
-        }else {
+        } else {
 
             Item item = itemRepository.findById(itemId).orElseThrow(
                     () -> new CustomException(NOT_FOUND_ITEM)
@@ -455,7 +498,7 @@ public class ItemService {
             if (item.getReportCnt() == 5) {
                 item.statusUpdate(itemId, 5);
                 List<Scrab> scrabs = scrabRepository.findAllByItemId(itemId);
-                for(Scrab scrab : scrabs){
+                for (Scrab scrab : scrabs) {
                     scrab.update(scrab.getId(), false);
                 }
             }
@@ -465,23 +508,22 @@ public class ItemService {
 
 
     // 이승재 / 아이템 검색
-//    @Cacheable(cacheNames = "itemSearchInfo", key = "#userDetails.userId")
     public List<ItemSearchResponseDto> searchItem(String keyword, UserDetailsImpl userDetails) {
         List<Item> itemList = itemRepository.searchByKeyword(keyword);
         List<ItemSearchResponseDto> itemResponseDtos = new ArrayList<>();
         Long userId = userDetails.getUserId();
-        for(Item item : itemList){
-            if(item.getStatus() ==1 || item.getStatus() == 0){
+        for (Item item : itemList) {
+            if (item.getStatus() == 1 || item.getStatus() == 0) {
                 Boolean isScrab;
-                if(scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()){
+                if (scrabRepository.findByUserIdAndItemId(userId, item.getId()).isPresent()) {
                     isScrab = true;
-                }else {
+                } else {
                     isScrab = false;
                 }
                 List<Scrab> scrabs = scrabRepository.findAllByItemId(item.getId());
                 int scrabCnt = 0;
-                for(Scrab scrab : scrabs){
-                    if(scrab.getScrab().equals(true)){
+                for (Scrab scrab : scrabs) {
+                    if (scrab.getScrab().equals(true)) {
                         scrabCnt++;
                     }
                 }
