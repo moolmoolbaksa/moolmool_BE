@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class JasyptConfig {
 
-    //properties에서 가져오기
+    //properties에서
     @Value("${jasypt.encryptor.password}")
     private String encryptKey;
 
