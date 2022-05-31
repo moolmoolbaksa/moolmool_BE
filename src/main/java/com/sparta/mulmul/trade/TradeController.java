@@ -43,8 +43,8 @@ public class TradeController {
 
     // 이승재 교환신청 확인 페이지 수락 버튼
     @PutMapping("/items/trade/decision")
-    private BarterStatusDto acceptTrade(@RequestParam Long barterId){
-        return tradeService.acceptTrade(barterId);
+    private BarterStatusDto acceptTrade(@RequestParam Long barterId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return tradeService.acceptTrade(barterId, userDetails);
     }
 
     //이승재 교환신청 확인 페이지 거절 버튼

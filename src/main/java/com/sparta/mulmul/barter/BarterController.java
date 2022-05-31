@@ -1,11 +1,10 @@
 package com.sparta.mulmul.barter;
 
-import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.barter.barterDto.BarterDto;
 import com.sparta.mulmul.barter.barterDto.BarterStatusDto;
 import com.sparta.mulmul.barter.barterDto.BarterTradeCheckDto;
 import com.sparta.mulmul.barter.barterDto.EditRequestDto;
-import com.sparta.mulmul.websocket.NotificationRepository;
+import com.sparta.mulmul.dto.OkDto;
 import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +17,6 @@ import java.util.List;
 @RestController
 public class BarterController {
     final private BarterService barterService;
-    private final BarterRepository barterRepository;
-    private final NotificationRepository notificationRepository;
 
     /*성훈 - 거래중인 내역보기*/
     @GetMapping("/user/barters")

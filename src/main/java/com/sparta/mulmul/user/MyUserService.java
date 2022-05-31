@@ -1,21 +1,23 @@
 package com.sparta.mulmul.user;
 
 
+import com.sparta.mulmul.barter.BarterRepository;
+import com.sparta.mulmul.exception.CustomException;
+import com.sparta.mulmul.item.Item;
+import com.sparta.mulmul.item.ItemRepository;
+import com.sparta.mulmul.item.Scrab;
+import com.sparta.mulmul.item.ScrabRepository;
 import com.sparta.mulmul.item.itemDto.ItemUserResponseDto;
 import com.sparta.mulmul.item.scrabDto.MyScrabItemDto;
+import com.sparta.mulmul.model.Report;
+import com.sparta.mulmul.repository.ReportRepository;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.user.userDto.MyPageResponseDto;
 import com.sparta.mulmul.user.userDto.UserEditDtailResponseDto;
 import com.sparta.mulmul.user.userDto.UserEditResponseDto;
 import com.sparta.mulmul.user.userDto.UserStoreResponseDto;
-import com.sparta.mulmul.exception.CustomException;
-import com.sparta.mulmul.item.Item;
-import com.sparta.mulmul.item.ItemRepository;
-import com.sparta.mulmul.item.ScrabRepository;
-import com.sparta.mulmul.model.Report;
-import com.sparta.mulmul.item.Scrab;
-import com.sparta.mulmul.repository.*;
-import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import static com.sparta.mulmul.exception.ErrorCode.NOT_FOUND_ITEM;
 import static com.sparta.mulmul.exception.ErrorCode.NOT_FOUND_USER;
 
@@ -36,33 +39,57 @@ public class MyUserService {
     private final ItemRepository itemRepository;
     private final ScrabRepository scrabRepository;
     private final BagRepository bagRepository;
+    private final BarterRepository barterRepository;
     private final ReportRepository reportRepository;
 
     // 성훈_마이페이지_내 정보보기
     @Transactional
-//    @Cacheable(cacheNames = "userProfile", key = "#userDetails.userId")
+    @Cacheable(cacheNames = "userProfile", key = "#userDetails.userId")
     public MyPageResponseDto showMyPage(UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
         Long userId = userDetails.getUserId();
 
         // 한 유저의 모든 아이템을 보여줌
-//        List<Item> myItemList = itemRepository.findAllMyItem(userId);
         List<ItemUserResponseDto> myItemList = itemRepository.findByMyPageItems(userId);
         // 한 유저의 모든 아이템을 보여줌
         List<ItemUserResponseDto> myItemResponseList = addItemList(myItemList);
 
         // 스크랩 정도 넣어주기
-//        List<Scrab> myScrabList = scrabRepository.findTop3ByUserIdAndScrabOrderByModifiedAtDesc(userId, true);
         List<ItemUserResponseDto> myScrabList = itemRepository.findByMyScrabItems(userId);
         // 스크랩 정도 넣어주기
         List<ItemUserResponseDto> myScrapItemList = addItemList(myScrabList);
+
+// 칭호 등급
+
+        // 유저의 전체 점수 float -> int 형변환
+        int totalPoint = (int) user.getTotalGrade();
+        int degreePoint;
+        // 상한치 1000?
+        if (totalPoint >= 500) {
+            degreePoint = 1000;
+        } else if (totalPoint >= 200) {
+            degreePoint = 500;
+        } else if (totalPoint >= 100) {
+            degreePoint = 200;
+        } else if (totalPoint >= 30) {
+            degreePoint = 100;
+        } else {
+            degreePoint = 30;
+        }
+
+        Long acceptorcnt = barterRepository.findByMyAcceptorCnt(userId);
+        Long requesterCnt = barterRepository.findByMyRequestorCnt(userId);
 
         // 보내줄 내용을 MyPageResponseDto에 넣어주기
         return new MyPageResponseDto(
                 user.getNickname(),
                 user.getProfile(),
                 user.getDegree(),
-                user.getGrade(),
+                totalPoint,
+                degreePoint,
+                acceptorcnt,
+                requesterCnt,
+                user.getRaterCount(),
                 user.getAddress(),
                 user.getStoreInfo(),
                 myItemResponseList,
@@ -70,7 +97,7 @@ public class MyUserService {
         );
     }
 
-    //
+    // 이미지 파싱 대표이미지럴 넣어준다
     private List<ItemUserResponseDto> addItemList(List<ItemUserResponseDto> ItemList) {
         List<ItemUserResponseDto> myItemList = new ArrayList<>();
 
@@ -88,6 +115,7 @@ public class MyUserService {
 
     // 성훈_마이페이지_내 정보수정
     @Transactional
+    @CacheEvict(cacheNames = "userProfile", key = "#userDetails.userId", allEntries = true)
     public UserEditResponseDto editMyPage(String nickname, String address, String
             storeInfo, String imgUrl, UserDetailsImpl userDetails) {
         User user = userRepository.findById(userDetails.getUserId()).orElseThrow(() -> new CustomException(NOT_FOUND_USER));
@@ -106,7 +134,6 @@ public class MyUserService {
     }
 
     // 이승재 / 찜한 아이템 보여주기
-//    @Cacheable(cacheNames = "scrabItemInfo", key = "#userDetails.userId")
     public List<MyScrabItemDto> scrabItem(UserDetailsImpl userDetails) {
         List<Scrab> scrabList = scrabRepository.findAllByUserIdOrderByModifiedAtDesc(userDetails.getUserId());
 
@@ -130,7 +157,6 @@ public class MyUserService {
     }
 
     // 이승재 / 유저 스토어 목록 보기
-//    @Cacheable(cacheNames = "anotherUserProfile")
     public UserStoreResponseDto showStore(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(NOT_FOUND_USER)
@@ -154,7 +180,23 @@ public class MyUserService {
             itemUserResponseDtos.add(itemUserResponseDto);
         }
 
-        return new UserStoreResponseDto(nickname, profile, degree, grade, address, storeInfo, itemUserResponseDtos);
+        // 유저의 전체 점수 float -> int 형변환
+        int totalPoint = (int) user.getTotalGrade();
+        int degreePoint;
+        // 상한치 1000?
+        if (totalPoint >= 500) {
+            degreePoint = 1000;
+        } else if (totalPoint >= 200) {
+            degreePoint = 500;
+        } else if (totalPoint >= 100) {
+            degreePoint = 200;
+        } else if (totalPoint >= 30) {
+            degreePoint = 100;
+        } else {
+            degreePoint = 30;
+        }
+
+        return new UserStoreResponseDto(nickname, profile, degree, totalPoint, degreePoint, address, storeInfo, itemUserResponseDtos);
 
     }
 
@@ -185,8 +227,6 @@ public class MyUserService {
             return "true";
         }
     }
-
-
 
 
     // 유저 정보 수정

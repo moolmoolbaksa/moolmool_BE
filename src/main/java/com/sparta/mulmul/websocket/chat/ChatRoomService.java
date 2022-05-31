@@ -11,6 +11,7 @@ import com.sparta.mulmul.websocket.chatDto.MessageResponseDto;
 import com.sparta.mulmul.websocket.chatDto.RoomDto;
 import com.sparta.mulmul.websocket.chatDto.RoomResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -174,7 +175,6 @@ public class ChatRoomService {
     }
 
     // 차단 회원 불러오기
-//    @Cacheable(cacheNames = "userBan")
     public List<BannedUserDto> getBanned(UserDetailsImpl userDetails){
         User user = userRepository
                 .findById(userDetails.getUserId())
