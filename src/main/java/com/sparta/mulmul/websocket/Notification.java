@@ -89,9 +89,9 @@ public class Notification extends CreationDate {
         notification.userId = user.getId();
         notification.changeId = chatRoom.getId();
 
-        if (chatRoom.getRequester() == user){
+        if (chatRoom.getRequester().getId().equals(user.getId()) ){
             notification.nickname = chatRoom.getAcceptor().getNickname();
-        } else if (chatRoom.getAcceptor() == user){
+        } else if (chatRoom.getAcceptor().getId().equals(user.getId()) ){
             notification.nickname = chatRoom.getRequester().getNickname();
         }
 
