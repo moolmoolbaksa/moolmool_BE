@@ -73,11 +73,6 @@ public class ItemService {
             List<String> favoredList = itemRequestDto.getFavored();
             String imgUrl = String.join(",", imgUrlList);
             String favored = String.join(",", favoredList);
-            Optional<Item> existItem = itemRepository.findByTitleAndContents(itemRequestDto.getTitle(), itemRequestDto.getContents());
-            if(existItem.isPresent()){
-                return 1L;
-            }else {
-
                 User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
                         () -> new CustomException(NOT_FOUND_USER)
                 );
@@ -109,7 +104,7 @@ public class ItemService {
 
                 item = itemRepository.save(item);
                 return item.getId();
-            }
+
 
         }else {
             throw new CustomException(WRONG_CATEGORY);
