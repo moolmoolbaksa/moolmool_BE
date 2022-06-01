@@ -21,6 +21,7 @@ import java.util.List;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.ACCEPTOR;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.REQUESTER;
+import static com.sparta.mulmul.websocket.chatDto.NotificationType.CHAT;
 
 @Service
 @RequiredArgsConstructor
