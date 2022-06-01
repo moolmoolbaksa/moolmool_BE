@@ -8,4 +8,6 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemQuerydsl 
     List<Item> findAllByBagId(Long bagId);
 
    Optional<Item> findByTitleAndContents(String title, String contents);
+
+    List<Item> findAllByItemIds(Long[] ids);
 }

@@ -149,18 +149,14 @@ public class BarterService {
         String myPosition;
         // 유저가 바이어라면 바이어거래완료를 true로 변경한다.
         if (myBarter.getBuyerId().equals(userId)) {
-            if (myBarter.getIsBuyerTrade()) {
-                throw new CustomException(FINISH_BARTER);
-            }
+            if (myBarter.getIsBuyerTrade()) {throw new CustomException(FINISH_BARTER);}
             myBarter.updateTradBuyer(true);
             // 상대방의 거래유무
             opponentTrade = myBarter.getIsSellerTrade();
             myPosition = "buyer";
             // 유저가 셀러라면 셀러거래완료를 true로 변경한다.
         } else {
-            if (myBarter.getIsSellerTrade()) {
-                throw new CustomException(FINISH_BARTER);
-            }
+            if (myBarter.getIsSellerTrade()) {throw new CustomException(FINISH_BARTER);}
             myBarter.updateTradSeller(true);
             opponentTrade = myBarter.getIsBuyerTrade();
             myPosition = "seller";

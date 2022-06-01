@@ -23,6 +23,7 @@ import java.util.List;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.ACCEPTOR;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.REQUESTER;
+import static com.sparta.mulmul.websocket.chatDto.NotificationType.CHAT;
 
 @Service
 @RequiredArgsConstructor
@@ -79,15 +80,20 @@ public class ChatRoomService {
                 .orElseThrow(() -> new CustomException(NOT_FOUND_USER)
                 );
         // 채팅방 찾아오기
-        ChatRoom chatRoom = roomRepository.findById(id)
+        ChatRoom chatRoom = roomRepository.findByIdFetch(id)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT)
                 );
-        if ( chatRoom.getRequester() == user) { chatRoom.reqOut(true); }
-        else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
-        else { throw new CustomException(EXIT_INVAILED); }
+        if ( chatRoom.getRequester().getId().equals(userDetails.getUserId())) {
+            chatRoom.reqOut(true);
+        } else if ( chatRoom.getAcceptor().getId().equals(userDetails.getUserId())) {
+            chatRoom.accOut(true);
+        } else {
+            throw new CustomException(EXIT_INVAILED);
+        }
 
         if ( chatRoom.getAccOut() && chatRoom.getReqOut()) {
             roomRepository.deleteById(chatRoom.getId()); // 둘 다 나간 상태라면 방 삭제
+            notificationRepository.deleteByChangeIdAndType(chatRoom.getId(), CHAT);
         } else {
             // 채팅방 종료 메시지 전달 및 저장
             messagingTemplate.convertAndSend("/sub/chat/room/" + chatRoom.getId(),
@@ -99,7 +105,6 @@ public class ChatRoomService {
     }
 
     // 사용자별 채팅방 전체 목록 가져오기
-//    @Cacheable(cacheNames = "chatListInfo", key = "#userDetails.userId")
     public List<RoomResponseDto> getRooms(UserDetailsImpl userDetails){
         // 회원 찾기
         User user = userRepository.findById(userDetails.getUserId())
