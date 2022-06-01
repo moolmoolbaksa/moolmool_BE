@@ -57,11 +57,12 @@ public class UserService {
 
         Long userId;
         String nickname;
-        System.out.println(payload);
+
         try {
             String token = extractor.extract(payload);
             userId = jwtDecoder.decodeTokenByUserId(token);
             nickname = jwtDecoder.decodeTokenByNickname(token);
+            jwtDecoder.expirationCheck(token);
         } catch (CustomException e) {
             throw new CustomException(INVAILD_CONTENTS_TOKEN);
         }
@@ -73,6 +74,7 @@ public class UserService {
     }
 
     public ResponseEntity<Map<String, Boolean>> sendToken(TokenDto tokenDto){
+
         Map<String, Boolean> map = new HashMap<>();
         map.put("ok", true);
         map.put("isFirst", tokenDto.getIsFirst());

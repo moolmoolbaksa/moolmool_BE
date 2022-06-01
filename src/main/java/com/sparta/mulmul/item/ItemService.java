@@ -17,6 +17,7 @@ import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import lombok.RequiredArgsConstructor;
 
+
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -327,7 +328,6 @@ public class ItemService {
                 String userAddress = user.getAddress().split(" ")[0] + " " + user.getAddress().split(" ")[1];
                 String itemAddress = address.split(" ")[0] + " " + address.split(" ")[1];
                 Location userLocation = locationRepository.findByArea(userAddress);
-
                 Location itemLocation = locationRepository.findByArea(itemAddress);
                 double userLat = userLocation.getLatitude();
                 double userLon = userLocation.getLongitude();

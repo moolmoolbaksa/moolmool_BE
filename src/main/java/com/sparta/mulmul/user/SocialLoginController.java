@@ -16,7 +16,6 @@ public class SocialLoginController {
 
     private final KakaoUserService kakaoUserService;
     private final GoogleUserService googleUserService;
-
     private final UserService userService;
 
     @GetMapping("/user/kakao")

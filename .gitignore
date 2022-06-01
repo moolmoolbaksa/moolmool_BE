@@ -1,13 +1,12 @@
 HELP.md
 .gradle
-*.log
 build/
 *.log
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-aws.yml
-
+*.properties
+*.log
 
 ### STS ###
 .apt_generated

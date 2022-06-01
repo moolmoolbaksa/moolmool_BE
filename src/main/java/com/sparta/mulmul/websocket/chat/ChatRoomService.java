@@ -6,10 +6,7 @@ import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.user.userDto.UserRequestDto;
 import com.sparta.mulmul.websocket.*;
-import com.sparta.mulmul.websocket.chatDto.BannedUserDto;
-import com.sparta.mulmul.websocket.chatDto.MessageResponseDto;
-import com.sparta.mulmul.websocket.chatDto.RoomDto;
-import com.sparta.mulmul.websocket.chatDto.RoomResponseDto;
+import com.sparta.mulmul.websocket.chatDto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
@@ -21,7 +18,8 @@ import java.util.List;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.ACCEPTOR;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.REQUESTER;
-import static com.sparta.mulmul.websocket.chatDto.NotificationType.CHAT;
+import static com.sparta.mulmul.websocket.chatDto.NotificationType.*;
+
 
 @Service
 @RequiredArgsConstructor
