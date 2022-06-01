@@ -68,6 +68,14 @@ public class ChatRoomService {
                             return c;
                         });
         chatRoom.enter(); // 채팅방에 들어간 상태로 변경 -> 람다를 사용해 일괄처리할 방법이 있는지 연구해 보도록 합니다.
+
+        notificationRepository.save(Notification.createOf(chatRoom, acceptor)); // 알림 작성 및 전달
+        messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
+                MessageResponseDto.createFrom(
+                        messageRepository.save(ChatMessage.createInitOf(chatRoom.getId()))
+                )
+        );
+
         return chatRoom.getId();
     }
 
@@ -82,8 +90,8 @@ public class ChatRoomService {
         ChatRoom chatRoom = roomRepository.findById(id)
                 .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT)
                 );
-        if ( chatRoom.getRequester() == user) { chatRoom.reqOut(true); }
-        else if ( chatRoom.getAcceptor() == user) { chatRoom.accOut(true); }
+        if ( chatRoom.getRequester().equals(user)) { chatRoom.reqOut(true); }
+        else if ( chatRoom.getAcceptor().equals(user)) { chatRoom.accOut(true); }
         else { throw new CustomException(EXIT_INVAILED); }
 
         if ( chatRoom.getAccOut() && chatRoom.getReqOut()) {
@@ -133,14 +141,14 @@ public class ChatRoomService {
 
         for (RoomDto dto : roomDtos) {
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
-            if ( dto.getAccId() == userId ) {
+            if ( dto.getAccId().equals(userId) ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
                     int unreadCnt = messageRepository.countMsg(dto.getReqId(), dto.getRoomId());
                     Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());
                     if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                     else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                 }
-            } else if ( dto.getReqId() == userId ){
+            } else if ( dto.getReqId().equals(userId) ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
                     int unreadCnt = messageRepository.countMsg(dto.getAccId(), dto.getRoomId());
                     Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());

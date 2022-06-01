@@ -33,7 +33,7 @@ public class NotificationService {
             if ( notification.getType() == CHAT ) {
                 ChatRoom chatRoom = roomRepository.findByIdFetch(notification.getChangeId())
                         .orElseThrow( () -> new CustomException(NOT_FOUND_CHAT));
-                if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ) {
+                if ( chatRoom.getAcceptor().getId().equals(userDetails.getUserId()) ) {
                     dtos.add(NotificationDto.createOf(notification, chatRoom.getRequester()));
                 } else {
                     dtos.add(NotificationDto.createOf(notification, chatRoom.getAcceptor()));
