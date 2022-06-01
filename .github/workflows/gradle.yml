@@ -54,4 +54,4 @@ jobs:
         run: aws s3 cp --region ap-northeast-2 --acl private ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
 
       - name: Code Deploy
-        run: aws deploy create-deployment --application-name mulmul-CodeDeploy --deployment-group-name mulmul-CodeDeploy --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip --region ap-northeast-2
+        run: aws deploy create-deployment --application-name mulmul-CodeDeploy --deployment-group-name mulmul-CodeDeploy --file-exists-behavior OVERWRITE --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip --region ap-northeast-2
