@@ -23,23 +23,29 @@ public class NotificationService {
     private final ChatRoomRepository roomRepository;
 
     // 알림 전체 목록
-//    @Cacheable(cacheNames = "notificationInfo", key = "#userDetails.userId")
     public List<NotificationDto> getNotification(UserDetailsImpl userDetails){
 
         List<Notification> notifications = notificationRepository.findAllByUserIdOrderByIdDesc(userDetails.getUserId());
         List<NotificationDto> dtos = new ArrayList<>();
 
+        for ( Notification noti : notifications ){
+            System.out.println(noti.getType() + ": " + noti.getChangeId());
+        }
+
         for (Notification notification : notifications){
             if ( notification.getType() == CHAT ) {
                 ChatRoom chatRoom = roomRepository.findByIdFetch(notification.getChangeId())
-                        .orElseThrow( () -> new CustomException(NOT_FOUND_CHAT));
-                if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ) {
-                    dtos.add(NotificationDto.createOf(notification, chatRoom.getRequester()));
-                } else {
-                    dtos.add(NotificationDto.createOf(notification, chatRoom.getAcceptor()));
+                        .orElse( null );
+                if ( chatRoom != null ) {
+                    if ( chatRoom.getAcceptor().getId().equals(userDetails.getUserId()) ) {
+                        dtos.add(NotificationDto.createOf(notification, chatRoom.getRequester()));
+                    } else if ( chatRoom.getRequester().getId().equals(userDetails.getUserId()) ) {
+                        dtos.add(NotificationDto.createOf(notification, chatRoom.getAcceptor()));
+                    }
                 }
-            } else { dtos.add(NotificationDto.createFrom(notification)); }
-
+            } else {
+                dtos.add(NotificationDto.createFrom(notification));
+            }
         }
         return dtos;
     }
