@@ -18,9 +18,7 @@
 ## 👩‍🎓 서비스 소개
 [물물박사 바로가기](https://moolmooldoctor.firebaseapp.com)
 
-[서비스 시연영상]()
-
-[발표 영상](https://www.youtube.com/watch?v=aSI8ODE3KIw)
+[발표 영상](https://youtu.be/0ctyjB97S3o)
 
 ## 📆 프로젝트 기간
 2022/04/22 ~ 2022/06/03
