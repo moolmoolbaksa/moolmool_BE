@@ -11,10 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class JasyptConfigTest {
     @Test
     public void jasypt_test() {
-        String plaintText = "Oo1aCKnxXrXzjZ9Qs0BN+p3levL7Hgj82NH6yrsv";
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
-        config.setPassword("moolmool");
 //        config.setPassword(System.getenv("JASYPT_PASSWORD"));
         config.setAlgorithm("PBEWithMD5AndDES");
         config.setKeyObtentionIterations("1000");
