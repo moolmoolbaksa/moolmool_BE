@@ -1,6 +1,5 @@
 package com.sparta.mulmul.image;
 
-import com.sparta.mulmul.image.Image;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

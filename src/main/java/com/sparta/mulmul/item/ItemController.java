@@ -20,7 +20,6 @@ public class ItemController {
     private final AwsS3Service awsS3Service;
     private final ItemService itemService;
     private final ItemStarService itemStarService;
-    private final MyUserService myUserService;
 
 
     // 이승재 / 보따리 아이템 등록하기

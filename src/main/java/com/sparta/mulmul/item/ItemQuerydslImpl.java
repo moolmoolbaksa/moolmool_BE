@@ -75,13 +75,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .fetch();
     }
 
-    @Override
-    public List<Item> findAllBybagId(Long bagId){
-        return queryFactory
-                .selectFrom(item)
-                .where(item.status.eq(0).or(item.status.eq(1)).and(item.bag.id.eq(bagId)))
-                .fetch();
-    }
+
 
     // 성훈 - 마이페이지 0-2상태의 아이템정보를 dto에 담는다
     @Override

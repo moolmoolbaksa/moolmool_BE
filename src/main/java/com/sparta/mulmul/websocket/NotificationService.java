@@ -70,8 +70,7 @@ public class NotificationService {
                         dtos.add(NotificationDto.createFrom(notification, starDtos));
                     }
                     break;
-//                case SCORE:
-//                    break;
+
                 default: dtos.add(NotificationDto.createFrom(notification)); break;
             }
         }
