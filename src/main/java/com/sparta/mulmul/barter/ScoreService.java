@@ -257,7 +257,6 @@ public class ScoreService {
         if (buyerScore && sellerScore) {
 
             // 유저 정보를 업데이트 이후 status를 거래완료(3) -> 평가완료(4)으로 업데이트를 한다.
-            barter.updateBarter(status);
             return new BarterStatusDto(true, true, barter.getStatus());
         }
 
