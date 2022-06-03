@@ -135,14 +135,14 @@ public class MyUserService {
 
     // 이승재 / 찜한 아이템 보여주기
     public List<MyScrabItemDto> scrabItem(UserDetailsImpl userDetails) {
-        List<Scrab> scrabList = scrabRepository.findAllByUserIdOrderByModifiedAtDesc(userDetails.getUserId());
+        List<Scrab> scrabs = scrabRepository.findAllScrab(userDetails.getUserId());
 
         List<MyScrabItemDto> myScrabItemDtoList = new ArrayList<>();
-        for (Scrab scrab : scrabList) {
-            if (scrab.getScrab().equals(true)) {
-                Item item = itemRepository.findById(scrab.getItemId()).orElseThrow(
-                        () -> new CustomException(NOT_FOUND_ITEM)
-                );
+        for(Scrab scrab : scrabs){
+            Item item = itemRepository.findById(scrab.getItemId()).orElseThrow(
+                    () -> new CustomException(NOT_FOUND_ITEM)
+            );
+            if(item.getStatus()==0 || item.getStatus()==1 || item.getStatus()==2) {
                 Long itemId = item.getId();
                 String title = item.getTitle();
                 String contents = item.getContents();
@@ -153,7 +153,6 @@ public class MyUserService {
             }
         }
         return myScrabItemDtoList;
-
     }
 
     // 이승재 / 유저 스토어 목록 보기
@@ -169,7 +168,7 @@ public class MyUserService {
         String storeInfo = user.getStoreInfo();
 
         Long userBadId = bagRepository.findByUserId(userId).getId();
-        List<Item> myItemList = itemRepository.findAllByBagId(userBadId);
+        List<Item> myItemList = itemRepository.findAllItemByBagId(userBadId);
         List<ItemUserResponseDto> itemUserResponseDtos = new ArrayList<>();
 
         for (Item item : myItemList) {

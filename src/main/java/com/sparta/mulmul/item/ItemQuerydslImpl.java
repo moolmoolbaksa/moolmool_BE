@@ -30,6 +30,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
         this.queryFactory = jpaQueryFactory;
     }
 
+    //이승재 / 메인페이지
     @Override
     public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable) {
         List<Item> results = queryFactory
@@ -47,7 +48,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
 
         return new PageImpl<>(results, pageable, total.size());
     }
-
+    //이승재 / 메인페이지 카테고리별
     @Override
     public Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable) {
         List<Item> results = queryFactory
@@ -66,6 +67,8 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
         return new PageImpl<>(results, pageable, total.size());
     }
 
+
+    //이승재 / 검색
     @Override
     public List<Item> searchByKeyword(String keyword){
         return  queryFactory
@@ -75,7 +78,15 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .fetch();
     }
 
-
+    //이승재 / 보유 아이템 확인
+    @Override
+    public List<Item> findAllItemByBagId(Long bagId){
+        return queryFactory
+                .selectFrom(item)
+                .where(item.status.eq(0).or(item.status.eq(1)).or(item.status.eq(2)).and(item.bag.id.eq(bagId)))
+                .orderBy(item.id.desc())
+                .fetch();
+    }
 
     // 성훈 - 마이페이지 0-2상태의 아이템정보를 dto에 담는다
     @Override

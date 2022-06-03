@@ -256,8 +256,7 @@ public class ScoreService {
         // 바이어와 셀러가 둘다 평가를 true로 하였다면 거래내역과 물품의 상태를 평가완료로 변경 ( status : 3 -> 4)
         if (buyerScore && sellerScore) {
 
-            // 유저 정보를 업데이트 이후 status를 거래완료(3) -> 평가완료(4)으로 업데이트를 한다.
-            barter.updateBarter(status);
+
             return new BarterStatusDto(true, true, barter.getStatus());
         }
 
