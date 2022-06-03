@@ -1,8 +1,7 @@
 package com.sparta.mulmul.barter;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.mulmul.barter.barterDto.BarterAcceptorCntDto;
-import com.sparta.mulmul.barter.barterDto.BarterRequesterCntDto;
+
 import com.sparta.mulmul.barter.barterDto.HotBarterDto;
 import com.sparta.mulmul.barter.barterDto.QHotBarterDto;
 import org.springframework.stereotype.Repository;

@@ -28,6 +28,7 @@ public enum ErrorCode {
     NO_MORE_ITEM(HttpStatus.BAD_REQUEST.value(), "I001", "더이상 아이템을 등록할 수 없습니다."),
     CANT_SCRAB_OWN_ITEM(HttpStatus.BAD_REQUEST.value(), "I002", "자신의 아이템은 구독할 수 없습니다."),
     EXISTED_ITEM(HttpStatus.BAD_REQUEST.value(), "I003", "이미 아이템이 올라가 있습니다."),
+    WRONG_CATEGORY(HttpStatus.BAD_REQUEST.value(), "I004", "올바르지 않은 카테고리입니다."),
 
     //IMAGE
     FAILIED_UPLOAD_IMAGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "M001", "파일 업로드에 실패하였습니다"),
@@ -55,7 +56,7 @@ public enum ErrorCode {
     LOGIN_FAILED(HttpStatus.BAD_REQUEST.value(), "L001", "아이디와 비밀번호를 확인해 주세요."),
     INVALID_LENGTH_TOKEN(HttpStatus.BAD_REQUEST.value(), "L002", "유효하지 않은 토큰입니다. 토큰의 길이를 확인해 주세요."),
     DECODING_FAILED_TOKEN(HttpStatus.BAD_REQUEST.value(), "L003", "유효하지 않은 토큰입니다. 토큰 디코딩에 실패했습니다."),
-    EXPIRATION_TOKEN(HttpStatus.BAD_REQUEST.value(), "L004", "만료된 토큰입니다."),
+    EXPIRATION_TOKEN(HttpStatus.UNAUTHORIZED.value(), "L004", "Unauthorized"),
     INVAILD_CONTENTS_TOKEN(HttpStatus.BAD_REQUEST.value(), "L005", "유효하지 않은 형식의 토큰입니다.");
 
     private final int httpStatus;

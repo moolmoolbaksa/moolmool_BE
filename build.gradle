@@ -11,16 +11,13 @@ plugins {
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'java'
 }
+jar {
+    enabled=false
+}
 
 group = 'com.sparta'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
 
 repositories {
     mavenCentral()
@@ -55,18 +52,16 @@ dependencies {
     implementation 'com.auth0:java-jwt:3.13.0'
     //WEB Socket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-cache', version: '2.3.2.RELEASE'
-    implementation 'com.github.ben-manes.caffeine:caffeine'
     //querydsl 추가
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
-    // 로그 남기기
-    implementation "ch.qos.logback:logback-classic:1.2.3"
-    implementation "ch.qos.logback:logback-core:1.2.3"
+
     //Caffeine
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
+    // 로그 남기기
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "ch.qos.logback:logback-core:1.2.3"
 }
 
 tasks.named('test') {

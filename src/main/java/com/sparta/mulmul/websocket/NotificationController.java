@@ -72,6 +72,7 @@ public class NotificationController {
     @DeleteMapping("/notification/{notificationId}")
     public ResponseEntity<OkDto> deleteNotification(@PathVariable Long notificationId){
 
+        // 회원 비교 절차 필요
         notificationRepository.deleteById(notificationId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));
     }
@@ -79,6 +80,14 @@ public class NotificationController {
     // 회원 가입 메시지
     @GetMapping("/notification/signup") // 회원가입 축하 메시지에 대해 이 주소로 요청을 보내면 작동합니다.
     public ResponseEntity<OkDto> signup(@RequestParam Long notificationId){
+
+        notificationService.setRead(notificationId);
+        return ResponseEntity.ok().body(OkDto.valueOf("true"));
+    }
+
+    // 교환 확정하기
+    @GetMapping("/notification/barter-complete") // 회원가입 축하 메시지에 대해 이 주소로 요청을 보내면 작동합니다.
+    public ResponseEntity<OkDto> barterComplete(@RequestParam Long notificationId){
 
         notificationService.setRead(notificationId);
         return ResponseEntity.ok().body(OkDto.valueOf("true"));

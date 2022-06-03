@@ -7,23 +7,20 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sparta.mulmul.exception.CustomException;
 import com.sparta.mulmul.exception.ErrorCode;
+import com.sparta.mulmul.security.UserDetailsImpl;
 import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.user.UserRepository;
-import com.sparta.mulmul.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -44,11 +41,6 @@ public class AwsS3Service {
             multipartFiles.forEach(file -> {
                 String fileName = createFileName(file.getOriginalFilename());
                 String fileFormatName = file.getContentType().substring(file.getContentType().lastIndexOf("/") + 1);
-
-
-                // 이미지 리사이즈 작업
-//                MultipartFile resizedFile = resizeImage(fileName, fileFormatName, file, 768);
-
                 ObjectMetadata objectMetadata = new ObjectMetadata();
                 objectMetadata.setContentLength(file.getSize());
                 objectMetadata.setContentType(file.getContentType());
@@ -69,28 +61,6 @@ public class AwsS3Service {
             List<String> imageUrlList = new ArrayList<>();
             imageUrlList.add("null");
             return imageUrlList;
-        }
-    }
-
-    MultipartFile resizeImage(String fileName, String fileFormatName, MultipartFile originalImage, int targetWidth) {
-        try {
-            // MultipartFile -> BufferedImage Convert
-            BufferedImage inputImage = ImageIO.read(originalImage.getInputStream());
-            int originWidth = inputImage.getWidth();
-            if(originWidth < targetWidth )
-                return originalImage;
-
-            BufferedImage outputImage = new BufferedImage(targetWidth, targetWidth, inputImage.getType());
-            Graphics2D graphics2D = outputImage.createGraphics();
-            graphics2D.drawImage(inputImage, 0, 0, targetWidth, targetWidth, null);
-            graphics2D.dispose();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(outputImage, fileFormatName, baos);
-            baos.flush();
-            return new MockMultipartFile(fileName, baos.toByteArray());
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.FAILIED_RESIZE_IMAGE);
         }
     }
 
@@ -117,11 +87,9 @@ public class AwsS3Service {
             String fileFormatName = multipartFile.getContentType().substring(multipartFile.getContentType().lastIndexOf("/")+1);
 
 
-            // 이미지 리사이즈 작업
-            MultipartFile resizedFile = resizeImage(fileName, fileFormatName, multipartFile, 768);
 
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(resizedFile.getSize());
+            objectMetadata.setContentLength(multipartFile.getSize());
             objectMetadata.setContentType(multipartFile.getContentType());
 
             String imgUrl = amazonS3.getUrl(bucket, fileName).toString();
@@ -141,7 +109,7 @@ public class AwsS3Service {
                 imageRepository.deleteById(nowImgId);
             }
 
-            try (InputStream inputStream = resizedFile.getInputStream()) {
+            try (InputStream inputStream = multipartFile.getInputStream()) {
                 amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
             } catch (IOException e) {

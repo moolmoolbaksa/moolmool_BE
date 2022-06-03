@@ -26,7 +26,7 @@ public class ChatRoomController {
     // 채팅방 만들기
     @PostMapping("/room")
     public Long createRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                            @RequestBody UserRequestDto requestDto) {
+                           @RequestBody UserRequestDto requestDto) {
         return roomService.createRoom(userDetails, requestDto);
     }
 

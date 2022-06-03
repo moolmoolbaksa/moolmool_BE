@@ -6,13 +6,8 @@ import com.sparta.mulmul.user.User;
 import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.user.userDto.UserRequestDto;
 import com.sparta.mulmul.websocket.*;
-import com.sparta.mulmul.websocket.chatDto.BannedUserDto;
-import com.sparta.mulmul.websocket.chatDto.MessageResponseDto;
-import com.sparta.mulmul.websocket.chatDto.RoomDto;
-import com.sparta.mulmul.websocket.chatDto.RoomResponseDto;
+import com.sparta.mulmul.websocket.chatDto.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +18,8 @@ import java.util.List;
 import static com.sparta.mulmul.exception.ErrorCode.*;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.ACCEPTOR;
 import static com.sparta.mulmul.websocket.chat.ChatRoomService.UserTypeEnum.Type.REQUESTER;
-import static com.sparta.mulmul.websocket.chatDto.NotificationType.CHAT;
+import static com.sparta.mulmul.websocket.chatDto.NotificationType.*;
+
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +37,7 @@ public class ChatRoomService {
     public Long createRoom(UserDetailsImpl userDetails, UserRequestDto requestDto){
         // 유효성 검사
         Long acceptorId = requestDto.getUserId();
-        if ( userDetails.getUserId() == acceptorId ) {
+        if ( userDetails.getUserId().equals(acceptorId) ) {
             throw new CustomException(CANNOT_CHAT_WITH_ME);
         }
         // 채팅 상대 찾아오기
@@ -57,18 +53,19 @@ public class ChatRoomService {
         }
         // 채팅방을 찾아보고, 없을 시 DB에 채팅방 저장, 메시지를 전달할 때 상대 이미지와 프로필 사진을 같이 전달해 줘야 함.
         ChatRoom chatRoom = roomRepository.findByUser(requester, acceptor)
-                        .orElseGet( () -> {
-                            ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
-                            // 채팅방 개설 메시지 생성
-                            notificationRepository.save(Notification.createOf(c, acceptor)); // 알림 작성 및 전달
-                            messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
-                                    MessageResponseDto.createFrom(
-                                            messageRepository.save(ChatMessage.createInitOf(c.getId()))
-                                    )
-                            );
-                            return c;
-                        });
+                .orElseGet( () -> {
+                    ChatRoom c = roomRepository.save(ChatRoom.createOf(requester, acceptor));
+                    // 채팅방 개설 메시지 생성
+                    notificationRepository.save(Notification.createOf(c, acceptor)); // 알림 작성 및 전달
+                    messagingTemplate.convertAndSend("/sub/notification/" + acceptorId,
+                            MessageResponseDto.createFrom(
+                                    messageRepository.save(ChatMessage.createInitOf(c.getId()))
+                            )
+                    );
+                    return c;
+                });
         chatRoom.enter(); // 채팅방에 들어간 상태로 변경 -> 람다를 사용해 일괄처리할 방법이 있는지 연구해 보도록 합니다.
+
         return chatRoom.getId();
     }
 
@@ -125,7 +122,7 @@ public class ChatRoomService {
                 .orElseThrow(() -> new CustomException(NOT_FOUND_CHAT)
                 );
         String flag;
-        if ( chatRoom.getAcceptor().getId() == userDetails.getUserId() ){ flag = ACCEPTOR; }
+        if ( chatRoom.getAcceptor().getId().equals(userDetails.getUserId()) ){ flag = ACCEPTOR; }
         else { flag = REQUESTER; }
 
         chatRoom.fixedRoom(flag);
@@ -138,14 +135,14 @@ public class ChatRoomService {
 
         for (RoomDto dto : roomDtos) {
             // 해당 방의 유저가 나가지 않았을 경우에는 배열에 포함해 줍니다.
-            if ( dto.getAccId() == userId ) {
+            if ( dto.getAccId().equals(userId) ) {
                 if (!dto.getAccOut()) { // 만약 Acc(내)가 나가지 않았다면
                     int unreadCnt = messageRepository.countMsg(dto.getReqId(), dto.getRoomId());
                     Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());
                     if (dto.getAccFixed()){ prefix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                     else { suffix.add(RoomResponseDto.createOf(ACCEPTOR, dto, unreadCnt, isBanned)); }
                 }
-            } else if ( dto.getReqId() == userId ){
+            } else if ( dto.getReqId().equals(userId) ){
                 if (!dto.getReqOut()) { // 만약 Req(내)가 나가지 않았다면
                     int unreadCnt = messageRepository.countMsg(dto.getAccId(), dto.getRoomId());
                     Boolean isBanned = bannedRepository.existsBy(dto.getAccId(), dto.getReqId());

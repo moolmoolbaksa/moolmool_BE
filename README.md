@@ -1,4 +1,4 @@
-# moolmool_BE
+# moolmool_FE
 # 실전프로젝트
 
 ### 📅 2022.04.12~
@@ -7,10 +7,10 @@
 
 |  이름  |  포지션  |
 | :----: | :-----: |
-|**Front End**|[**GitHub**](https://github.com/moolmoolbaksa/moolmool_FE)|
+|**Front End**|[**GitHub**](https://github.com/CloneCoding-team1-6/FE)|
 |[⭐강동현](https://github.com/rriverr)|<img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=React&logoColor=white"/>|
 |[김진현](https://github.com/wlsgus93)|<img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=React&logoColor=white"/>|
-|**BacK End**|[**GitHub**](https://github.com/moolmoolbaksa/moolmool_BE)|
+|**BacK End**|[**GitHub**](https://github.com/CloneCoding-team1-6/BE)|
 | [⭐황석준](https://github.com/hwangseokjun)|<img src="https://img.shields.io/badge/Springboot-6DB33F?style=flat-square&logo=Springboot&logoColor=white"/>|
 | [이승재](https://github.com/bonoo1)|<img src="https://img.shields.io/badge/Springboot-6DB33F?style=flat-square&logo=Springboot&logoColor=white"/>|
 | [엄성훈](https://github.com/cbjjzzang)|<img src="https://img.shields.io/badge/Springboot-6DB33F?style=flat-square&logo=Springboot&logoColor=white"/>|
@@ -18,20 +18,23 @@
 ## 👩‍🎓 서비스 소개
 [물물박사 바로가기](https://moolmooldoctor.firebaseapp.com)
 
-[서비스 시연영상]()
-
-[발표 영상]()
+[발표 영상](https://youtu.be/0ctyjB97S3o)
 
 ## 📆 프로젝트 기간
 2022/04/22 ~ 2022/06/03
 배포 2022/05/24
 
 ## ⚙ 주요 기능
-**`보따리(인벤토리) 기반의 사용별 교환상품 등록`**
+**`보따리(인벤토리) 기반의 사용자별 교환상품 등록`**
 
 **`교환상품의 6가지 교환 상태 변화 컨트롤`**
 
 **`교환상품의 일대다 거래`**
+
+**`웹소켓 기반의 실시간 채팅과 알림 기능`**
+
+**`차단과 신고, 욕설 필터링 등의 회원 관리 기능`**
+
 
 ## 🗺 API 설계
 [API 설계 보러가기](https://www.notion.so/b308c025e9954cadb9fdc19d86bd411f?v=b6b1eb52cfe24793b97163d7b4825b07)

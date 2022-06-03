@@ -16,9 +16,12 @@ import com.sparta.mulmul.user.UserRepository;
 import com.sparta.mulmul.websocket.NotificationRepository;
 import com.sparta.mulmul.websocket.chatDto.NotificationType;
 import lombok.RequiredArgsConstructor;
+
+
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,43 +64,52 @@ public class ItemService {
         if (itemCnt >= 9) {
             return 0L;
         }
-        List<String> imgUrlList = itemRequestDto.getImgUrl();
-        List<String> favoredList = itemRequestDto.getFavored();
-        String imgUrl = String.join(",", imgUrlList);
-        String favored = String.join(",", favoredList);
-        Optional<Item> existItem = itemRepository.findByTitleAndContents(itemRequestDto.getTitle(), itemRequestDto.getContents());
-        if (existItem.isPresent()) {
-            return 1L;
-        } else {
+        //카테고리값 비교
+        String category = itemRequestDto.getCategory();
+        if(category.equals("디지털기기") || category.equals("생활가전") || category.equals("가구/인테리어") || category.equals("유아동")
+            || category.equals("유아도서") || category.equals("생활/가공식품") || category.equals("스포츠/레저") || category.equals("여성잡화")
+            || category.equals("여성의류") || category.equals("남성패션/잡화") || category.equals("게임/취미") || category.equals("뷰티/미용")
+            || category.equals("반려동물용품") || category.equals("도서/티켓/음반") || category.equals("식물")){
+            List<String> imgUrlList = itemRequestDto.getImgUrl();
+            List<String> favoredList = itemRequestDto.getFavored();
+            String imgUrl = String.join(",", imgUrlList);
+            String favored = String.join(",", favoredList);
+                User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
+                        () -> new CustomException(NOT_FOUND_USER)
+                );
 
-            User user = userRepository.findById(userDetails.getUserId()).orElseThrow(
-                    () -> new CustomException(NOT_FOUND_USER)
-            );
+                // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +
+                bag.update(bag.getItemCnt() + 1);
+                String address;
+                if(user.getAddress().isEmpty()){
+                    address = "null";
+                }else{
+                    address = user.getAddress();
+                }
 
-            // 유저 아이디를 통해 보따리 정보를 가져오고 후에 아이템을 저장할때 보따리 정보 넣어주기 & 아이템 개수 +
-            bag.update(bag.getItemCnt() + 1);
+                Item item = Item.builder()
+                        .title(itemRequestDto.getTitle())
+                        .contents(itemRequestDto.getContents())
+                        .address(address)  //유저 정보에서 가져오기
+                        .category(itemRequestDto.getCategory())
+                        .scrabCnt(0)
+                        .commentCnt(0) // 사용할지 안할지 확정안됨
+                        .viewCnt(0)
+                        .reportCnt(0)
+                        .status(0)
+                        .itemImg(imgUrl)
+                        .type(itemRequestDto.getType())
+                        .favored(favored)
+                        .bag(bag)
+                        .build();
+
+                item = itemRepository.save(item);
+                return item.getId();
 
 
-            Item item = Item.builder()
-                    .title(itemRequestDto.getTitle())
-                    .contents(itemRequestDto.getContents())
-                    .address(user.getAddress())  //유저 정보에서 가져오기
-                    .category(itemRequestDto.getCategory())
-                    .scrabCnt(0)
-                    .commentCnt(0) // 사용할지 안할지 확정안됨
-                    .viewCnt(0)
-                    .reportCnt(0)
-                    .status(0)
-                    .itemImg(imgUrl)
-                    .type(itemRequestDto.getType())
-                    .favored(favored)
-                    .bag(bag)
-                    .build();
-
-            item = itemRepository.save(item);
-            return item.getId();
+        }else {
+            throw new CustomException(WRONG_CATEGORY);
         }
-
     }
 
     //이승재 / 전체 아이템 조회(카테고리별)
@@ -195,16 +207,31 @@ public class ItemService {
     //이승재 / 거리 계산
     private String getDistance(UserDetailsImpl userDetails, Item item) {
         String distance;
+
         if (userDetails == null) {
             distance = "null";
             return distance;
         } else {
+            String itemAddress;
+            if (item.getAddress().equals("null")) {
+                distance = "null";
+                return distance;
+            } else {
+                itemAddress = item.getAddress();
+            }
+            distance = caculateDistance(userDetails.getUserId(), itemAddress);
 
-            distance = caculateDistance(userDetails.getUserId(), item.getAddress());
+            if (userDetails == null) {
+                distance = "null";
+                return distance;
+            } else {
+
+                distance = caculateDistance(userDetails.getUserId(), item.getAddress());
+
+            }
+            return distance;
         }
-        return distance;
     }
-
     // 이승재 / 아이템 상세페이지
     @Transactional
     @Cacheable(cacheNames = "itemDetailInfo", key = "#userDetails.userId + '::' + #itemId")

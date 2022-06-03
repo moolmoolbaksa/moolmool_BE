@@ -24,7 +24,9 @@
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily -->
+
             <fileNamePattern>log\logback\logback-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <!-- or whenever the file size reaches 100MB -->
                 <maxFileSize>100MB</maxFileSize>
@@ -43,6 +45,7 @@
     <!-- Loggers -->
     <!-- <logger name="org.apache.catalina" level="ERROR">
     </logger>
+<<<<<<< HEAD
 
     <logger name="org.apache.commons" level="ERROR">
     </logger>
@@ -59,6 +62,18 @@
     <logger name="org.mybatis.spring" level="DEBUG">
     </logger>
 
+=======
+    <logger name="org.apache.commons" level="ERROR">
+    </logger>
+    <logger name="org.springframework" level="DEBUG" >
+    </logger>
+    <logger name="egovframework.*" level="DEBUG">
+    </logger>
+    <logger name="java.sql" level="DEBUG">
+    </logger>
+    <logger name="org.mybatis.spring" level="DEBUG">
+    </logger>
+>>>>>>> b7322c8badae43dddf285b6ecefaff6ba70eb8c4
     <logger name="egovframework.sqlmappers" level="TRACE">
     </logger> -->
 

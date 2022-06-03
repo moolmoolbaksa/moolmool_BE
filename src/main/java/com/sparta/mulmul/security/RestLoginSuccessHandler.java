@@ -14,6 +14,7 @@ import static com.sparta.mulmul.security.jwt.JwtTokenUtils.*;
 public class RestLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     public static final String AUTH_HEADER = "Authorization";
+    public static final String REFRESH_HEADER = "Refresh";
     public static final String TOKEN_TYPE = "BEARER";
 
     @Override
@@ -23,7 +24,7 @@ public class RestLoginSuccessHandler extends SavedRequestAwareAuthenticationSucc
         final UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         // Token 생성
-        final String token = generateJwtToken(userDetails);
+        final String token = generateAccessToken(userDetails);
         response.addHeader(AUTH_HEADER, TOKEN_TYPE + " " + token);
         response.setContentType("application/json;charset=utf-8");
 
