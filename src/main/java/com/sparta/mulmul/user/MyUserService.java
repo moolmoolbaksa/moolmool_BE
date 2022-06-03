@@ -102,6 +102,7 @@ public class MyUserService {
         List<ItemUserResponseDto> myItemList = new ArrayList<>();
 
         for (ItemUserResponseDto eachItem : ItemList) {
+
             ItemUserResponseDto Item = new ItemUserResponseDto(
                     eachItem.getItemId(),
                     eachItem.getImage().split(",")[0],

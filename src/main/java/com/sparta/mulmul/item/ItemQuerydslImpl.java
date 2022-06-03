@@ -35,7 +35,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
     public Page<Item> findAllItemOrderByCreatedAtDesc(Pageable pageable) {
         List<Item> results = queryFactory
                 .selectFrom(item)
-                .where(item.status.eq(0).or(item.status.eq(1)))
+                .where(item.status.between(0,1))
                 .orderBy(item.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -43,7 +43,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
 
         List<Item> total = queryFactory
                 .selectFrom(item)
-                .where(item.status.eq(0).or(item.status.eq(1)))
+                .where(item.status.between(0,1))
                 .fetch();
 
         return new PageImpl<>(results, pageable, total.size());
@@ -53,7 +53,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
     public Page<Item> findAllItemByCategoryOrderByCreatedAtDesc(String category, Pageable pageable) {
         List<Item> results = queryFactory
                 .selectFrom(item)
-                .where(item.status.eq(0).or(item.status.eq(1)).and(item.category.eq(category)))
+                .where(item.status.between(0,1).and(item.category.eq(category)))
                 .orderBy(item.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -61,7 +61,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
 
         List<Item> total = queryFactory
                 .selectFrom(item)
-                .where(item.status.eq(0).or(item.status.eq(1)).and(item.category.eq(category)))
+                .where(item.status.between(0,1).and(item.category.eq(category)))
                 .fetch();
 
         return new PageImpl<>(results, pageable, total.size());
@@ -83,7 +83,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
     public List<Item> findAllItemByBagId(Long bagId){
         return queryFactory
                 .selectFrom(item)
-                .where(item.status.eq(0).or(item.status.eq(1)).or(item.status.eq(2)).and(item.bag.id.eq(bagId)))
+                .where(item.status.between(0,2).and(item.bag.id.eq(bagId)))
                 .orderBy(item.id.desc())
                 .fetch();
     }
@@ -119,7 +119,7 @@ public class ItemQuerydslImpl implements ItemQuerydsl {
                 .join(scrab1).on(scrab1.itemId.eq(item.id))
                 .fetchJoin()
                 .distinct()
-                .where(scrab1.userId.eq(userId), scrab1.scrab.eq(true))
+                .where(scrab1.userId.eq(userId), scrab1.scrab.eq(true), item.status.between(0,2))
                 .orderBy(scrab1.modifiedAt.desc())
                 .limit(3)
                 .fetch();
